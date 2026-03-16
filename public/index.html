@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Be a Scientist — E.S.C. Behavior Intervention Tool</title>
+<style>
+  :root {
+    --purple:#5B21B6; --purple-light:#EDE9FE; --purple-mid:#7C3AED; --purple-dark:#3B0764;
+    --green-light:#DCFCE7; --green-mid:#16A34A;
+    --blue-light:#DBEAFE; --blue-mid:#1D4ED8;
+    --amber-light:#FEF3C7; --amber-mid:#D97706;
+    --red-light:#FEE2E2; --red-mid:#DC2626;
+    --gray-50:#F9FAFB; --gray-100:#F3F4F6; --gray-200:#E5E7EB;
+    --gray-300:#D1D5DB; --gray-400:#9CA3AF; --gray-500:#6B7280;
+    --gray-600:#4B5563; --gray-700:#374151; --gray-800:#1F2937; --gray-900:#111827;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#F8F7FF;color:var(--gray-800);min-height:100vh}
+
+  .header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 100%);color:white;padding:2rem 1rem 1.5rem;text-align:center}
+  .header-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+  .header h1{font-size:28px;font-weight:800;margin-bottom:6px;letter-spacing:-.5px}
+  .header p{font-size:14px;opacity:.85;max-width:520px;margin:0 auto;line-height:1.6}
+
+  .rule-bar{background:white;border-bottom:1px solid var(--gray-200);padding:10px 1rem;display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center}
+  .rule{font-size:12px;color:var(--gray-500)}
+  .rule strong{color:var(--gray-700)}
+
+  .progress-wrap{background:white;border-bottom:1px solid var(--gray-200);padding:12px 1rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  .step-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;justify-content:center}
+  .step{display:flex;align-items:center;gap:4px;font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--gray-300);color:var(--gray-500);background:white;font-weight:500}
+  .step.active{background:var(--purple-light);color:var(--purple);border-color:var(--purple)}
+  .step.done{background:var(--green-light);color:var(--green-mid);border-color:var(--green-mid)}
+  .step-num{width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+  .pbar-track{height:4px;background:var(--gray-200);border-radius:2px}
+  .pbar-fill{height:100%;background:var(--purple);border-radius:2px;transition:width .4s ease}
+  .pbar-label{text-align:center;font-size:11px;color:var(--gray-500);margin-top:4px}
+
+  .main{max-width:740px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+  .card{background:white;border:1px solid var(--gray-200);border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+  .card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--gray-100)}
+  .sec-badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;flex-shrink:0;white-space:nowrap;letter-spacing:.02em}
+  .card-title{font-size:16px;font-weight:700;color:var(--gray-800)}
+  .card-focus{font-size:12px;color:var(--gray-500);margin-top:3px;line-height:1.5}
+
+  .q{margin-bottom:1.25rem}
+  .q label{display:block;font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:5px}
+  .hint{font-size:12px;color:var(--gray-500);margin-bottom:7px;font-style:italic;line-height:1.5}
+  textarea,input[type=text],select{width:100%;font-family:inherit;font-size:14px;color:var(--gray-800);background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 12px;resize:vertical;transition:border-color .15s}
+  textarea{min-height:80px}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,33,182,.1)}
+
+  .chip-group{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--gray-200);font-size:13px;cursor:pointer;background:var(--gray-50);color:var(--gray-600);transition:all .15s;user-select:none;font-weight:500}
+  .chip:hover{border-color:var(--purple);color:var(--purple)}
+  .chip.sel{background:var(--purple-light);color:var(--purple);border-color:var(--purple);font-weight:600}
+
+  .obs-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:240px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:8px;padding:8px;background:var(--gray-50)}
+  .obs-chip{padding:5px 10px;border-radius:6px;border:1px solid var(--gray-200);font-size:12px;cursor:pointer;background:white;color:var(--gray-600);transition:all .15s;user-select:none;line-height:1.4}
+  .obs-chip:hover{border-color:var(--purple);color:var(--purple)}
+  .obs-chip.sel{background:var(--purple-light);color:var(--purple);border-color:var(--purple);font-weight:600}
+
+  .bucket-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .bucket-card{border:2px solid var(--gray-200);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;background:white}
+  .bucket-card:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .bucket-card.sel{box-shadow:0 2px 12px rgba(0,0,0,.1)}
+  .bucket-title{font-size:14px;font-weight:700;margin-bottom:4px}
+  .bucket-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
+
+  .insight-box{background:var(--blue-light);border-left:4px solid var(--blue-mid);border-radius:0 8px 8px 0;padding:12px 14px;margin-top:1rem;display:none}
+  .insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-mid);margin-bottom:5px}
+  .insight-text{font-size:13px;color:var(--gray-700);line-height:1.65}
+
+  .btn-row{display:flex;gap:10px;align-items:center;margin-top:1.5rem;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;border:2px solid var(--gray-200);background:white;color:var(--gray-700)}
+  .btn:hover{background:var(--gray-50);border-color:var(--gray-300)}
+  .btn-primary{background:var(--purple);color:white;border-color:var(--purple)}
+  .btn-primary:hover{background:var(--purple-mid);border-color:var(--purple-mid)}
+  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
+  .btn-outline{background:white;color:var(--purple);border-color:var(--purple)}
+  .btn-outline:hover{background:var(--purple-light)}
+
+  .dots{display:inline-flex;gap:3px;align-items:center}
+  .dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:bop 1.2s infinite}
+  .dot:nth-child(2){animation-delay:.2s}
+  .dot:nth-child(3){animation-delay:.4s}
+  @keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+  .hidden{display:none!important}
+
+  /* Results */
+  #results{display:none}
+  .r-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 100%);color:white;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem}
+  .r-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.75;margin-bottom:8px}
+  .r-title{font-size:22px;font-weight:800;margin-bottom:12px}
+  .tags{margin-bottom:10px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-right:5px;margin-bottom:5px}
+  .tag-high{background:#FEE2E2;color:#991B1B}
+  .tag-moderate{background:var(--amber-light);color:#92400E}
+  .tag-low{background:var(--green-light);color:#14532D}
+  .tag-info{background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)}
+  .r-summary{font-size:14px;opacity:.9;line-height:1.7}
+
+  .trauma-banner{background:#FEF3C7;border:1.5px solid #D97706;border-radius:10px;padding:12px 14px;margin-bottom:1rem}
+  .trauma-banner-title{font-size:12px;font-weight:700;color:#92400E;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+  .trauma-banner-body{font-size:13px;color:#78350F;line-height:1.6}
+
+  .window-banner{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:10px;padding:12px 14px;margin-bottom:1.25rem}
+  .window-banner-title{font-size:11px;font-weight:700;color:var(--purple);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+  .window-banner-body{font-size:13px;color:var(--purple-dark);line-height:1.6}
+
+  .bucket-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+  .bucket-pill{padding:12px;border-radius:10px}
+  .bucket-pill-title{font-size:13px;font-weight:700;margin-bottom:3px}
+  .bucket-pill-body{font-size:12px;opacity:.85;line-height:1.5}
+
+  .rcard{background:white;border:1px solid var(--gray-200);border-radius:14px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .rcard-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray-100)}
+  .rcard-body{font-size:13px;color:var(--gray-600);line-height:1.7}
+
+  .int-item{padding:12px 0;border-bottom:1px solid var(--gray-100)}
+  .int-item:last-child{border-bottom:none}
+  .int-name{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
+  .int-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+  .int-bucket-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px}
+  .int-link{font-size:12px;color:var(--blue-mid);text-decoration:none;font-weight:600}
+  .int-link:hover{text-decoration:underline}
+  .int-why{font-size:13px;color:var(--gray-600);margin-bottom:5px;line-height:1.5}
+  .int-moves{font-size:12px;color:var(--gray-600);line-height:1.6;background:var(--gray-50);border-radius:6px;padding:8px 10px;border-left:3px solid var(--purple)}
+  .int-moves strong{color:var(--purple)}
+
+  .warning-card{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+  .warning-card-title{font-size:13px;font-weight:700;color:var(--red-mid);margin-bottom:6px}
+  .warning-card-body{font-size:13px;color:#7F1D1D;line-height:1.6}
+
+  .trial-card{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #86EFAC;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+  .trial-title{font-size:14px;font-weight:700;color:#14532D;margin-bottom:8px}
+  .trial-body{font-size:13px;color:#166534;line-height:1.7}
+
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+  .review-card{background:var(--blue-light);border:1.5px solid #93C5FD;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+  .review-title{font-size:13px;font-weight:700;color:var(--blue-mid);margin-bottom:5px}
+  .review-body{font-size:13px;color:#1E3A8A;line-height:1.6}
+
+  .action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--gray-200)}
+
+  .error-card{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+  .error-card p{font-size:14px;line-height:1.6}
+  .error-card p:first-child{font-weight:700;color:#991B1B;margin-bottom:4px}
+  .error-card p:last-child{color:#7F1D1D}
+
+  @media(max-width:600px){
+    .bucket-grid,.two-col,.bucket-row{grid-template-columns:1fr}
+    .obs-grid{grid-template-columns:1fr}
+    .header h1{font-size:22px}
+    .step{font-size:10px;padding:3px 7px}
+  }
+  @media print{
+    .progress-wrap,.btn-row,.action-row,.header,.rule-bar{display:none}
+    .card,.rcard,.trial-card,.review-card,.warning-card,.trauma-banner,.window-banner{box-shadow:none;border:1px solid #ddd;break-inside:avoid}
+    body{background:white}
+    #form{display:none!important}
+    #results{display:block!important}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">E.S.C. Educational Engagement Coaching</div>
+  <h1>Be a Scientist</h1>
+  <p>Narrow your focus to what you can observe. Complete all 6 steps to generate a personalized intervention grounded in your strategy library.</p>
+</div>
+
+<div class="rule-bar">
+  <div class="rule"><strong>Observable, not a judgement</strong> · Head down · Calling out · Out of seat</div>
+  <div class="rule"><strong>Look for patterns</strong> · Frequency · Time · Task · Setting</div>
+  <div class="rule"><strong>Work WITH, not TO or FOR</strong> · Social Discipline Window</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="step-row" id="stepRow"></div>
+  <div class="pbar-track"><div class="pbar-fill" id="pbar" style="width:0%"></div></div>
+  <div class="pbar-label" id="pbarLabel">Step 1 of 6 — What is happening?</div>
+</div>
+
+<div class="main">
+  <div id="form"></div>
+  <div id="results"></div>
+</div>
+
+<script>
+const BASE="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/";
+
+const OBS=["Late or early to class","Frequently absent","Bangs on desk in frustration","Having side conversations","Rough play","Off task","Out of seat","Stealing/Theft","Upset/Crying","Isolated play","Picked last in games/activities","Refuses to work with peers","Inappropriate language or tone","Name calling","Does not maintain eye contact","Complaints of boredom","Head down","Hood up","Repetitive behaviors","Cheating","Frequent bathroom breaks/trips to nurse","Negative self-talk","Messy desk / materials","Texting / Off task with technology","Unprepared for class","Always first or last to turn in work","Picking nails or skin","Tapping / Fidgeting","Blames others","Argues with others","Expresses instant remorse","Does not complete work","Does not turn in work","Excessively asks for help/reassurance","Refuses help when offered","Gives frequent excuses","Yells or screams","Makes noises","Interrupts others","Stands too close to others","Calls out","Touches others/Doesn't keep hands to self"];
+
+const FIGHT=new Set(["Bangs on desk in frustration","Having side conversations","Rough play","Inappropriate language or tone","Name calling","Blames others","Argues with others","Yells or screams","Interrupts others","Calls out","Touches others/Doesn't keep hands to self","Stealing/Theft"]);
+const FLIGHT=new Set(["Late or early to class","Frequently absent","Off task","Out of seat","Head down","Hood up","Frequent bathroom breaks/trips to nurse","Texting / Off task with technology","Refuses to work with peers","Isolated play","Cheating"]);
+const FREEZE=new Set(["Does not complete work","Does not turn in work","Does not maintain eye contact","Repetitive behaviors","Tapping / Fidgeting","Complaints of boredom","Negative self-talk","Picking nails or skin","Makes noises","Upset/Crying"]);
+const FAWN=new Set(["Excessively asks for help/reassurance","Gives frequent excuses","Expresses instant remorse","Refuses help when offered","Unprepared for class"]);
+
+const BUCKETS=[
+  {id:"connection",label:"Connection",desc:"Relationship to self, others, the work",bg:"#EDE9FE",text:"#5B21B6",border:"#7C3AED"},
+  {id:"awareness",label:"Awareness",desc:"Recognition that the behavior is happening",bg:"#DCFCE7",text:"#14532D",border:"#16A34A"},
+  {id:"skills",label:"Skills",desc:"Specific social, behavioral, academic training",bg:"#DBEAFE",text:"#1E3A8A",border:"#1D4ED8"},
+  {id:"regulation",label:"Regulation",desc:"Identify and cope with feelings",bg:"#FEF3C7",text:"#78350F",border:"#D97706"}
+];
+
+const SECTIONS=[
+  {id:"what",num:"#1",label:"WHAT",title:"What is happening (or not happening)?",focus:"Focus on the concrete action you can see. Must be observable — not a judgement.",bg:"#DBEAFE",text:"#1E3A8A",
+   questions:[
+    {id:"observables",label:"Select all observable behaviors you notice",hint:"From the Common Observables list — pick everything that applies.",type:"obs"},
+    {id:"describe",label:"Describe exactly what you see or hear",hint:'Specific and observable only. e.g. "Head down every math class during group work."',type:"textarea"},
+    {id:"not_happening",label:"Is there anything NOT happening that concerns you?",hint:'e.g. "Not completing any written work" or "Not engaging with peers at all."',type:"textarea"}
+  ]},
+  {id:"when",num:"#2",label:"WHEN",title:"When is it happening?",focus:"Focus on frequency, time of day, type of task, subject area. Look for patterns.",bg:"#DCFCE7",text:"#14532D",
+   questions:[
+    {id:"frequency",label:"How often does this occur?",type:"chips",options:["First time","A few times this week","Daily","Multiple times per day","Almost every class"]},
+    {id:"time_of_day",label:"What time of day?",type:"chips",options:["Morning arrival","Early class","Mid-morning","Lunch / unstructured","Afternoon class","End of day","During transitions","Throughout the day"]},
+    {id:"task_type",label:"During what type of task or activity?",type:"chips",options:["Independent work","Whole group lesson","Small group","Partner work","Transitions","Unstructured / free time","Test or assessment","Any / all tasks"]},
+    {id:"pattern",label:"Any patterns you've noticed?",hint:'e.g. "Every Monday" · "After lunch" · "When a sub is in" · "Before a test"',type:"textarea"}
+  ]},
+  {id:"who",num:"#3",label:"WHO",title:"Who is involved?",focus:"Focus on the relationship between the parties. Look at dynamics.",bg:"#EDE9FE",text:"#5B21B6",
+   questions:[
+    {id:"grade",label:"What grade is this student in?",type:"select",options:["Pre-K / Kindergarten","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12"]},
+    {id:"others",label:"Who is present when the behavior occurs?",type:"chips",options:["Specific peer(s)","Whole class","Teacher / me","Teaching assistant","Admin / other staff","Happens when alone","Across all settings"]},
+    {id:"dynamics",label:"Describe the dynamics",hint:'e.g. "Calls out only when teacher is talking" · "Out of seat to visit friends"',type:"textarea"},
+    {id:"whats_worked",label:"What have you already tried? What worked, even a little?",type:"textarea"}
+  ]},
+  {id:"where",num:"#4",label:"WHERE",title:"Where is it happening?",focus:"Focus on the specific location the observable is happening. Look at location.",bg:"#FEE2E2",text:"#991B1B",
+   questions:[
+    {id:"location",label:"Where does this behavior occur?",type:"chips",options:["Specific classroom","Hallway","Cafeteria","Playground","Gym","Nurse's office","Transportation / bus","On school grounds","Outside of school","Multiple / all locations"]},
+    {id:"location_detail",label:"Describe the environment at that location",hint:"Noise level, class size, seating arrangement, structure level.",type:"textarea"},
+    {id:"safe_location",label:"Is there a location where this behavior does NOT occur?",hint:"This reveals protective environmental factors worth replicating.",type:"textarea"}
+  ]},
+  {id:"why",num:"#5",label:"WHY",title:"Why is it happening?",focus:"Focus on what the student may need. Determine the intervention bucket.",bg:"#F3F4F6",text:"#374151",
+   questions:[
+    {id:"buckets",label:"Which intervention bucket(s) does this most likely fall into?",hint:"Connection · Awareness · Skills · Regulation — select all that apply.",type:"buckets"},
+    {id:"student_need",label:"What do you think this student needs most right now?",hint:"Relationship to self/others, recognition of behavior, lagging skills, or emotional regulation.",type:"textarea"},
+    {id:"context",label:"Any relevant student context? (optional)",hint:"Learning needs, recent events, known diagnoses — only what's appropriate to share.",type:"textarea"}
+  ]},
+  {id:"how",num:"#6",label:"HOW",title:"How will we specifically meet this student's needs?",focus:"Focus on all variables. Put it all together: Student · Teacher · Environment.",bg:"#DCFCE7",text:"#14532D",
+   questions:[
+    {id:"teacher_fit",label:"What approaches feel manageable for you as the educator right now?",hint:"The best intervention is one you can implement consistently. Be honest about capacity.",type:"textarea"},
+    {id:"env_constraints",label:"Environmental constraints or opportunities?",hint:'e.g. "No TA available" · "Can rearrange seating" · "Student responds to movement"',type:"textarea"},
+    {id:"goal",label:"What does success look like in 2 weeks?",hint:"Describe the specific observable change you hope to see.",type:"textarea"}
+  ]}
+];
+
+let current=0,data={},insights={},done=new Set();
+
+function detectTrauma(obs){
+  let f=0,fl=0,fr=0,fw=0;
+  obs.forEach(o=>{if(FIGHT.has(o))f++;if(FLIGHT.has(o))fl++;if(FREEZE.has(o))fr++;if(FAWN.has(o))fw++;});
+  const mx=Math.max(f,fl,fr,fw);
+  if(mx===0)return null;
+  if(f===mx)return{type:"Fight",desc:"The student may be engaging with a perceived threat — aggression, arguing, defiance, or outbursts. Avoid power struggles. Use calm neutral tone and relational discipline moves."};
+  if(fl===mx)return{type:"Flight",desc:"The student may be trying to escape the perceived threat — avoidance, withdrawal, leaving tasks. Provide safe, predictable options and increase connection before demanding compliance."};
+  if(fr===mx)return{type:"Freeze",desc:"The student may be shutting down in response to overwhelm — numb, still, unable to respond. Reduce demands first. Use gentle check-ins and breathing before expecting engagement."};
+  return{type:"Fawn",desc:"The student may be appeasing to avoid conflict — over-compliance, excessive remorse, people pleasing. Build authentic relationship. Validate genuine effort and help student find their voice."};
+}
+
+async function callAPI(messages){
+  const res=await fetch('/api/chat',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages})
+  });
+  const j=await res.json();
+  if(!res.ok)throw new Error(j.error||'Server error');
+  return j.content?.[0]?.text||'';
+}
+
+function render(){
+  document.getElementById('form').innerHTML='';
+  SECTIONS.forEach((s,i)=>{
+    const div=document.createElement('div');
+    div.id='sec_'+s.id;
+    div.className='card'+(i!==current&&!done.has(s.id)?' hidden':'');
+    div.innerHTML=buildSec(s,i);
+    document.getElementById('form').appendChild(div);
+    initSec(s);
+  });
+  updateSteps();showCurrent();
+}
+
+function buildSec(s,idx){
+  let h=`<div class="card-header">
+    <div class="sec-badge" style="background:${s.bg};color:${s.text}">${s.num}: ${s.label}</div>
+    <div><div class="card-title">${s.title}</div><div class="card-focus">${s.focus}</div></div>
+  </div>`;
+  s.questions.forEach(q=>{
+    h+=`<div class="q"><label>${q.label}</label>`;
+    if(q.hint)h+=`<div class="hint">${q.hint}</div>`;
+    if(q.type==='textarea')h+=`<textarea id="q_${q.id}" placeholder="Type your response here..."></textarea>`;
+    else if(q.type==='select'){
+      h+=`<select id="q_${q.id}"><option value="">Select grade level...</option>`;
+      q.options.forEach(o=>h+=`<option value="${o}">${o}</option>`);
+      h+=`</select>`;
+    }else if(q.type==='chips'){
+      h+=`<div class="chip-group" id="c_${q.id}">`;
+      q.options.forEach(o=>h+=`<div class="chip" data-v="${o}">${o}</div>`);
+      h+=`</div>`;
+    }else if(q.type==='obs'){
+      h+=`<div class="obs-grid" id="c_${q.id}">`;
+      OBS.forEach(o=>h+=`<div class="obs-chip" data-v="${o}">${o}</div>`);
+      h+=`</div>`;
+    }else if(q.type==='buckets'){
+      h+=`<div class="bucket-grid" id="c_${q.id}">`;
+      BUCKETS.forEach(b=>h+=`<div class="bucket-card" data-v="${b.id}" data-bg="${b.bg}" data-border="${b.border}" data-text="${b.text}">
+        <div class="bucket-title" style="color:${b.text}">${b.label}</div>
+        <div class="bucket-desc">${b.desc}</div>
+      </div>`);
+      h+=`</div>`;
+    }
+    h+=`</div>`;
+  });
+  h+=`<div class="insight-box" id="ins_${s.id}"><div class="insight-label">AI coaching note</div><p class="insight-text" id="ins_t_${s.id}"></p></div>`;
+  const isLast=idx===SECTIONS.length-1;
+  h+=`<div class="btn-row"><button class="btn btn-primary" id="btn_${s.id}" onclick="submit('${s.id}',${isLast})">
+    ${isLast?'Generate My Intervention Plan':'Analyze &amp; Continue ›'}
+    <span class="dots hidden" id="d_${s.id}"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
+  </button></div>`;
+  return h;
+}
+
+function initSec(s){
+  s.questions.forEach(q=>{
+    if(q.type==='chips'||q.type==='obs'){
+      const c=document.getElementById('c_'+q.id);if(!c)return;
+      const cls=q.type==='obs'?'obs-chip':'chip';
+      c.querySelectorAll('.'+cls).forEach(el=>el.addEventListener('click',()=>el.classList.toggle('sel')));
+    }else if(q.type==='buckets'){
+      const c=document.getElementById('c_'+q.id);if(!c)return;
+      c.querySelectorAll('.bucket-card').forEach(el=>el.addEventListener('click',()=>{
+        const on=el.classList.toggle('sel');
+        el.style.background=on?el.dataset.bg:'';
+        el.style.borderColor=on?el.dataset.border:'';
+      }));
+    }
+  });
+}
+
+function getVal(id){const e=document.getElementById('q_'+id);return e?e.value.trim():'';}
+function getChips(id){const c=document.getElementById('c_'+id);if(!c)return[];return[...c.querySelectorAll('.chip.sel,.obs-chip.sel')].map(e=>e.dataset.v);}
+function getBuckets(id){const c=document.getElementById('c_'+id);if(!c)return[];return[...c.querySelectorAll('.bucket-card.sel')].map(e=>e.dataset.v);}
+
+function collect(sid){
+  const s=SECTIONS.find(x=>x.id===sid),d={};
+  s.questions.forEach(q=>{
+    if(q.type==='chips'||q.type==='obs')d[q.id]=getChips(q.id);
+    else if(q.type==='buckets')d[q.id]=getBuckets(q.id);
+    else d[q.id]=getVal(q.id);
+  });
+  return d;
+}
+
+function sumSection(sid,d){
+  const s=SECTIONS.find(x=>x.id===sid);
+  return s.questions.map(q=>{const v=Array.isArray(d[q.id])?d[q.id].join(', '):d[q.id];return v?`${q.label}: ${v}`:''}).filter(Boolean).join('\n');
+}
+
+function fullSummary(){
+  return SECTIONS.map(s=>{const d=data[s.id];if(!d)return'';return`=== ${s.num} ${s.title} ===\n${sumSection(s.id,d)}`;}).join('\n\n');
+}
+
+function showCurrent(){
+  SECTIONS.forEach((s,i)=>{
+    const el=document.getElementById('sec_'+s.id);if(!el)return;
+    if(i===current){el.classList.remove('hidden');setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),100);}
+    else if(!done.has(s.id))el.classList.add('hidden');
+  });
+}
+
+function updateSteps(){
+  const labels=['What','When','Who','Where','Why','How'];
+  document.getElementById('stepRow').innerHTML=SECTIONS.map((s,i)=>{
+    let cls='step';
+    if(done.has(s.id))cls+=' done';
+    else if(i===current)cls+=' active';
+    return`<div class="${cls}"><span class="step-num">${done.has(s.id)?'✓':i+1}</span>${s.num} ${labels[i]}</div>`;
+  }).join('');
+  const pct=Math.round(done.size/SECTIONS.length*100);
+  document.getElementById('pbar').style.width=pct+'%';
+  const curr=SECTIONS[current];
+  document.getElementById('pbarLabel').textContent=done.size===SECTIONS.length?'All 6 steps complete — review your plan below':`Step ${current+1} of 6 — ${curr?curr.title:''}`;
+}
+
+async function submit(sid,isFinal){
+  const d=collect(sid);data[sid]=d;
+  const btn=document.getElementById('btn_'+sid),dots=document.getElementById('d_'+sid);
+  btn.disabled=true;dots.classList.remove('hidden');
+  const sum=sumSection(sid,d);
+  try{
+    if(!isFinal){
+      const sec=SECTIONS.find(s=>s.id===sid);
+      const txt=await callAPI([{role:'user',content:`You are a supportive E.S.C. Educational Engagement Coaching specialist using the "Be a Scientist" framework. The educator just completed step "${sec.num} ${sec.title}".
+
+Their responses:
+${sum}
+
+All data so far:
+${JSON.stringify(data)}
+
+Write a 2-3 sentence coaching note. Acknowledge what they shared, name one specific insight this step reveals (a pattern, dynamic, or environmental factor), and briefly note what the next step will clarify. Be warm, trauma-informed, and practical. Do NOT recommend interventions yet.`}]);
+      insights[sid]=txt;
+      document.getElementById('ins_t_'+sid).textContent=txt;
+      document.getElementById('ins_'+sid).style.display='block';
+      done.add(sid);current++;
+      await new Promise(r=>setTimeout(r,400));
+      btn.disabled=false;dots.classList.add('hidden');
+      updateSteps();showCurrent();
+    }else{
+      done.add(sid);updateSteps();
+      await buildPlan(btn,dots);
+    }
+  }catch(e){
+    btn.disabled=false;dots.classList.add('hidden');
+    showError(e.message);
+  }
+}
+
+async function buildPlan(btn,dots){
+  const observables=data.what?.observables||[];
+  const traumaR=detectTrauma(observables);
+
+  const KNOWLEDGE=`STRATEGY LIBRARY WITH IMPLEMENTATION DETAILS (E.S.C. Behavior Coaching):
+
+2x10 STRATEGY (Connection): 2 minutes of non-academic 1-on-1 conversation per day for 10 consecutive days. THE MOVES: Make the time. Make it individual. Make it personal — let them drive the topic. Make it separate — NOT about work or behavior. CONNECTION tweak: Choose a high-interest hobby and participate together. REGULATION tweak: Schedule right before or after the most challenging part of the day.
+
+CHECK IN / CHECK OUT (Connection): Pair student with an adult partner to connect about their day. THE MOVES: Use a profile/inventory to learn student interests first. Co-establish 3-5 target behaviors. Focus on listening — not compliance. Time it during natural transitions. Communicate updates to the full team and family. AWARENESS tweak: Use restorative questions. SKILLS tweak: Teach a specific skill to transfer back to class.
+
+BREAK CARD (Regulation/Awareness): Physical card giving both teacher AND student ability to initiate a break. THE MOVES: Have a conversation about purpose. Co-design the card with the student. Establish ground rules: Who initiates? How many times? Where do they go? Practice by role playing. Provide a menu of regulation strategies to use during the break. CONNECTION tweak: Student may bring a peer on the break.
+
+BREATHING TECHNIQUES (Regulation): Customized exercises to regulate the brain. THE MOVES: Introduce the why behind brain regulation. Trial variety: slow counting (7-11), belly breathing, tracing, Rapid Resets (Tense+Release, Alphabet Soup, Stop Sign, Escape Space, Hand to Heart). Implement: schedule before/during/after known challenge times. Reflect with student on what works.
+
+SELF-MONITORING (Awareness): Students monitor a specific target behavior. THE MOVES: Determine data-informed target behavior (calling out, out of area, fidgeting, etc.). Define in concrete observable terms. Schedule frequency — timed intervals or teacher cue. Format: checklist, post-it, app. Feedback: written comparison between teacher and student observations or conferencing.
+
+SECRET SIGNAL (Awareness/Skills): Co-created nonverbal signal to redirect without public shame. THE MOVES: Discuss purpose with student. Co-create a signal that works for BOTH. Make it discrete — only between adult and student. Make it two-way — student can also initiate to request a break. Systematize, practice, praise when used.
+
+RESPONSIBILITIES (Connection): Elevate student to a leadership role in school. THE MOVES: Conference to establish purpose and expectations. Frame as an honor. Work with student to select from options. Must NOT be used as punishment OR reward — it is sacred. Categories: Hospitality (greeter, tour guide), Service/Duty (clean-up, mail carrier, paper stocker), Role Model/Leadership (morning greeter, safety patrol, mentor, buddy). Schedule to coincide with the student's most challenging time of day.
+
+SPECIFIC SKILLS TRAINING (Skills): Explicit teaching of target social/behavioral skills. THE MOVES: Use multiple data sources to identify the target skill. Plan a schedule — one-and-done lessons won't work. Core Components: explicit instruction, modeling, role play, transference, continuous feedback. Use scenarios, social stories, or prosocial models. Capitalize on teachable moments for authentic transfer.
+
+RESET PLAN (Regulation): Three pre-planned options for student to responsively self-regulate. THE MOVES: Develop collaboratively: (1) from their seat, (2) in another section of the room, (3) outside the room. Give copy to every adult who works with the student. Practice via role play. Use AFTER a crisis — before reflection or repair conversations.
+
+CHECK-IN (Connection): Format to acknowledge student effort, growth, and appreciation. THE MOVES: Choose format (personalized notes, sticky notes, 1-on-1). Establish frequency and follow-up. Use effort-based and behavior-specific language — Gratitude Formula: Observation + Feeling + Need + Appreciation.
+
+MOOD METER (Awareness/Regulation): Build awareness of emotions. THE MOVES: Normalize all emotions as messengers. Introduce quadrants: Green (calm/happy), Blue (sad/tired), Yellow (anxious/nervous), Red (angry/frustrated). Practice at scheduled times. Link each area to a regulation strategy menu.
+
+AFFIRMATIONS (Connection/Regulation): Positive self-talk through mantras, totems, or mirrors. Mantras: routine, ritual, positive, verbal, catchy, affirming. Totems: small meaningful object student can hold to regulate. Mirrors: positive self-talk while looking at reflection — safe and process-oriented.
+
+GREETING AT THE DOOR (Connection): Name + Eye contact + Nonverbal + Positive notice. Research: increases engagement 20%, decreases disruptive behavior 9%. Each greeting is a Belonging Cue.
+
+ENVIRONMENTAL MODIFICATIONS (Skills/Regulation): Preferential/Strategic Seating, Advanced Warning of Transitions, Fidgets, Headphones, Visual Schedule, First/Then Statements, Simplifying/Jumpstarting Assignments, Nonverbal Redirection, Paired with Positive Peer, Visibly Random Grouping. SEATING: Rows=independent/testing; Clusters=collaboration; Pairs=connection; Circle/U=community. SIGNALS OF WELCOME AND CALM: Maximize muted blues/greens/purples, soft music, natural light. Minimize harsh noises, buzzing lights, bold busy patterns.
+
+RELATIONAL DISCIPLINE MOVES (Skills/Connection): Graduated sequence — (1) extended eye contact, (2) nonverbal cue, (3) short subtle verbal reminder, (4) whole-class reminder. Goal: stop behavior + express care + redirect. Work WITH not TO or FOR (Social Discipline Window — High Firm + High Fair = Relational).
+
+PRAISE (All buckets): Minimize Personal praise. Maximize Effort-Based and Behavior-Specific. Gratitude Formula: "When I see [observation], I feel [feeling] because [need met]. Thank you." 4 Ways to Elevate: Private. Specific. Effort and strategy. Authentic.
+
+COMMUNITY SYSTEMS (Connection/Skills): All For One (group earns together — Good Behavior Game, Compliment Chain), One For All (Secret/Mystery Student earns for class), To Each Their Own (First/Then — Classroom Economy, Premack Principle).
+
+COUNSELING / SAP (Connection/Skills): 1:1 counselor, small group (lunch bunch, problem-solving group), SAP referral, school-based services.
+
+SCHEDULE ADAPTATIONS (Regulation/Skills): PASS rotation, Assigned ACT, Supervised Transitions (Early/Delayed), Structured Transitions, Mobility Plan.
+
+CHILL-OUT OPTIONS (Regulation): At seat: breathing, fidget, headphones, music, journal, doodle, affirmation. In room: sensory corner, movement area, mood meter. Outside room: walk, gym, sensory path, mentor a younger student, run an errand, school job, trusted adult.
+
+TRAUMA LENS: Fight → avoid power struggles, use calm neutral tone, relational discipline. Flight → increase connection before demanding compliance, provide safe exits. Freeze → reduce demands first, gentle check-ins, breathing. Fawn → build authentic relationship, validate genuine effort, help student find voice. ALL → work WITH not TO or FOR.`;
+
+  try{
+    const response=await callAPI([{role:'user',content:`You are an E.S.C. Educational Engagement Coaching specialist. An educator has completed all 6 steps of the Be a Scientist process. Generate a comprehensive, personalized intervention plan using ONLY the strategies and language from the provided knowledge base.
+
+FULL OBSERVATION:
+${fullSummary()}
+
+COACHING NOTES FROM EACH STEP:
+${Object.entries(insights).map(([k,v])=>`${k}: ${v}`).join('\n')}
+
+TRAUMA RESPONSE DETECTED: ${traumaR?`${traumaR.type} — ${traumaR.desc}`:'No clear trauma response pattern from observables'}
+
+${KNOWLEDGE}
+
+CRITICAL: Work WITH the student — Social Discipline Window (High Firm + High Fair). The best intervention fits the STUDENT, the TEACHER, and the ENVIRONMENT. Use effort-based and behavior-specific praise language only. Reference 6-8 consecutive school weeks for implementation review.
+
+Respond ONLY with valid JSON (no markdown, no backticks):
+{
+  "scientist_summary": "2-3 sentence summary using Be a Scientist language — observable, pattern-focused, specific. Reference their actual observables.",
+  "trauma_type": "${traumaR?traumaR.type:'none'}",
+  "trauma_guidance": "${traumaR?traumaR.desc.replace(/"/g,"'"): ''}",
+  "social_discipline_note": "1 sentence on how to position this relationship — working WITH this student specifically",
+  "primary_bucket": "connection|awareness|skills|regulation",
+  "secondary_bucket": "connection|awareness|skills|regulation|none",
+  "bucket_rationale": "1-2 sentences explaining bucket choice tied to their specific observation data",
+  "priority": "low|moderate|high",
+  "tags": ["tag1","tag2","tag3"],
+  "try_first": [
+    {"name":"exact strategy name from library","bucket":"connection|awareness|skills|regulation","why":"1-2 sentence rationale tied to their data","the_moves":"2-4 specific implementation steps from the one-pager adapted to THIS student and THIS teacher capacity"},
+    {"name":"...","bucket":"...","why":"...","the_moves":"..."},
+    {"name":"...","bucket":"...","why":"...","the_moves":"..."}
+  ],
+  "also_consider": [
+    {"name":"exact strategy name","bucket":"...","why":"brief rationale"},
+    {"name":"exact strategy name","bucket":"...","why":"brief rationale"},
+    {"name":"exact strategy name","bucket":"...","why":"brief rationale"}
+  ],
+  "what_to_say": "A real usable script — 2-4 sentences the educator can say to this student tomorrow. Effort-based or behavior-specific language only. No personal praise.",
+  "what_not_to_do": "1-2 specific sentences on what to avoid with this student based on the data and trauma lens.",
+  "environment_fits": ["specific environmental adjustment tied to where/what data","specific adjustment 2","specific adjustment 3"],
+  "two_week_trial": "Concrete plan — Days 1-3 (start here), Days 4-7 (build on this), Days 8-14 (monitor and adjust). Specific to their context.",
+  "what_to_track": "Exactly what observable data to collect and what change would signal the intervention is working.",
+  "who_to_loop_in": ["specific person or role 1","specific person or role 2"],
+  "review_by": "Specific recommendation — reference 6-8 consecutive school weeks before determining effectiveness."
+}`}]);
+
+    let txt=response.replace(/```json|```/g,'').trim();
+    // handle potential leading/trailing chars
+    const start=txt.indexOf('{'),end=txt.lastIndexOf('}');
+    if(start>-1&&end>-1)txt=txt.slice(start,end+1);
+    const plan=JSON.parse(txt);
+    btn.disabled=false;dots.classList.add('hidden');
+    showResults(plan);
+  }catch(e){
+    btn.disabled=false;dots.classList.add('hidden');
+    showError(e.message);
+  }
+}
+
+function showError(msg){
+  document.getElementById('results').style.display='block';
+  document.getElementById('results').innerHTML=`<div class="error-card"><p>Something went wrong generating the plan.</p><p>${msg||'Please try again.'}</p><div class="btn-row" style="margin-top:1rem"><button class="btn btn-outline" onclick="startOver()">Start over</button></div></div>`;
+}
+
+function bColor(b){const m={connection:'#5B21B6',awareness:'#14532D',skills:'#1E3A8A',regulation:'#78350F'};return m[b]||'#374151';}
+function bBg(b){const m={connection:'#EDE9FE',awareness:'#DCFCE7',skills:'#DBEAFE',regulation:'#FEF3C7'};return m[b]||'#F3F4F6';}
+function slug(n){return n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
+
+function showResults(p){
+  const rs=document.getElementById('results');
+  rs.style.display='block';
+  document.getElementById('form').style.display='none';
+  setTimeout(()=>rs.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  const prTag=p.priority==='high'?'tag-high':p.priority==='moderate'?'tag-moderate':'tag-low';
+  let h=`<div class="r-header">
+    <div class="r-eyebrow">E.S.C. Be a Scientist — Put It All Together</div>
+    <div class="r-title">Behavior Intervention Plan</div>
+    <div class="tags"><span class="tag ${prTag}">${p.priority} priority</span>${(p.tags||[]).map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div>
+    <div class="r-summary">${p.scientist_summary}</div>
+  </div>`;
+  if(p.trauma_type&&p.trauma_type!=='none'&&p.trauma_guidance){
+    h+=`<div class="trauma-banner"><div class="trauma-banner-title">Trauma lens — ${p.trauma_type} response pattern detected</div><div class="trauma-banner-body">${p.trauma_guidance}</div></div>`;
+  }
+  if(p.social_discipline_note){
+    h+=`<div class="window-banner"><div class="window-banner-title">Social Discipline Window — Work WITH, not TO or FOR</div><div class="window-banner-body">${p.social_discipline_note}</div></div>`;
+  }
+  const buckets=[p.primary_bucket];
+  if(p.secondary_bucket&&p.secondary_bucket!=='none')buckets.push(p.secondary_bucket);
+  h+=`<div class="bucket-row">`;
+  buckets.forEach(b=>{h+=`<div class="bucket-pill" style="background:${bBg(b)};border:1.5px solid ${bColor(b)}40"><div class="bucket-pill-title" style="color:${bColor(b)}">${b.charAt(0).toUpperCase()+b.slice(1)} bucket</div><div class="bucket-pill-body" style="color:${bColor(b)}">${p.bucket_rationale}</div></div>`;});
+  h+=`</div>`;
+  h+=`<div class="rcard"><div class="rcard-title">Start with these strategies — from your E.S.C. library</div>`;
+  (p.try_first||[]).forEach(s=>{h+=`<div class="int-item"><div class="int-name">${s.name}</div><div class="int-meta"><span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span><a class="int-link" href="${BASE+slug(s.name)}" target="_blank">view one-pager ↗</a></div><div class="int-why">${s.why}</div>${s.the_moves?`<div class="int-moves"><strong>How to start with this student:</strong> ${s.the_moves}</div>`:''}</div>`;});
+  h+=`</div>`;
+  h+=`<div class="rcard"><div class="rcard-title">Also consider</div>`;
+  (p.also_consider||[]).forEach(s=>{h+=`<div class="int-item"><div class="int-name">${s.name}</div><div class="int-meta"><span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span><a class="int-link" href="${BASE+slug(s.name)}" target="_blank">view one-pager ↗</a></div><div class="int-why">${s.why}</div></div>`;});
+  h+=`</div>`;
+  h+=`<div class="rcard"><div class="rcard-title">What to say to this student</div><div class="rcard-body" style="font-style:italic;font-size:14px">"${p.what_to_say}"</div></div>`;
+  if(p.what_not_to_do){h+=`<div class="warning-card"><div class="warning-card-title">What NOT to do with this student</div><div class="warning-card-body">${p.what_not_to_do}</div></div>`;}
+  h+=`<div class="rcard"><div class="rcard-title">Environmental adjustments — fits the environment</div><ul style="padding-left:1.4rem">`;
+  (p.environment_fits||[]).forEach(t=>h+=`<li style="font-size:13px;color:#4B5563;margin-bottom:7px;line-height:1.6">${t}</li>`);
+  h+=`</ul></div>`;
+  h+=`<div class="trial-card"><div class="trial-title">2-Week Trial Plan — Start Here</div><div class="trial-body">${p.two_week_trial}</div></div>`;
+  h+=`<div class="two-col"><div class="rcard"><div class="rcard-title">What to track</div><div class="rcard-body">${p.what_to_track}</div></div><div class="rcard"><div class="rcard-title">Who to loop in</div><ul style="padding-left:1.4rem">${(p.who_to_loop_in||[]).map(x=>`<li style="font-size:13px;color:#4B5563;margin-bottom:5px">${x}</li>`).join('')}</ul></div></div>`;
+  h+=`<div class="review-card"><div class="review-title">Review by</div><div class="review-body">${p.review_by}</div></div>`;
+  h+=`<div class="action-row"><button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button><button class="btn btn-outline" onclick="startOver()">Start a New Observation</button></div>`;
+  rs.innerHTML=h;
+}
+
+function startOver(){
+  current=0;data={};insights={};done=new Set();
+  document.getElementById('results').style.display='none';
+  document.getElementById('form').style.display='block';
+  render();window.scrollTo({top:0,behavior:'smooth'});
+}
+
+render();
+</script>
+</body>
+</html>
