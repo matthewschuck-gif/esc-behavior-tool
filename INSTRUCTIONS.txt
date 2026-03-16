@@ -1,0 +1,74 @@
+================================================
+HOW TO UPDATE YOUR API KEY IN VERCEL
+================================================
+
+FINDING YOUR ENVIRONMENT VARIABLE IN VERCEL:
+---------------------------------------------
+1. Go to vercel.com and sign in
+2. Click on your project (esc-behavior-tool)
+3. Click the "Settings" tab at the top
+4. In the left sidebar, click "Environment Variables"
+5. You will see ANTHROPIC_API_KEY listed there
+6. Click the three dots (...) to the right of it → click "Edit"
+7. Delete the current value and paste your correct key
+8. Make sure the key starts with:  sk-ant-
+   (There should be NO spaces before or after the key)
+9. Click "Save"
+
+REDEPLOY AFTER CHANGING THE KEY:
+---------------------------------
+Changing the environment variable does NOT automatically update
+your live site. You must redeploy:
+1. Click the "Deployments" tab at the top
+2. Find the most recent deployment
+3. Click the three dots (...) to the right → click "Redeploy"
+4. Wait ~1 minute for it to finish
+5. Visit your site and try again
+
+WHERE TO GET YOUR API KEY:
+--------------------------
+1. Go to console.anthropic.com
+2. Sign in to your account
+3. Click "API Keys" in the left menu
+4. If you don't see your key (they only show once), click "Create Key"
+5. Copy the full key starting with sk-ant-
+6. Paste it into Vercel as described above
+
+WHAT THE ERROR MESSAGES MEAN:
+------------------------------
+"ANTHROPIC_API_KEY is not set"
+  → The variable name was typed wrong in Vercel, OR
+    you forgot to add it. Go back and add it.
+
+"ANTHROPIC_API_KEY looks incorrect"
+  → The key was pasted with extra spaces or characters.
+    Edit it in Vercel and make sure it starts with sk-ant-
+
+"authentication_error" or "invalid x-api-key"
+  → The key itself is wrong or was deleted from Anthropic.
+    Go to console.anthropic.com and create a new key.
+
+"Your credit balance is too low"
+  → Add credits at console.anthropic.com → Billing
+    $5 credit = ~150 full reports
+
+================================================
+UPLOADING THESE UPDATED FILES TO GITHUB
+================================================
+1. Go to github.com and open your esc-behavior-tool repository
+2. Click on the "api" folder
+3. Click "chat.js"
+4. Click the pencil (edit) icon in the top right
+5. Select all the text and DELETE it
+6. Open the chat.js file from this zip and copy its contents
+7. Paste it into GitHub
+8. Click "Commit changes" → "Commit changes" again
+9. Vercel will automatically redeploy within ~1 minute
+
+OR — easier — just drag and drop the new files:
+1. In your GitHub repo, click "Add file" → "Upload files"
+2. Drag in the new api/chat.js file
+3. Click "Commit changes"
+4. Vercel redeploys automatically
+
+================================================
