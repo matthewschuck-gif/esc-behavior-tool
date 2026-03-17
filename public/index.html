@@ -3,201 +3,315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Behavior Intervention Center — E.S.C. Ephrata Area School District</title>
+<title>Behavior Intervention Center</title>
 <style>
-  :root {
-    --purple:#5B21B6;--purple-light:#EDE9FE;--purple-mid:#7C3AED;--purple-dark:#3B0764;
-    --gold:#F59E0B;--gold-light:#FEF3C7;--gold-dark:#B45309;--gold-mid:#D97706;
-    --green-light:#DCFCE7;--green-mid:#16A34A;
-    --blue-light:#DBEAFE;--blue-mid:#1D4ED8;
-    --red-light:#FEE2E2;--red-mid:#DC2626;
-    --gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;
-    --gray-300:#D1D5DB;--gray-400:#9CA3AF;--gray-500:#6B7280;
-    --gray-600:#4B5563;--gray-700:#374151;--gray-800:#1F2937;--gray-900:#111827;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#F8F7FF;color:var(--gray-800);min-height:100vh}
-  .header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,#4C1D95 100%);color:white;padding:1.5rem 1rem 1.25rem;text-align:center}
-  .header-badge{display:inline-block;background:var(--gold);color:var(--purple-dark);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
-  .header h1{font-size:26px;font-weight:800;margin-bottom:4px;letter-spacing:-.5px}
-  .header h1 span{color:var(--gold)}
-  .header-sub{font-size:13px;opacity:.85;margin-bottom:12px}
-  .header-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-  .header-link{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all .15s}
-  .header-link:hover{background:rgba(255,255,255,.25);color:var(--gold)}
-  .header-link.gold{background:var(--gold);border-color:var(--gold);color:var(--purple-dark)}
-  .header-link.gold:hover{background:#FBBF24}
-  .nav-tabs{background:var(--purple-dark);display:flex;justify-content:center;border-bottom:3px solid var(--gold)}
-  .nav-tab{padding:10px 20px;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);cursor:pointer;border:none;background:transparent;transition:all .15s;border-bottom:3px solid transparent;margin-bottom:-3px}
-  .nav-tab:hover{color:white;background:rgba(255,255,255,.08)}
-  .nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(245,158,11,.1)}
-  .page{display:none}
-  .page.active{display:block}
-  .rule-bar{background:white;border-bottom:1px solid var(--gray-200);padding:8px 1rem;display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center}
-  .rule{font-size:12px;color:var(--gray-500)}
-  .rule strong{color:var(--gray-700)}
-  .progress-wrap{background:white;border-bottom:1px solid var(--gray-200);padding:10px 1rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-  .step-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;justify-content:center}
-  .step{display:flex;align-items:center;gap:4px;font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--gray-300);color:var(--gray-500);background:white;font-weight:500}
-  .step.active{background:var(--purple-light);color:var(--purple);border-color:var(--purple)}
-  .step.done{background:var(--green-light);color:var(--green-mid);border-color:var(--green-mid)}
-  .step-num{width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
-  .pbar-track{height:4px;background:var(--gray-200);border-radius:2px}
-  .pbar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--gold));border-radius:2px;transition:width .4s ease}
-  .pbar-label{text-align:center;font-size:11px;color:var(--gray-500);margin-top:3px}
-  .main{max-width:760px;margin:0 auto;padding:1.5rem 1rem 4rem}
-  .card{background:white;border:1px solid var(--gray-200);border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
-  .card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--gray-100)}
-  .sec-badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;flex-shrink:0;white-space:nowrap}
-  .card-title{font-size:16px;font-weight:700;color:var(--gray-800)}
-  .card-focus{font-size:12px;color:var(--gray-500);margin-top:3px;line-height:1.5}
-  .q{margin-bottom:1.25rem}
-  .q label{display:block;font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:5px}
-  .hint{font-size:12px;color:var(--gray-500);margin-bottom:7px;font-style:italic;line-height:1.5}
-  textarea,input[type=text],select{width:100%;font-family:inherit;font-size:14px;color:var(--gray-800);background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 12px;resize:vertical;transition:border-color .15s}
-  textarea{min-height:80px}
-  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,33,182,.1)}
-  .chip-group{display:flex;flex-wrap:wrap;gap:7px}
-  .chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--gray-200);font-size:13px;cursor:pointer;background:var(--gray-50);color:var(--gray-600);transition:all .15s;user-select:none;font-weight:500}
-  .chip:hover{border-color:var(--purple);color:var(--purple)}
-  .chip.sel{background:var(--purple-light);color:var(--purple);border-color:var(--purple);font-weight:600}
-  .obs-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:260px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:8px;padding:8px;background:var(--gray-50)}
-  .obs-chip{padding:5px 10px;border-radius:6px;border:1px solid var(--gray-200);font-size:12px;cursor:pointer;background:white;color:var(--gray-600);transition:all .15s;user-select:none;line-height:1.4}
-  .obs-chip:hover{border-color:var(--purple);color:var(--purple)}
-  .obs-chip.sel{background:var(--purple-light);color:var(--purple);border-color:var(--purple);font-weight:600}
-  .bucket-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .bucket-card{border:2px solid var(--gray-200);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;background:white}
-  .bucket-card:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(0,0,0,.06)}
-  .bucket-title{font-size:14px;font-weight:700;margin-bottom:4px}
-  .bucket-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
-  .insight-box{background:var(--blue-light);border-left:4px solid var(--blue-mid);border-radius:0 8px 8px 0;padding:12px 14px;margin-top:1rem;display:none}
-  .insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-mid);margin-bottom:5px}
-  .insight-text{font-size:13px;color:var(--gray-700);line-height:1.65}
-  .btn-row{display:flex;gap:10px;align-items:center;margin-top:1.5rem;flex-wrap:wrap}
-  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;border:2px solid var(--gray-200);background:white;color:var(--gray-700)}
-  .btn:hover{background:var(--gray-50)}
-  .btn-primary{background:var(--purple);color:white;border-color:var(--purple)}
-  .btn-primary:hover{background:var(--purple-mid)}
-  .btn-primary:disabled{opacity:.45;cursor:not-allowed}
-  .btn-gold{background:var(--gold);color:var(--purple-dark);border-color:var(--gold);font-weight:700}
-  .btn-gold:hover{background:#FBBF24}
-  .btn-outline{background:white;color:var(--purple);border-color:var(--purple)}
-  .btn-outline:hover{background:var(--purple-light)}
-  .dots{display:inline-flex;gap:3px;align-items:center}
-  .dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:bop 1.2s infinite}
-  .dot:nth-child(2){animation-delay:.2s}
-  .dot:nth-child(3){animation-delay:.4s}
-  @keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
-  .hidden{display:none!important}
-  #results{display:none}
-  .r-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 100%);color:white;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;border-bottom:4px solid var(--gold)}
-  .r-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.75;margin-bottom:8px}
-  .r-title{font-size:22px;font-weight:800;margin-bottom:12px}
-  .tags{margin-bottom:10px}
-  .tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-right:5px;margin-bottom:5px}
-  .tag-high{background:#FEE2E2;color:#991B1B}
-  .tag-moderate{background:var(--gold-light);color:#92400E}
-  .tag-low{background:var(--green-light);color:#14532D}
-  .tag-info{background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)}
-  .r-summary{font-size:14px;opacity:.9;line-height:1.7}
-  .trauma-banner{background:#FEF3C7;border:1.5px solid var(--gold);border-radius:10px;padding:12px 14px;margin-bottom:1rem}
-  .trauma-banner-title{font-size:12px;font-weight:700;color:#92400E;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
-  .trauma-banner-body{font-size:13px;color:#78350F;line-height:1.6}
-  .window-banner{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:10px;padding:12px 14px;margin-bottom:1.25rem}
-  .window-banner-title{font-size:11px;font-weight:700;color:var(--purple);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
-  .window-banner-body{font-size:13px;color:var(--purple-dark);line-height:1.6}
-  .bucket-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
-  .bucket-pill{padding:12px;border-radius:10px}
-  .bucket-pill-title{font-size:13px;font-weight:700;margin-bottom:3px}
-  .bucket-pill-body{font-size:12px;opacity:.85;line-height:1.5}
-  .rcard{background:white;border:1px solid var(--gray-200);border-radius:14px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-  .rcard-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray-100)}
-  .rcard-body{font-size:13px;color:var(--gray-600);line-height:1.7}
-  .int-item{padding:12px 0;border-bottom:1px solid var(--gray-100)}
-  .int-item:last-child{border-bottom:none}
-  .int-name{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
-  .int-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
-  .int-bucket-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px}
-  .int-link{font-size:12px;color:var(--blue-mid);text-decoration:none;font-weight:600}
-  .int-link:hover{text-decoration:underline}
-  .int-why{font-size:13px;color:var(--gray-600);margin-bottom:5px;line-height:1.5}
-  .int-moves{font-size:12px;color:var(--gray-600);line-height:1.6;background:var(--gray-50);border-radius:6px;padding:8px 10px;border-left:3px solid var(--purple)}
-  .int-moves strong{color:var(--purple)}
-  .warning-card{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
-  .warning-card-title{font-size:13px;font-weight:700;color:var(--red-mid);margin-bottom:6px}
-  .warning-card-body{font-size:13px;color:#7F1D1D;line-height:1.6}
-  .trial-card{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #86EFAC;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
-  .trial-title{font-size:14px;font-weight:700;color:#14532D;margin-bottom:8px}
-  .trial-body{font-size:13px;color:#166534;line-height:1.7}
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
-  .review-card{background:var(--blue-light);border:1.5px solid #93C5FD;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
-  .review-title{font-size:13px;font-weight:700;color:var(--blue-mid);margin-bottom:5px}
-  .review-body{font-size:13px;color:#1E3A8A;line-height:1.6}
-  .action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--gray-200)}
-  .error-card{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-  .error-card p{font-size:14px;line-height:1.6}
-  .error-card p:first-child{font-weight:700;color:#991B1B;margin-bottom:4px}
-  .error-card p:last-child{color:#7F1D1D}
-  /* LIBRARY */
-  .lib-hero{background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;border-bottom:4px solid var(--gold)}
-  .lib-hero h2{font-size:20px;font-weight:800;margin-bottom:6px}
-  .lib-hero p{font-size:13px;opacity:.85;line-height:1.6}
-  .bucket-section{margin-bottom:2rem}
-  .bucket-section-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:8px;border-bottom:2px solid var(--gray-200)}
-  .bucket-section-title{font-size:17px;font-weight:700}
-  .bucket-section-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
-  .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
-  .lib-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;text-decoration:none;color:inherit;transition:all .15s;display:block;border-left:4px solid var(--gray-200)}
-  .lib-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-1px)}
-  .lib-card-name{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
-  .lib-card-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
-  .lib-card-link{font-size:11px;font-weight:600;margin-top:6px;display:inline-block}
-  /* RESOURCES */
-  .res-section{margin-bottom:2rem}
-  .res-section h3{font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--gold)}
-  .res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
-  .res-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;text-decoration:none;color:inherit;transition:all .15s;display:block}
-  .res-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--purple)}
-  .res-card-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px}
-  .res-card-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
-  @media(max-width:600px){
-    .bucket-grid,.two-col,.bucket-row{grid-template-columns:1fr}
-    .obs-grid{grid-template-columns:1fr}
-    .header h1{font-size:20px}
-    .step{font-size:10px;padding:3px 7px}
-    .lib-grid,.res-grid{grid-template-columns:1fr}
-    .nav-tab{padding:8px 10px;font-size:11px}
-  }
-  @media print{
-    .nav-tabs,.progress-wrap,.btn-row,.action-row,.header,.rule-bar{display:none}
-    .card,.rcard,.trial-card,.review-card,.warning-card,.trauma-banner,.window-banner{box-shadow:none;border:1px solid #ddd;break-inside:avoid}
-    body{background:white}
-    #form{display:none!important}
-    #results{display:block!important}
-    .page{display:block!important}
-  }
+:root{--purple:#5B21B6;--purple-light:#EDE9FE;--purple-mid:#7C3AED;--purple-dark:#3B0764;--gold:#F59E0B;--gold-light:#FEF3C7;--gold-dark:#B45309;--green-light:#DCFCE7;--green-mid:#16A34A;--green-dark:#14532D;--blue-light:#DBEAFE;--blue-mid:#1D4ED8;--blue-dark:#1E3A8A;--red-light:#FEE2E2;--red-mid:#DC2626;--teal-light:#CCFBF1;--teal-mid:#0D9488;--gray-50:#F9FAFB;--gray-100:#F3F4F6;--gray-200:#E5E7EB;--gray-300:#D1D5DB;--gray-400:#9CA3AF;--gray-500:#6B7280;--gray-600:#4B5563;--gray-700:#374151;--gray-800:#1F2937}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#F8F7FF;color:var(--gray-800);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 60%,#4C1D95 100%);color:white;padding:1.5rem 1rem 1.25rem;text-align:center}
+.header-badge{display:inline-block;background:var(--gold);color:var(--purple-dark);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:10px}
+.header h1{font-size:26px;font-weight:800;margin-bottom:4px}
+.header h1 span{color:var(--gold)}
+.header-sub{font-size:13px;opacity:.85;margin-bottom:12px}
+.header-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hlink{display:inline-flex;align-items:center;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all .15s}
+.hlink:hover{background:rgba(255,255,255,.25);color:var(--gold)}
+.hlink.gold{background:var(--gold);border-color:var(--gold);color:var(--purple-dark)}
+.hlink.gold:hover{background:#FBBF24}
+.nav-tabs{background:var(--purple-dark);display:flex;justify-content:center;border-bottom:3px solid var(--gold);flex-wrap:wrap}
+.nav-tab{padding:10px 14px;font-size:13px;font-weight:600;color:rgba(255,255,255,.7);cursor:pointer;border:none;background:transparent;transition:all .15s;border-bottom:3px solid transparent;margin-bottom:-3px}
+.nav-tab:hover{color:white;background:rgba(255,255,255,.08)}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(245,158,11,.1)}
+.nbadge{background:var(--red-mid);color:white;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;vertical-align:middle}
+.page{display:none}
+.page.active{display:block}
+.main{max-width:760px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.hero{background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border-radius:16px;padding:1.5rem;margin-bottom:1.5rem;border-bottom:4px solid var(--gold)}
+.hero h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.85;line-height:1.6}
+.rule-bar{background:white;border-bottom:1px solid var(--gray-200);padding:8px 1rem;display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center}
+.rule{font-size:12px;color:var(--gray-500)}
+.rule strong{color:var(--gray-700)}
+.progress-wrap{background:white;border-bottom:1px solid var(--gray-200);padding:10px 1rem;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.step-row{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;justify-content:center}
+.step{display:flex;align-items:center;gap:4px;font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--gray-300);color:var(--gray-500);background:white;font-weight:500}
+.step.active{background:var(--purple-light);color:var(--purple);border-color:var(--purple)}
+.step.done{background:var(--green-light);color:var(--green-mid);border-color:var(--green-mid)}
+.step-num{width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.pbar-track{height:4px;background:var(--gray-200);border-radius:2px}
+.pbar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--gold));border-radius:2px;transition:width .4s ease}
+.pbar-label{text-align:center;font-size:11px;color:var(--gray-500);margin-top:3px}
+.card{background:white;border:1px solid var(--gray-200);border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.card-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--gray-100)}
+.sec-badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:8px;flex-shrink:0;white-space:nowrap}
+.card-title{font-size:16px;font-weight:700;color:var(--gray-800)}
+.card-focus{font-size:12px;color:var(--gray-500);margin-top:3px;line-height:1.5}
+.q{margin-bottom:1.25rem}
+.q label{display:block;font-size:14px;font-weight:600;color:var(--gray-700);margin-bottom:5px}
+.hint{font-size:12px;color:var(--gray-500);margin-bottom:7px;font-style:italic;line-height:1.5}
+textarea,input[type=text],select{width:100%;font-family:inherit;font-size:14px;color:var(--gray-800);background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:8px;padding:9px 12px;resize:vertical;transition:border-color .15s}
+textarea{min-height:80px}
+textarea:focus,input:focus,select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,33,182,.1)}
+.chip-group{display:flex;flex-wrap:wrap;gap:7px}
+.chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--gray-200);font-size:13px;cursor:pointer;background:var(--gray-50);color:var(--gray-600);transition:all .15s;user-select:none;font-weight:500}
+.chip:hover{border-color:var(--purple);color:var(--purple)}
+.chip.sel{background:var(--purple-light);color:var(--purple);border-color:var(--purple);font-weight:600}
+.obs-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;max-height:260px;overflow-y:auto;border:1px solid var(--gray-200);border-radius:8px;padding:8px;background:var(--gray-50)}
+.obs-chip{padding:5px 10px;border-radius:6px;border:1px solid var(--gray-200);font-size:12px;cursor:pointer;background:white;color:var(--gray-600);transition:all .15s;user-select:none;line-height:1.4}
+.obs-chip:hover{border-color:var(--purple);color:var(--purple)}
+.obs-chip.sel{background:var(--purple-light);color:var(--purple);border-color:var(--purple);font-weight:600}
+.emotion-signal{border-radius:10px;padding:10px 14px;margin-top:10px;display:none;font-size:13px;line-height:1.6}
+.emotion-signal-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.bucket-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bucket-card{border:2px solid var(--gray-200);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;background:white}
+.bucket-card:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.bucket-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.bucket-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
+.insight-box{background:var(--blue-light);border-left:4px solid var(--blue-mid);border-radius:0 8px 8px 0;padding:12px 14px;margin-top:1rem;display:none}
+.insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue-mid);margin-bottom:5px}
+.insight-text{font-size:13px;color:var(--gray-700);line-height:1.65}
+.btn-row{display:flex;gap:10px;align-items:center;margin-top:1.5rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;border:2px solid var(--gray-200);background:white;color:var(--gray-700)}
+.btn:hover{background:var(--gray-50)}
+.btn-primary{background:var(--purple);color:white;border-color:var(--purple)}
+.btn-primary:hover{background:var(--purple-mid)}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-gold{background:var(--gold);color:var(--purple-dark);border-color:var(--gold);font-weight:700}
+.btn-gold:hover{background:#FBBF24}
+.btn-teal{background:var(--teal-mid);color:white;border-color:var(--teal-mid)}
+.btn-teal:hover{background:#0F766E}
+.btn-outline{background:white;color:var(--purple);border-color:var(--purple)}
+.btn-outline:hover{background:var(--purple-light)}
+.btn-sm{padding:6px 12px;font-size:12px}
+.dots{display:inline-flex;gap:3px;align-items:center}
+.dot{width:5px;height:5px;border-radius:50%;background:currentColor;animation:bop 1.2s infinite}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes bop{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.hidden{display:none!important}
+#results{display:none}
+.r-header{background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 100%);color:white;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;border-bottom:4px solid var(--gold)}
+.r-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.75;margin-bottom:8px}
+.r-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.r-meta{font-size:12px;opacity:.7;margin-bottom:10px}
+.tags{margin-bottom:10px}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-right:5px;margin-bottom:5px}
+.tag-high{background:#FEE2E2;color:#991B1B}
+.tag-moderate{background:var(--gold-light);color:#92400E}
+.tag-low{background:var(--green-light);color:var(--green-dark)}
+.tag-info{background:rgba(255,255,255,.2);color:white;border:1px solid rgba(255,255,255,.3)}
+.r-summary{font-size:14px;opacity:.9;line-height:1.7}
+.trauma-banner{background:#FEF3C7;border:1.5px solid var(--gold);border-radius:10px;padding:12px 14px;margin-bottom:1rem}
+.trauma-banner-title{font-size:12px;font-weight:700;color:#92400E;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.trauma-banner-body{font-size:13px;color:#78350F;line-height:1.6}
+.window-banner{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:10px;padding:12px 14px;margin-bottom:1.25rem}
+.window-banner-title{font-size:11px;font-weight:700;color:var(--purple);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+.window-banner-body{font-size:13px;color:var(--purple-dark);line-height:1.6}
+.bucket-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.25rem}
+.bucket-pill{padding:12px;border-radius:10px}
+.bucket-pill-title{font-size:13px;font-weight:700;margin-bottom:3px}
+.bucket-pill-body{font-size:12px;opacity:.85;line-height:1.5}
+.rcard{background:white;border:1px solid var(--gray-200);border-radius:14px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.rcard-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray-100)}
+.rcard-body{font-size:13px;color:var(--gray-600);line-height:1.7}
+.int-item{padding:12px 0;border-bottom:1px solid var(--gray-100)}
+.int-item:last-child{border-bottom:none}
+.int-name{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
+.int-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.int-bucket-tag{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px}
+.int-link{font-size:12px;color:var(--blue-mid);text-decoration:none;font-weight:600}
+.int-link:hover{text-decoration:underline}
+.int-why{font-size:13px;color:var(--gray-600);margin-bottom:5px;line-height:1.5}
+.int-moves{font-size:12px;color:var(--gray-600);line-height:1.6;background:var(--gray-50);border-radius:6px;padding:8px 10px;border-left:3px solid var(--purple)}
+.int-moves strong{color:var(--purple)}
+.warning-card{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.warning-card-title{font-size:13px;font-weight:700;color:var(--red-mid);margin-bottom:6px}
+.warning-card-body{font-size:13px;color:#7F1D1D;line-height:1.6}
+.trial-card{background:linear-gradient(135deg,#F0FDF4,#DCFCE7);border:1.5px solid #86EFAC;border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.trial-title{font-size:14px;font-weight:700;color:var(--green-dark);margin-bottom:8px}
+.trial-body{font-size:13px;color:#166534;line-height:1.7}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.review-card{background:var(--blue-light);border:1.5px solid #93C5FD;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.review-title{font-size:13px;font-weight:700;color:var(--blue-mid);margin-bottom:5px}
+.review-body{font-size:13px;color:var(--blue-dark);line-height:1.6}
+.action-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--gray-200)}
+.error-card{background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.error-card p{font-size:14px;line-height:1.6}
+.error-card p:first-child{font-weight:700;color:#991B1B;margin-bottom:4px}
+.error-card p:last-child{color:#7F1D1D}
+.teacher-info{background:var(--gold-light);border:1.5px solid var(--gold);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem}
+.teacher-info-title{font-size:13px;font-weight:700;color:var(--gold-dark);margin-bottom:10px}
+.teacher-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.teacher-info input{background:white}
+.bucket-section{margin-bottom:2rem}
+.bucket-section-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:8px;border-bottom:2px solid var(--gray-200)}
+.bucket-section-title{font-size:17px;font-weight:700}
+.bucket-section-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.lib-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;text-decoration:none;color:inherit;transition:all .15s;display:block;border-left:4px solid var(--gray-200)}
+.lib-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-1px)}
+.lib-card-name{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
+.lib-card-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
+.lib-card-link{font-size:11px;font-weight:600;margin-top:6px;display:inline-block}
+.lib-search{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:inherit;margin-bottom:1.5rem;background:white}
+.lib-search:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,33,182,.1)}
+.res-section{margin-bottom:2rem}
+.res-section h3{font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid var(--gold)}
+.res-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.res-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;text-decoration:none;color:inherit;transition:all .15s;display:block}
+.res-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--purple)}
+.res-card-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px}
+.res-card-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
+.emotion-section{margin-bottom:2rem}
+.emotion-section-title{font-size:17px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
+.emotion-section-sub{font-size:13px;color:var(--gray-500);margin-bottom:1rem;line-height:1.5}
+.mood-meter-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.mood-zone{border-radius:14px;padding:1.25rem;border:1.5px solid transparent}
+.mood-zone-title{font-size:16px;font-weight:800;margin-bottom:4px}
+.mood-zone-sub{font-size:12px;font-weight:600;opacity:.8;margin-bottom:8px}
+.mood-zone-desc{font-size:12px;line-height:1.6;margin-bottom:8px}
+.mood-zone-strategies{font-size:12px;font-weight:600;margin-bottom:4px}
+.mood-zone-list{font-size:12px;line-height:1.7;opacity:.9}
+.emotion-framework{background:white;border:1px solid var(--gray-200);border-radius:14px;padding:1.25rem;margin-bottom:1rem}
+.emotion-framework-title{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid var(--gray-100)}
+.ef-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ef-card{border-radius:10px;padding:10px}
+.ef-card-title{font-size:12px;font-weight:700;margin-bottom:6px}
+.ef-item{font-size:12px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.06);line-height:1.5}
+.ef-item:last-child{border:none}
+.domains-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.domain-card{background:white;border:1px solid var(--gray-200);border-radius:10px;padding:1rem;display:flex;gap:12px;align-items:flex-start}
+.domain-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.domain-name{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:3px}
+.domain-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
+.praise-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem}
+.praise-card{border-radius:12px;padding:1rem;text-align:center}
+.praise-type{font-size:14px;font-weight:800;margin-bottom:4px}
+.praise-example{font-size:12px;font-style:italic;margin-bottom:6px;opacity:.8}
+.praise-rec{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.praise-why{font-size:12px;opacity:.85;line-height:1.5}
+.gratitude-formula{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem}
+.gf-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px}
+.gf-steps{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gf-step{background:var(--purple);color:white;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;text-align:center}
+.gf-plus{font-size:16px;font-weight:700;color:var(--purple)}
+.regulation-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.reg-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;border-top:4px solid var(--gray-200)}
+.reg-card-title{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
+.reg-card-desc{font-size:12px;color:var(--gray-500);margin-bottom:6px;line-height:1.5}
+.reg-strategies{font-size:12px;color:var(--gray-600);line-height:1.7}
+.coregulation-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.coreg-card{border-radius:12px;padding:1rem;border:1px solid transparent}
+.coreg-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.coreg-desc{font-size:12px;line-height:1.5;margin-bottom:8px;opacity:.85}
+.coreg-list{font-size:12px;line-height:1.8;opacity:.9}
+.emotion-link-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;color:inherit;transition:all .15s}
+.emotion-link-card:hover{border-color:var(--purple);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.emotion-link-name{font-size:13px;font-weight:700;color:var(--gray-800)}
+.emotion-link-desc{font-size:12px;color:var(--gray-500);margin-top:2px}
+.log-empty{text-align:center;padding:3rem 1rem;color:var(--gray-400)}
+.log-empty-icon{font-size:48px;margin-bottom:12px}
+.log-empty-title{font-size:16px;font-weight:600;margin-bottom:6px;color:var(--gray-500)}
+.log-empty-sub{font-size:13px;line-height:1.6}
+.log-card{background:white;border:1px solid var(--gray-200);border-radius:14px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.log-card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
+.log-card-title{font-size:15px;font-weight:700;color:var(--gray-800)}
+.log-card-meta{font-size:12px;color:var(--gray-500);margin-top:2px}
+.log-card-summary{font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:10px}
+.log-card-strategies{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.log-strategy-tag{font-size:11px;font-weight:600;padding:3px 8px;border-radius:8px}
+.log-actions{display:flex;gap:8px;flex-wrap:wrap}
+.progress-section{margin-top:12px;padding-top:12px;border-top:1px solid var(--gray-100)}
+.progress-section-title{font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:8px}
+.progress-entry{background:var(--gray-50);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:13px;color:var(--gray-600);line-height:1.5}
+.progress-entry-date{font-size:11px;color:var(--gray-400);margin-bottom:2px;font-weight:600}
+.add-progress-form{margin-top:8px}
+.add-progress-form textarea{min-height:60px;font-size:13px}
+.status-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px}
+@media(max-width:600px){.bucket-grid,.two-col,.bucket-row,.mood-meter-grid,.praise-grid,.ef-grid,.coregulation-grid,.regulation-grid,.teacher-info-grid{grid-template-columns:1fr}.obs-grid{grid-template-columns:1fr}.header h1{font-size:20px}.step{font-size:10px;padding:3px 7px}.lib-grid,.res-grid{grid-template-columns:1fr}.nav-tab{padding:8px 8px;font-size:11px}.gf-steps{flex-direction:column;align-items:flex-start}}
+@media print{.nav-tabs,.progress-wrap,.btn-row,.action-row,.header,.rule-bar,.teacher-info{display:none}.card,.rcard,.trial-card,.review-card,.warning-card,.trauma-banner,.window-banner{box-shadow:none;border:1px solid #ddd;break-inside:avoid}body{background:white}#form{display:none!important}#results{display:block!important}.page{display:block!important}}
+
+/* DARK MODE */
+body.dark{background:#0F0F1A;color:#E2E8F0}
+body.dark .header{background:linear-gradient(135deg,#1E0A3C 0%,#2D1260 100%)}
+body.dark .nav-tabs{background:#0A0A14}
+body.dark .rule-bar,body.dark .progress-wrap{background:#1A1A2E;border-color:#2D2D4E}
+body.dark .rule{color:#94A3B8}
+body.dark .rule strong{color:#CBD5E1}
+body.dark .card,body.dark .rcard,body.dark .log-card,body.dark .emotion-framework,body.dark .domain-card,body.dark .reg-card{background:#1A1A2E;border-color:#2D2D4E;color:#E2E8F0}
+body.dark .card-title,body.dark .rcard-title,body.dark .card-focus,body.dark .int-name,body.dark .domain-name{color:#E2E8F0}
+body.dark .card-focus,body.dark .rcard-body,body.dark .int-why,body.dark .domain-desc,body.dark .hint,body.dark .reg-card-desc,body.dark .reg-strategies{color:#94A3B8}
+body.dark textarea,body.dark input[type=text],body.dark select{background:#0F0F1A;border-color:#2D2D4E;color:#E2E8F0}
+body.dark .chip{background:#1A1A2E;border-color:#2D2D4E;color:#94A3B8}
+body.dark .chip:hover{border-color:var(--purple-mid);color:#C4B5FD}
+body.dark .chip.sel{background:#2D1260;color:#C4B5FD;border-color:var(--purple-mid)}
+body.dark .obs-grid{background:#0F0F1A;border-color:#2D2D4E}
+body.dark .obs-chip{background:#1A1A2E;border-color:#2D2D4E;color:#94A3B8}
+body.dark .obs-chip.sel{background:#2D1260;color:#C4B5FD;border-color:var(--purple-mid)}
+body.dark .bucket-card{background:#1A1A2E;border-color:#2D2D4E}
+body.dark .bucket-desc{color:#94A3B8}
+body.dark .lib-card{background:#1A1A2E;border-color:#2D2D4E}
+body.dark .lib-card-name{color:#E2E8F0}
+body.dark .lib-card-desc{color:#94A3B8}
+body.dark .lib-search{background:#1A1A2E;border-color:#2D2D4E;color:#E2E8F0}
+body.dark .res-card{background:#1A1A2E;border-color:#2D2D4E}
+body.dark .res-card-desc{color:#94A3B8}
+body.dark .res-section h3{border-color:#F59E0B}
+body.dark .insight-box{background:#1E3A5F;border-color:#3B82F6}
+body.dark .int-moves{background:#0F0F1A}
+body.dark .progress-entry{background:#0F0F1A;color:#CBD5E1}
+body.dark .pbar-track{background:#2D2D4E}
+body.dark .step{background:#1A1A2E;border-color:#2D2D4E;color:#94A3B8}
+body.dark .step.active{background:#2D1260;color:#C4B5FD;border-color:var(--purple-mid)}
+body.dark .step.done{background:#0D2D1A;color:#4ADE80;border-color:#16A34A}
+body.dark .btn{background:#1A1A2E;border-color:#2D2D4E;color:#CBD5E1}
+body.dark .btn:hover{background:#2D2D4E}
+body.dark .btn-outline{background:transparent;color:#C4B5FD;border-color:var(--purple-mid)}
+body.dark .add-progress-form textarea{background:#0F0F1A;border-color:#2D2D4E;color:#E2E8F0}
+body.dark .sotd-card{background:#1A1A2E;border-color:#2D2D4E}
+body.dark .sotd-name{color:#E2E8F0}
+body.dark .sotd-desc{color:#94A3B8}
+
+/* DARK MODE TOGGLE */
+.dark-toggle{position:absolute;right:1rem;top:1rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
+.dark-toggle:hover{background:rgba(255,255,255,.25)}
+.header-inner{position:relative}
+
+/* STRATEGY OF THE DAY */
+.sotd-card{background:white;border:1px solid var(--gray-200);border-radius:14px;padding:1.25rem;margin-bottom:1.5rem;border-left:4px solid var(--purple)}
+.sotd-eyebrow{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple);margin-bottom:6px}
+.sotd-name{font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
+.sotd-bucket{font-size:11px;font-weight:700;padding:2px 8px;border-radius:8px;display:inline-block;margin-bottom:8px}
+.sotd-desc{font-size:13px;color:var(--gray-600);line-height:1.6;margin-bottom:10px}
+
+/* GLOSSARY TOOLTIPS */
+.gterm{border-bottom:1px dashed var(--purple);cursor:help;color:inherit;position:relative;display:inline}
+.gterm:hover .gtooltip{display:block}
+.gtooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--gray-900);color:white;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;width:240px;z-index:999;font-weight:400;box-shadow:0 4px 12px rgba(0,0,0,.3);pointer-events:none}
+.gtooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--gray-900)}
 </style>
 </head>
 <body>
-
 <div class="header">
-  <div class="header-badge">Ephrata Area School District</div>
-  <h1>Behavior <span>Intervention</span> Center</h1>
-  <div class="header-sub">E.S.C. Educational Engagement Coaching &middot; Be a Scientist Framework</div>
-  <div class="header-links">
-    <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="header-link gold">&#8599; E.S.C. Strategy Site</a>
-    <a href="https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist" target="_blank" class="header-link">Be a Scientist</a>
-    <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit" target="_blank" class="header-link">Find the Right Fit</a>
+  <div class="header-inner">
+    <button class="dark-toggle" onclick="toggleDark()" id="darkBtn">&#9790; Dark</button>
+    <div class="header-badge">Ephrata Area School District</div>
+    <h1>Behavior <span>Intervention</span> Center</h1>
+    <div class="header-sub">E.S.C. Educational Engagement Coaching &middot; Be a Scientist Framework</div>
+    <div class="header-links">
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">&#8599; E.S.C. Strategy Site</a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist" target="_blank" class="hlink">Be a Scientist</a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit" target="_blank" class="hlink">Find the Right Fit</a>
+    </div>
   </div>
 </div>
-
 <div class="nav-tabs">
   <button class="nav-tab active" onclick="showPage('tool',this)">&#128300; Intervention Tool</button>
+  <button class="nav-tab" onclick="showPage('emotions',this)">&#129505; Emotions Hub</button>
   <button class="nav-tab" onclick="showPage('library',this)">&#128218; Strategy Library</button>
+  <button class="nav-tab" onclick="showPage('logs',this)">&#128203; Saved Plans <span class="nbadge" id="logBadge" style="display:none">0</span></button>
   <button class="nav-tab" onclick="showPage('resources',this)">&#128279; Resources</button>
 </div>
-
-<!-- TOOL PAGE -->
 <div class="page active" id="page-tool">
   <div class="rule-bar">
     <div class="rule"><strong>Observable, not a judgement</strong> &middot; Head down &middot; Calling out &middot; Out of seat</div>
@@ -210,559 +324,132 @@
     <div class="pbar-label" id="pbarLabel">Step 1 of 6 &mdash; What is happening?</div>
   </div>
   <div class="main">
+<!-- Hidden fields for name/building still used in plan header -->
+<input type="hidden" id="teacherName" value="Educator">
+<input type="hidden" id="teacherBuilding" value="EASD">
+    <div id="sotdCard"></div>
     <div id="form"></div>
     <div id="results"></div>
   </div>
 </div>
-
-<!-- LIBRARY PAGE -->
+<div class="page" id="page-emotions">
+  <div class="main">
+    <div class="hero"><h2>&#129505; Emotions Hub</h2><p>Emotions are messengers. Understanding the emotional landscape behind behavior helps us respond to what a student needs rather than just what they are doing.</p></div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Mood Meter &mdash; The Four Zones</div>
+      <div class="emotion-section-sub">"If you can name it, you can tame it." &mdash; Marc Brackett, Permission to Feel</div>
+      <div class="mood-meter-grid">
+        <div class="mood-zone" style="background:#DCFCE7;border-color:#16A34A"><div class="mood-zone-title" style="color:#14532D">&#129001; Green Zone</div><div class="mood-zone-sub" style="color:#166534">Calm, Happy, Ready to Learn</div><div class="mood-zone-desc" style="color:#166534">High pleasantness, low-moderate energy. The student is regulated, engaged, and able to access learning.</div><div class="mood-zone-strategies" style="color:#14532D">Strategies that work well:</div><div class="mood-zone-list" style="color:#166534">2x10 &middot; Morning Greeting &middot; Responsibilities &middot; Morning Meeting &middot; Positive Praise</div></div>
+        <div class="mood-zone" style="background:#DBEAFE;border-color:#1D4ED8"><div class="mood-zone-title" style="color:#1E3A8A">&#128309; Blue Zone</div><div class="mood-zone-sub" style="color:#1E40AF">Sad, Tired, Withdrawn, Sick</div><div class="mood-zone-desc" style="color:#1E40AF">Low pleasantness, low energy. The student may appear shut down, disengaged, or emotionally flat.</div><div class="mood-zone-strategies" style="color:#1E3A8A">Strategies that work well:</div><div class="mood-zone-list" style="color:#1E40AF">Check In &middot; Pulse Check &middot; Empathetic Listening &middot; Responsibilities &middot; Gentle Movement Break</div></div>
+        <div class="mood-zone" style="background:#FEF3C7;border-color:#D97706"><div class="mood-zone-title" style="color:#78350F">&#128993; Yellow Zone</div><div class="mood-zone-sub" style="color:#92400E">Anxious, Nervous, Frustrated, Excited</div><div class="mood-zone-desc" style="color:#92400E">Low-moderate pleasantness, high energy. The student may be agitated, unfocused, or escalating.</div><div class="mood-zone-strategies" style="color:#78350F">Strategies that work well:</div><div class="mood-zone-list" style="color:#92400E">Break Card &middot; Secret Signal &middot; Breathing Techniques &middot; Fidget &middot; Forewarning &middot; Controlled Choices</div></div>
+        <div class="mood-zone" style="background:#FEE2E2;border-color:#DC2626"><div class="mood-zone-title" style="color:#991B1B">&#128308; Red Zone</div><div class="mood-zone-sub" style="color:#B91C1C">Angry, Frustrated, Terrified, Overwhelmed</div><div class="mood-zone-desc" style="color:#B91C1C">Low pleasantness, high energy. The student is dysregulated and likely in a Fight/Flight/Freeze/Fawn response.</div><div class="mood-zone-strategies" style="color:#991B1B">Strategies that work well:</div><div class="mood-zone-list" style="color:#B91C1C">Reset Plan &middot; Break Card &middot; Calm Neutral Tone &middot; Rapid Resets &middot; Avoid Power Struggle</div></div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Trauma Response Behaviors &mdash; Fight / Flight / Freeze / Fawn</div>
+      <div class="emotion-section-sub">"When a threat is identified, the downstairs brain takes over." &mdash; Joe Brummer, Building a Trauma-Informed Restorative School</div>
+      <div class="emotion-framework">
+        <div class="emotion-framework-title">What you see &rarr; What it may mean &rarr; How to respond</div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+          <div style="background:#FEE2E2;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#991B1B;margin-bottom:6px">&#128293; Fight</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Aggression, arguing, defiance, yelling, throwing objects, provoking, slamming doors, talking back, hands in fists</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7"><strong>Respond with:</strong> Calm neutral tone &middot; Relational Discipline Moves &middot; Avoid power struggles &middot; Reduce audience</div></div>
+          <div style="background:#FEF3C7;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:6px">&#127939; Flight</div><div style="font-size:12px;color:#78350F;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Walking out, ignoring, head down/hood up, avoiding tasks, daydreaming, cutting class, frequent bathroom trips</div><div style="font-size:12px;color:#78350F;line-height:1.7"><strong>Respond with:</strong> Connection before compliance &middot; Break Card &middot; Provide safe exits &middot; Responsibilities</div></div>
+          <div style="background:#DBEAFE;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#1E3A8A;margin-bottom:6px">&#10052; Freeze</div><div style="font-size:12px;color:#1E3A8A;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Blank stares, dissociation, numb shrug, head on desk, inability to move or respond, appears forgetful, avoids tasks</div><div style="font-size:12px;color:#1E3A8A;line-height:1.7"><strong>Respond with:</strong> Reduce demands first &middot; Gentle check-in &middot; Breathing &middot; Wait before expecting engagement</div></div>
+          <div style="background:#DCFCE7;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#14532D;margin-bottom:6px">&#129419; Fawn</div><div style="font-size:12px;color:#166534;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Perfectionism, over-preparing, overly helpful, befriends bullies, submits to pressure, exaggerated people pleasing, lacks boundaries</div><div style="font-size:12px;color:#166534;line-height:1.7"><strong>Respond with:</strong> Build authentic relationship &middot; Validate genuine effort &middot; Help student find their voice &middot; Secret Signal</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Emotions are Messengers</div>
+      <div class="emotion-section-sub">We can invite others to connect their emotional vocabulary with appropriate expression. &mdash; Aguilar & Cohen, The PD Book</div>
+      <div class="emotion-framework">
+        <div class="emotion-framework-title">Three Ways to Support Emotional Literacy in Your Setting</div>
+        <div class="ef-grid">
+          <div class="ef-card" style="background:#EDE9FE"><div class="ef-card-title" style="color:#5B21B6">Build the Environment</div><div class="ef-item" style="color:#5B21B6">Normalize feelings &mdash; use mood meter and sticky note check-ins</div><div class="ef-item" style="color:#5B21B6">Appreciate feelings &mdash; verbally acknowledge, express gratitude</div><div class="ef-item" style="color:#5B21B6">Validate feelings &mdash; use empathy, never dismiss</div></div>
+          <div class="ef-card" style="background:#DBEAFE"><div class="ef-card-title" style="color:#1E3A8A">Make the First Moves</div><div class="ef-item" style="color:#1E3A8A">Ask: What's going on? How do you know you're feeling this?</div><div class="ef-item" style="color:#1E3A8A">Model vulnerability &mdash; communicate your own emotions first</div><div class="ef-item" style="color:#1E3A8A">Avoid emotional invalidation at all times</div></div>
+          <div class="ef-card" style="background:#DCFCE7"><div class="ef-card-title" style="color:#14532D">Foster Introspection</div><div class="ef-item" style="color:#14532D">Take time to acknowledge &mdash; do not avoid or dismiss</div><div class="ef-item" style="color:#14532D">Hold time for processing &mdash; mindfulness, Meta-Moment</div><div class="ef-item" style="color:#14532D">Dig deeper &mdash; ask more than just "How are you?"</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Five Domains of Regulation</div>
+      <div class="emotion-section-sub">Understanding different types of regulation helps us develop the right skills to improve them. &mdash; Brummer, adapted from Sorrels (2015)</div>
+      <div class="domains-grid">
+        <div class="domain-card"><div class="domain-icon" style="background:#EDE9FE">&#129361;</div><div><div class="domain-name">Physical Regulation</div><div class="domain-desc">The ability to regulate our bodies in response to sensory input — equilibrium, hunger cues, movement, and sensory processing.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#DBEAFE">&#129504;</div><div><div class="domain-name">Cognitive Regulation</div><div class="domain-desc">The ability to control and purposefully use our minds — holding information, blocking distractions, and maintaining focus on a task.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#FEF3C7">&#128149;</div><div><div class="domain-name">Emotional Regulation</div><div class="domain-desc">The ability to control and manage unpleasant or overwhelming emotions, or to feel and enjoy the pleasant ones.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#DCFCE7">&#129309;</div><div><div class="domain-name">Social Regulation</div><div class="domain-desc">The ability to adapt behaviors based on how they impact others — empathy, reading facial cues, voice tones, and relational messages.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#FEE2E2">&#127775;</div><div><div class="domain-name">Pro-Social Regulation</div><div class="domain-desc">The capacity to empathize AND act on that information — responding in caring ways to a friend's distress or excitement.</div></div></div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Emotional Regulation Strategies &mdash; Four Category Types</div>
+      <div class="emotion-section-sub">Emotional regulation starts with giving ourselves and others permission to own our feelings. &mdash; Brackett, Permission to Feel, p.146</div>
+      <div class="regulation-grid">
+        <div class="reg-card" style="border-top-color:#5B21B6"><div class="reg-card-title" style="color:#5B21B6">&#128168; Mindful Breathing</div><div class="reg-card-desc">Calms the body and mind. "Hits the brake" on the stress response.</div><div class="reg-strategies"><strong>Strategies:</strong> 7-11 Breathing &middot; Belly Breathing &middot; Rapid Resets &middot; Shape Breathing &middot; Thich Nhat Hahn Breathing &middot; Slow Counting</div></div>
+        <div class="reg-card" style="border-top-color:#1D4ED8"><div class="reg-card-title" style="color:#1D4ED8">&#128336; Forward-Looking</div><div class="reg-card-desc">Anticipate what will cause an unwanted emotion. Plan ahead to alter the emotional impact.</div><div class="reg-strategies"><strong>Strategies:</strong> Reset Plan &middot; Forewarning &middot; Implementation Intention &middot; Scheduled Breaks</div></div>
+        <div class="reg-card" style="border-top-color:#D97706"><div class="reg-card-title" style="color:#D97706">&#128065; Attention-Shifting</div><div class="reg-card-desc">Tempers the impact of an emotion by diverting attention away from its source.</div><div class="reg-strategies"><strong>Strategies:</strong> Drinking Water &middot; Look Up &middot; Fidgets &middot; Music &middot; Doodle Notes &middot; Movement Break &middot; Visualization</div></div>
+        <div class="reg-card" style="border-top-color:#16A34A"><div class="reg-card-title" style="color:#16A34A">&#129504; Cognitive Reframing</div><div class="reg-card-desc">Analyze what is triggering the emotional experience and find a new way of seeing it.</div><div class="reg-strategies"><strong>Strategies:</strong> Meta-Moment &middot; Q-Tip &middot; Affirmations &middot; Mantra &middot; Journal Writing &middot; Positive Self-Talk</div></div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">3 Components of Co-Regulation</div>
+      <div class="emotion-section-sub">When we meet students' dysregulated behaviors with co-regulation, they learn how to self-regulate. &mdash; Micere Keels, Trauma Responsive Educational Practices</div>
+      <div class="coregulation-grid">
+        <div class="coreg-card" style="background:#EDE9FE;border-color:#7C3AED"><div class="coreg-title" style="color:#5B21B6">&#129309; Build</div><div class="coreg-desc" style="color:#5B21B6">Cultivate a warm, responsive relationship by displaying care and affection.</div><div class="coreg-list" style="color:#5B21B6">2x10 &middot; Greeting at the Door &middot; Affirmations &middot; Morning Meeting &middot; Circles &middot; Teach Kindness</div></div>
+        <div class="coreg-card" style="background:#DBEAFE;border-color:#1D4ED8"><div class="coreg-title" style="color:#1E3A8A">&#128203; Structure</div><div class="coreg-desc" style="color:#1E3A8A">Structure the environment to make self-regulation manageable. Avoid vague expectations and prolonged quiet seated work.</div><div class="coreg-list" style="color:#1E3A8A">Getting Class Ready &middot; TROGS &middot; Visual Schedule &middot; Structured Routine &middot; Belonging Cues</div></div>
+        <div class="coreg-card" style="background:#DCFCE7;border-color:#16A34A"><div class="coreg-title" style="color:#14532D">&#127979; Coach</div><div class="coreg-desc" style="color:#14532D">Modeling, instruction, and positive reinforcement of even modest progress toward regulation.</div><div class="coreg-list" style="color:#14532D">Zones of Regulation &middot; 100 Coping Strategies &middot; Mood Shifters &middot; Positive Self-Talk</div></div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Three Types of Praise &mdash; and the Gratitude Formula</div>
+      <div class="emotion-section-sub">Adapted from Trauma Responsive Educational Practices &mdash; Micere Keels (2023)</div>
+      <div class="praise-grid">
+        <div class="praise-card" style="background:#FEE2E2;border:1.5px solid #FCA5A5"><div class="praise-type" style="color:#991B1B">Personal</div><div class="praise-example" style="color:#B91C1C">"You are really smart!"</div><div class="praise-rec" style="background:#FCA5A5;color:#7F1D1D">Minimize This Type</div><div class="praise-why" style="color:#7F1D1D">Subjective, can feel judgmental. Reinforces fixed mindset and de-emphasizes effort.</div></div>
+        <div class="praise-card" style="background:#DCFCE7;border:1.5px solid #86EFAC"><div class="praise-type" style="color:#14532D">Effort-Based</div><div class="praise-example" style="color:#166534">"You worked really hard!"</div><div class="praise-rec" style="background:#86EFAC;color:#14532D">Maximize This Type</div><div class="praise-why" style="color:#166534">Reinforces progress along the path to a goal. Especially impactful for struggling learners.</div></div>
+        <div class="praise-card" style="background:#EDE9FE;border:1.5px solid #C4B5FD"><div class="praise-type" style="color:#5B21B6">Behavior-Specific</div><div class="praise-example" style="color:#6D28D9">"You did ___ well!"</div><div class="praise-rec" style="background:#C4B5FD;color:#3B0764">Maximize This Type</div><div class="praise-why" style="color:#4C1D95">Objective because it is observable. Clear communication benefits all learners.</div></div>
+      </div>
+      <div class="gratitude-formula">
+        <div class="gf-title">&#127381; The Gratitude Formula &mdash; Trading Praise for Gratitude (Brummer, 2021)</div>
+        <div class="gf-steps">
+          <div class="gf-step">When I see...<br><span style="font-weight:400;font-size:11px">Observation</span></div>
+          <div class="gf-plus">+</div>
+          <div class="gf-step">I feel...<br><span style="font-weight:400;font-size:11px">Feeling</span></div>
+          <div class="gf-plus">+</div>
+          <div class="gf-step">because...<br><span style="font-weight:400;font-size:11px">Need met</span></div>
+          <div class="gf-plus">+</div>
+          <div class="gf-step">Thank you!<br><span style="font-weight:400;font-size:11px">Appreciation</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="emotion-section">
+      <div class="emotion-section-title">Explore More</div>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">Coping Strategies One-Pager &#8599;</div><div class="emotion-link-desc">Full list of regulation strategies with implementation steps from E.S.C.</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/the-brain" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">The Brain &mdash; E.S.C. Site &#8599;</div><div class="emotion-link-desc">Affect Script Theory, Mental Health, Trauma, Basic Needs, and Engagement resources</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      <a href="https://www.zonesofregulation.com" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">Zones of Regulation &#8599;</div><div class="emotion-link-desc">Curriculum for teaching students to identify emotional states and apply strategies</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      <a href="https://howwefeel.org" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">How We Feel App &#8599;</div><div class="emotion-link-desc">Free app for students to identify, track, and respond to daily emotions</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      <a href="https://emotionalintelligence.yale.edu/ruler" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">RULER / Mood Meter &mdash; Yale Center for Emotional Intelligence &#8599;</div><div class="emotion-link-desc">Research and tools for emotional literacy from Marc Brackett and Yale</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+    </div>
+  </div>
+</div>
 <div class="page" id="page-library">
   <div class="main">
-    <div class="lib-hero">
-      <h2>&#128218; Full Strategy Library</h2>
-      <p>Every intervention from the E.S.C. Find the Right Fit library &mdash; organized by bucket. Click any strategy to open its full one-pager on the E.S.C. site.</p>
-    </div>
+    <div class="hero"><h2>&#128218; Full Strategy Library</h2><p>Every intervention from the E.S.C. Find the Right Fit library organized by bucket. Click any strategy to open its full one-pager on the E.S.C. site.</p></div>
+    <input class="lib-search" placeholder="Search strategies... (e.g. break card, fidget, 2x10)" oninput="filterLibrary(this.value)" id="libSearch">
     <div id="libraryContent"></div>
   </div>
 </div>
-
-<!-- RESOURCES PAGE -->
+<div class="page" id="page-logs">
+  <div class="main">
+    <div class="hero"><h2>&#128203; Saved Intervention Plans</h2><p>All completed plans saved here in this browser. Add progress notes to track what you tried and what happened over time. Plans are stored locally on this device.</p></div>
+    <div id="logsContent"></div>
+  </div>
+</div>
 <div class="page" id="page-resources">
   <div class="main">
-    <div class="lib-hero">
-      <h2>&#128279; Additional Resources</h2>
-      <p>Curated resources to support behavior coaching, SEL, trauma-informed practices, and the Be a Scientist framework.</p>
-    </div>
+    <div class="hero"><h2>&#128279; Additional Resources</h2><p>Curated resources to support behavior coaching, SEL, trauma-informed practices, and the Be a Scientist framework.</p></div>
     <div id="resourcesContent"></div>
   </div>
 </div>
-
-<script>
-const BASE="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/";
-
-const LIBRARY={
-  connection:{label:"Connection",desc:"Relationship to self, others, the work",color:"#5B21B6",bg:"#EDE9FE",strategies:[
-    {name:"2x10",desc:"2 minutes of non-academic 1-on-1 conversation per day for 10 consecutive days. Student drives the topic. Not about work or behavior."},
-    {name:"Morning Greeting",desc:"Name + Eye contact + Nonverbal + Positive notice at the door. Increases engagement 20% and decreases disruptive behavior 9%."},
-    {name:"Check In / Check Out",desc:"Pair a student with an adult partner to connect about their day using target behaviors, restorative questions, and active listening."},
-    {name:"Check and Connect",desc:"Structured mentoring pairing students with a caring adult who monitors engagement and provides consistent support."},
-    {name:"One on One Conferencing With Student",desc:"A private, structured conversation to discuss progress, needs, and next steps with the student."},
-    {name:"Positive Praise and Encouragement",desc:"Effort-based and behavior-specific feedback delivered privately and authentically. Gratitude Formula: Observation + Feeling + Need + Thank you."},
-    {name:"Reflective/Empathetic Listening",desc:"Active listening, perspective-taking, and unconditional acceptance to build relational trust."},
-    {name:"Empathy Interview",desc:"Structured conversation to understand a student's experience and needs from their own perspective."},
-    {name:"Student Consulting",desc:"Involve the student as a partner in identifying strategies and solutions for their own behavior."},
-    {name:"Sticky Note Check In",desc:"Personalized sticky note messages acknowledging effort, growth, or appreciation left for the student."},
-    {name:"Shadow Day",desc:"An adult follows a student through their day to better understand their experience and identify needs."},
-    {name:"Smile",desc:"A consistent nonverbal that communicates welcome, warmth, and care. Simple but powerful."},
-    {name:"High-Fives and Handshakes",desc:"Physical nonverbal greetings that communicate belonging and positive connection at the door."},
-    {name:"Positive Phone Calls",desc:"Proactive calls home sharing genuine positive observations about a student's effort or behavior."},
-    {name:"Model Positive Relationships",desc:"Educators deliberately model respectful, caring interactions to teach relationship skills."},
-    {name:"Brag",desc:"Authentically celebrate student strengths and accomplishments in a community-building way."},
-    {name:"Peer Buddy Program",desc:"Strategically pair students to build connection, support social skills, and foster belonging."},
-    {name:"Assigned Partner",desc:"Intentionally pair a student with a positive peer for activities to build connection and reduce isolation."},
-    {name:"Classroom Job/Responsibility",desc:"Meaningful roles that build connection, purpose, and a sense of value to the community."},
-    {name:"Morning Meeting",desc:"Daily whole-class community-building routine: greeting, sharing, activity, and morning message."},
-    {name:"Informal Classroom Circles",desc:"Low-stakes proactive circle practice to build community and normalize dialogue."},
-    {name:"The Peace Table",desc:"A designated space for students to resolve conflicts using structured restorative conversation."},
-    {name:"Success Jar",desc:"A shared collection of student successes and positive moments celebrated as a class community."},
-    {name:"Mantra",desc:"A brief personalized positive statement a student repeats to build self-worth and de-escalate."},
-    {name:"Whisper Wish",desc:"A quiet, private positive statement delivered discretely to a student to build connection."},
-    {name:"Personalized Notes At Desk",desc:"A personalized written note at a student's desk before they arrive as a Belonging Cue."},
-    {name:"Kudos",desc:"Structured acknowledgment of a specific positive action a student took — private or public."},
-    {name:"Student Survey",desc:"Gather student perspective on their experience, interests, and needs to inform relationship-building."},
-    {name:"Help Offered Survey",desc:"Survey students on interests and expertise, then display so peers can access each other's strengths."},
-    {name:"Empathetic Listening",desc:"Listening without judgment, validating feelings, and avoiding quick fixes to communicate genuine care."},
-    {name:"Active Listening",desc:"Body language, reflection, and clarifying questions that show a student their voice matters."},
-    {name:"Impromptu Conferences",desc:"Brief unplanned check-ins initiated by the educator or student to maintain connection."},
-    {name:"Dear Future Self",desc:"Letter-writing activity where students write to their future self, building identity and hope."},
-    {name:"Letter Writing",desc:"Students write letters to trusted adults or peers as a structured way to process feelings."},
-    {name:"Student Led Conferences",desc:"Students lead discussions about their own progress, goals, and learning with family and teachers."},
-    {name:"Responsibilities",desc:"Elevate struggling students to leadership roles: greeter, mentor, mail carrier, announcements. SACRED — never taken away, never a reward or punishment."},
-    {name:"Affirmations",desc:"Positive self-talk through mantras (repeated phrases), totems (meaningful objects), or mirrors (self-reflection)."},
-    {name:"Daily Behavior Form",desc:"Structured daily tracking form shared between school and home for consistent communication."}
-  ]},
-  awareness:{label:"Awareness",desc:"Recognition that the behavior is happening",color:"#14532D",bg:"#DCFCE7",strategies:[
-    {name:"Secret Signal",desc:"Co-created nonverbal signal between adult and student for redirection without public shame. Two-way: teacher or student can initiate."},
-    {name:"Self Monitoring/Assessment",desc:"Students monitor a specific target behavior using checklists, timers, or journals with educator feedback at intervals."},
-    {name:"Behavioral Monitoring/Tracking",desc:"Systematic observation and recording of target behaviors to identify patterns and measure progress."},
-    {name:"Zones of Regulation",desc:"Curriculum teaching students to identify emotional states using color-coded zones and apply matching strategies."},
-    {name:"Mood Meter",desc:"Quadrant-based emotional check-in tool: Green=calm, Blue=sad, Yellow=anxious, Red=angry. Linked to regulation strategy menu."},
-    {name:"Planned Ignoring",desc:"Intentionally withholding attention from minor attention-seeking behaviors while reinforcing expected ones."},
-    {name:"Social Stories",desc:"Personalized short stories describing a social situation and appropriate responses to build understanding."},
-    {name:"Stoplight Cup Feedback",desc:"Red/yellow/green cups signal emotional state or understanding level to the teacher discretely."},
-    {name:"Picture Reminder",desc:"A personal photo placed accessibly to ground a student and remind them of something meaningful."},
-    {name:"Noise Tracker",desc:"Visual tool for monitoring classroom noise levels to build shared awareness of the environment."},
-    {name:"Q-Tip",desc:"Visual reminder to Quit Taking It Personally — helps reframe reactions for students and educators."},
-    {name:"Try Again",desc:"Calm, non-punitive redirection giving the student an opportunity to practice the expected behavior."},
-    {name:"Blurt Tokens",desc:"Tokens that students manage when calling out — builds self-awareness of impulsive verbal behaviors."},
-    {name:"Talking Tokens",desc:"Physical tokens providing structured, fair participation while building self-monitoring skills."},
-    {name:"Daily Planner",desc:"Structured organizational tool students use to build awareness of tasks, deadlines, and routines."},
-    {name:"Organizational Checklist",desc:"Visual step-by-step list helping students manage materials, tasks, and routines independently."},
-    {name:"Color Coding",desc:"Consistent color systems helping students organize materials, tasks, and expectations visually."},
-    {name:"Color Coded Folders/Resources",desc:"Assign colors to subjects or categories to support organization and reduce cognitive load."},
-    {name:"Doodle Notes",desc:"Allow sketching or doodling while listening to improve focus and retention."},
-    {name:"Class Values",desc:"Co-created community agreements building shared awareness of expectations and shared identity."},
-    {name:"Restitution",desc:"Restorative process where students make things right after a behavior by contributing positively."},
-    {name:"Natural Consequences",desc:"Allow logical, naturally occurring outcomes of behavior to teach cause-and-effect awareness."},
-    {name:"Clear Consistent Consequences",desc:"Transparent, predictable consequences applied consistently to build awareness of expectations."},
-    {name:"Logical Consequences",desc:"Consequences directly related to the behavior, connecting actions to outcomes."},
-    {name:"Problem or Behavior Contract",desc:"Co-authored written agreement outlining specific behavior goals, strategies, and accountability."},
-    {name:"Non-Dominant Hand",desc:"Using non-dominant hand interrupts automatic behaviors and builds self-awareness."},
-    {name:"Log of Items and Item Sign Out Sheet",desc:"Structured tracking system for students who struggle with materials management."}
-  ]},
-  skills:{label:"Skills",desc:"Specific social, behavioral, academic training",color:"#1E3A8A",bg:"#DBEAFE",strategies:[
-    {name:"Specific Skills Training",desc:"Explicit instruction in a lagging skill: instruction + modeling + role play + transference + continuous feedback. Not one-and-done."},
-    {name:"Social Skills Instruction",desc:"Targeted teaching of social skills using the Core Components with opportunities for authentic transfer."},
-    {name:"Controlled Choices",desc:"Offer two acceptable options to give agency while maintaining structure and expectations."},
-    {name:"Avoid The Power Struggle",desc:"Relational discipline moves, calm tone, and de-escalation language prevent win/lose confrontations."},
-    {name:"I-Messages",desc:"Communicate impact using When I see/hear ___, I feel ___ because ___ to avoid blame."},
-    {name:"If...Then Statements",desc:"Clear conditional language communicating expectations and natural outcomes calmly."},
-    {name:"Use Calm Neutral Tone",desc:"Steady, regulated voice tone during behavioral interactions to avoid escalation."},
-    {name:"Model Appropriate Language",desc:"Explicitly demonstrate the words, tone, and phrases expected in a given situation."},
-    {name:"Alternative Ways to Say-Language Profiler",desc:"Teach students alternative words and phrases to express needs, frustration, or disagreement appropriately."},
-    {name:"Simplify Directions",desc:"Break multi-step directions into single steps delivered one at a time to reduce cognitive overload."},
-    {name:"Chunking Material",desc:"Divide tasks into smaller manageable portions to make expectations clear and reduce overwhelm."},
-    {name:"Alternative Ways to Complete Assignments",desc:"Flexible formats (oral, visual, digital) for demonstrating knowledge based on student strengths."},
-    {name:"Help Start Assignment",desc:"Provide the first step or example with the student to reduce initiation difficulty."},
-    {name:"Jumpstart Assignments",desc:"Begin the assignment with the student to break through the barrier of starting difficult tasks."},
-    {name:"Visual Schedule",desc:"Displayed daily or class schedule giving students predictability and reducing transition anxiety."},
-    {name:"Forewarning of Changes in Schedule/Routine",desc:"Advance notice of schedule changes to reduce anxiety for students who struggle with transitions."},
-    {name:"Structured Routine",desc:"Consistent, predictable routines that reduce cognitive load and give students safety and control."},
-    {name:"Supervised Transitions",desc:"Additional structure and adult support during transition times when behavior concerns arise."},
-    {name:"Redirection to Activity",desc:"Redirect attention toward a structured task to interrupt an escalating behavior."},
-    {name:"Note to Teacher/Errand",desc:"Send a student on a purposeful errand for a movement break and reset without losing face."},
-    {name:"Proximity",desc:"Move physically closer as a quiet, noninvasive redirection without calling attention."},
-    {name:"Preferential Seating",desc:"Strategically place students to minimize distractions, increase teacher access, or support focus."},
-    {name:"Move Student to Another Area in Room",desc:"Relocate within the classroom to improve focus, reduce triggers, or increase support."},
-    {name:"Individual Work Space",desc:"A designated private work area to reduce stimulation and support independent focus."},
-    {name:"Rearrangement of Classroom",desc:"Reorganize the physical space to reduce triggers or change the relational dynamic."},
-    {name:"Turn Desk Around",desc:"Reposition a desk to reduce visual distractions and support independent work."},
-    {name:"Limit Items at Desk",desc:"Reduce materials at a desk to minimize distraction and improve organization."},
-    {name:"Intermittent Incentives",desc:"Randomly deliver intrinsic experience-based incentives when a student meets expectations. Must be random — no pattern."},
-    {name:"Simple Rewards System",desc:"Straightforward point or token system tied to specific observable behaviors and a student-selected reward."},
-    {name:"Incentive Menu",desc:"Student-selected list of preferred activities or experiences that can be earned by meeting behavioral goals."},
-    {name:"Classroom Based Reward System",desc:"Whole-class or individual motivation system using points, tokens, or charts tied to clear expectations."},
-    {name:"Individualized Point Scaled System",desc:"Tiered point system tailored to an individual student's specific behavioral goals and reward preferences."},
-    {name:"Mystery Student",desc:"Secret student earns a reward for the whole class by meeting behavioral goals. Identity not revealed unless goal is met."},
-    {name:"Reentry Plans",desc:"Structured plan for a student returning after suspension, crisis, or extended absence."},
-    {name:"Behavior Meetings with Team",desc:"Structured team meetings to share data, align strategies, and coordinate a consistent response."},
-    {name:"Collaboration with Outside Services",desc:"Engage community agencies, mental health providers, or specialists for wraparound support."},
-    {name:"Counseling",desc:"1:1, small group, or SAP-based counseling with a trusted school professional."},
-    {name:"In-School Suspension",desc:"Structured, supervised alternative to out-of-school suspension with academic and behavioral supports."},
-    {name:"Short Term Loss of Privileges",desc:"Temporary removal of a specific privilege directly related to the behavior as a logical consequence."},
-    {name:"Loss of Unstructured or Free Time",desc:"Unstructured time redirected to complete unfinished work or reflect on behavior."},
-    {name:"Transition Time Withheld",desc:"Briefly withhold transition access as a consequence for behavior during that specific transition."},
-    {name:"Relational Discipline Moves",desc:"Graduated sequence: extended eye contact → nonverbal cue → quiet verbal reminder → whole-class redirect. Stops behavior, expresses care, redirects."},
-    {name:"Pocket Points",desc:"Quiet, teacher-to-student incentive system where points are delivered for meeting expectations."},
-    {name:"The Boomerang",desc:"Return a behavior back to the student as a reflection tool: What did I just see? What does that tell you?"},
-    {name:"Sentence Stems",desc:"Structured language starters helping students communicate needs, reflections, or responses."},
-    {name:"Choral Responses",desc:"Whole-class verbal responses to increase engagement, check understanding, and provide structure."},
-    {name:"Call on Student Frequently",desc:"Increase positive, low-stakes interactions with a student to build engagement and connection."},
-    {name:"Talking Tokens",desc:"Physical tokens structuring participation and building self-monitoring of verbal behaviors."},
-    {name:"Community Service",desc:"Structured opportunity for a student to contribute positively to the school or community."},
-    {name:"Formal Circles",desc:"Structured restorative circle for repairing harm, addressing conflict, or reintegrating a student."},
-    {name:"Restorative Circles",desc:"Community-building or responsive circles giving all participants voice and shared ownership."},
-    {name:"Family Group Decision Making",desc:"Collaborative process engaging family and school together in developing a plan to support a student."},
-    {name:"Victim-Offender Dialogue",desc:"Facilitated restorative conversation between those harmed and those who caused harm."},
-    {name:"High Stakes Conferencing",desc:"Formal, structured meeting addressing serious behavior with student and key stakeholders."},
-    {name:"Schedule Adaptations",desc:"PASS rotation, Assigned ACT, Supervised/Structured Transitions, Mobility Plan to adjust schedule for student needs."}
-  ]},
-  regulation:{label:"Regulation",desc:"Identify and cope with feelings",color:"#78350F",bg:"#FEF3C7",strategies:[
-    {name:"Break Card",desc:"Physical card giving BOTH teacher and student ability to initiate a break. Co-designed with ground rules and a menu of regulation options. Practiced before needed."},
-    {name:"Reset Plan",desc:"Three pre-planned options developed collaboratively: (1) at seat, (2) in another section of room, (3) outside room. Practiced before needed. Used AFTER a crisis."},
-    {name:"Sensory/Movement Breaks",desc:"Scheduled or responsive breaks involving movement or sensory input to regulate the nervous system."},
-    {name:"Scheduled Breaks",desc:"Pre-planned breaks built into the day at times of known difficulty to prevent escalation."},
-    {name:"Coping Strategies",desc:"A personalized toolkit of strategies a student can use to manage stress, frustration, or overwhelm."},
-    {name:"Deep Breathing",desc:"Structured breathing exercises: 7-11 breathing, belly breathing, shape tracing, tapping. Activates the parasympathetic nervous system."},
-    {name:"Slow Counting to 10-Breathing Exercises",desc:"Counting-based regulation strategies that create a pause between trigger and response."},
-    {name:"Belly Breathing",desc:"Diaphragmatic breathing technique that shifts the body from stress response to calm."},
-    {name:"Mindfulness",desc:"Structured present-moment awareness practices that reduce reactivity over time."},
-    {name:"Stress Ball or Fidget",desc:"Handheld sensory tool providing physical input to support regulation during seated tasks."},
-    {name:"Sit Disk",desc:"Inflatable wobble cushion providing sensory input and movement for students who struggle with prolonged sitting."},
-    {name:"Use of Timer",desc:"Visual timer reducing anxiety about task length and supporting self-management of transitions."},
-    {name:"Velcro on Desk",desc:"Textured surface under a desk for discreet tactile sensory input during class."},
-    {name:"Option to Stand While Working",desc:"Allow students to stand at their desk or a standing area to meet movement needs while engaged."},
-    {name:"Listen to Music",desc:"Allow headphones and music to reduce auditory distractions and support focus or regulation."},
-    {name:"Headphones",desc:"Noise-reducing or music headphones to manage sensory overload or support focus during work."},
-    {name:"Weighted Lap Pad",desc:"Weighted pad placed on the lap to provide calming deep pressure input during seated tasks."},
-    {name:"Weighted Snake/Blanket",desc:"Weighted object draped over shoulders or lap to provide calming proprioceptive input."},
-    {name:"Deep Pressure",desc:"Firm physical pressure (weighted items, compression) activating the body's calming response."},
-    {name:"Diffuser",desc:"Calming scents (lavender, etc.) in a designated space to support sensory regulation."},
-    {name:"Barefoot/Socks",desc:"Removing shoes allows sensory grounding input through the feet for some students."},
-    {name:"Room Temperature",desc:"Adjusting temperature — cooler environments tend to support regulation and focus."},
-    {name:"Rest Your Eyes",desc:"Brief permission to close eyes and rest in place as a low-demand regulation reset."},
-    {name:"Calisthenics",desc:"Brief structured physical exercise to release tension and provide movement-based regulation."},
-    {name:"Drinking Water",desc:"Water helps metabolize cortisol. When shoulders relax after drinking, regulation has been supported."},
-    {name:"Musical Reset",desc:"A specific song or musical cue as a signal for a class or individual to transition and reset."},
-    {name:"Rapid Resets",desc:"Quick in-the-moment techniques: Tense+Release, Alphabet Soup, Stop Sign, Climb Down the Ladder, Escape Space, Hand to Heart, Finger Thumb Switch, Thumb Drum."},
-    {name:"Affirmations",desc:"Positive self-talk through mantras (routine, ritual, positive, verbal, catchy), totems (meaningful objects), or mirrors."},
-    {name:"Journal Writing",desc:"Structured or open writing as a processing and regulation tool for thoughts, feelings, and emotions."},
-    {name:"Thich Nhat Hahn Breathing",desc:"Mindful breathing paired with intentional phrases to build present-moment awareness and calm."},
-    {name:"The Fish Tank",desc:"Observing a fish tank or nature imagery as a calming, attention-restoring sensory experience."},
-    {name:"Pulse Checks",desc:"Brief structured awareness tools — journal writing, unopened letter, picture reminder — to check on emotional state."},
-    {name:"Zones of Regulation",desc:"Color-coded emotional state identification linked to matched regulation strategy menus."},
-    {name:"Mood Meter",desc:"Quadrant-based emotional check-in tool linked to a personalized regulation strategy menu."},
-    {name:"Check In / Check Out",desc:"Structured adult check-ins timed to the most challenging moments of the day to support regulation through connection."}
-  ]}
-};
-
-const RESOURCES=[
-  {section:"E.S.C. Behavior Coaching Site",items:[
-    {title:"Strategies Homepage",desc:"Full hub for all E.S.C. behavior coaching resources and tools.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage"},
-    {title:"Be a Scientist",desc:"The full 6-step Educational Engagement Coaching Process.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist"},
-    {title:"Find the Right Fit — Full Library",desc:"Complete intervention library with one-pagers for every strategy.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit"},
-    {title:"The Brain",desc:"Resources on affect script theory, mental health, trauma, basic needs, and engagement.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/the-brain"},
-    {title:"Behavior Coaching",desc:"Direct coaching support and consultation resources.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist/behavior-coaching"}
-  ]},
-  {section:"SEL & Emotional Literacy",items:[
-    {title:"CASEL — Fundamentals of SEL",desc:"Research-based framework for social emotional learning implementation.",url:"https://casel.org/fundamentals-of-sel/"},
-    {title:"Character Strong Weeklies",desc:"2-3 minute videos with quick ideas to embed SEL topics in your classroom.",url:"https://characterstrong.com"},
-    {title:"Character Lab Tips",desc:"2-minute reads on SEL topics for students or educators.",url:"https://characterlab.org/tips-of-the-week/"},
-    {title:"Greater Good Science Center",desc:"Science-based insights including articles, videos, and podcasts on wellbeing.",url:"https://greatergood.berkeley.edu"},
-    {title:"Search Institute",desc:"Bank of activities filtered by time, type, age, and group size.",url:"https://www.search-institute.org"},
-    {title:"Atlas of Emotions",desc:"Interactive website to explore emotions and understand our responses.",url:"http://atlasofemotions.org"},
-    {title:"How We Feel App",desc:"Free app for students to identify, track, and respond to daily emotions.",url:"https://howwefeel.org"},
-    {title:"Permission to Feel — Marc Brackett",desc:"Resources on emotional literacy and the RULER approach from Yale.",url:"https://www.marcbrackett.com/permission-to-feel/"},
-    {title:"Signature Practices Playbook — CASEL",desc:"Strategies pluggable into the beginning, middle, or end of lessons.",url:"https://casel.org"}
-  ]},
-  {section:"Trauma-Informed Practices",items:[
-    {title:"Building a Trauma-Informed Restorative School — Joe Brummer",desc:"Framework for trauma-responsive school culture including Fight/Flight/Freeze/Fawn.",url:"https://www.joebrummer.com"},
-    {title:"Trauma Responsive Educational Practices — Micere Keels",desc:"Research on trauma-informed classroom strategies including co-regulation and relational discipline.",url:"https://press.uchicago.edu"},
-    {title:"Positive Childhood Experiences (PCEs) — CDC",desc:"Research on protective factors that buffer adverse childhood experiences.",url:"https://www.cdc.gov/violenceprevention/aces/pce.html"},
-    {title:"Emotional Poverty — Ruby Payne",desc:"Resources on regulation techniques including look up, water, future story, and breathing.",url:"https://www.ahaprocess.com"},
-    {title:"Relationship, Responsibility, and Regulation — Souers & Hall",desc:"Framework for building connection, accountability, and co-regulation in schools.",url:"https://www.ascd.org"}
-  ]},
-  {section:"Restorative Practices",items:[
-    {title:"IIRP — Restorative Practices",desc:"International Institute for Restorative Practices — research and training resources.",url:"https://www.iirp.edu"},
-    {title:"Social Discipline Window — Wachtel",desc:"Working WITH people rather than TO or FOR them. High Firm + High Fair = Relational.",url:"https://www.iirp.edu/defining-restorative/social-discipline-window"},
-    {title:"Circles — E.S.C. Resources",desc:"Guides for implementing community-building and restorative circles in your school.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/informal-classroom-circles"},
-    {title:"Hacking School Discipline Together — Benson",desc:"Practical restorative discipline approaches including Reset Plans and Break Cards.",url:"https://hacklearning.org"}
-  ]},
-  {section:"Behavior & Classroom Management",items:[
-    {title:"Intervention Central",desc:"Free tools and resources for behavior intervention and academic support.",url:"https://www.interventioncentral.org"},
-    {title:"PBIS.org",desc:"Positive Behavioral Interventions and Supports — tiered framework and data tools.",url:"https://www.pbis.org"},
-    {title:"Discipline with Dignity — Curwin & Mendler",desc:"Research behind relationship-based discipline including Secret Signal.",url:"https://www.ascd.org"},
-    {title:"When the Adults Change — Paul Dix",desc:"Adult behavior change as the lever for student behavior. Source of TROGS and Embellished Countdown.",url:"https://pivotaleducation.com"},
-    {title:"Atomic Habits — James Clear",desc:"Habit-building tools applicable to student self-monitoring and behavior change.",url:"https://jamesclear.com"},
-    {title:"Drive — Daniel Pink",desc:"Research on intrinsic motivation behind Intermittent Incentives and Elevate Praise.",url:"https://www.danpink.com/books/drive/"},
-    {title:"Hacking Classroom Management — Mike Roberts",desc:"Proactive classroom management strategies including Community Systems.",url:"https://hacklearning.org"}
-  ]},
-  {section:"Regulation & Brain Science",items:[
-    {title:"Rapid Resets — E.S.C.",desc:"Quick in-the-moment regulation techniques from Improving School Mental Health.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
-    {title:"Emotional Regulation Strategies — E.S.C.",desc:"Four types: Mindful Breathing, Forward-Looking, Attention-Shifting, Cognitive Reframing.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
-    {title:"Zones of Regulation",desc:"Curriculum for teaching students to identify emotional states and apply strategies.",url:"https://www.zonesofregulation.com"},
-    {title:"Mood Meter — Yale Center for Emotional Intelligence",desc:"RULER approach research and tools for emotional literacy.",url:"https://emotionalintelligence.yale.edu/ruler"},
-    {title:"Five Domains of Regulation",desc:"Physical, Cognitive, Emotional, Social, and Pro-Social regulation frameworks.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
-    {title:"Improving School Mental Health — Peck & Caswell",desc:"Source for Rapid Reset techniques used in E.S.C. regulation resources.",url:"https://www.schoolmentalhealth.org"}
-  ]}
-];
-
-function renderLibrary(){
-  const c=document.getElementById('libraryContent');
-  let h='';
-  Object.entries(LIBRARY).forEach(([key,bucket])=>{
-    h+=`<div class="bucket-section"><div class="bucket-section-header"><span class="bucket-section-badge" style="background:${bucket.bg};color:${bucket.color}">${bucket.label}</span><div><div class="bucket-section-title" style="color:${bucket.color}">${bucket.label} Strategies</div><div style="font-size:12px;color:var(--gray-500)">${bucket.desc}</div></div></div><div class="lib-grid">`;
-    bucket.strategies.forEach(s=>{
-      const url=BASE+s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-      h+=`<a class="lib-card" href="${url}" target="_blank" style="border-left-color:${bucket.color}"><div class="lib-card-name">${s.name}</div><div class="lib-card-desc">${s.desc}</div><div class="lib-card-link" style="color:${bucket.color}">View one-pager &#8599;</div></a>`;
-    });
-    h+=`</div></div>`;
-  });
-  c.innerHTML=h;
-}
-
-function renderResources(){
-  const c=document.getElementById('resourcesContent');
-  let h='';
-  RESOURCES.forEach(section=>{
-    h+=`<div class="res-section"><h3>${section.section}</h3><div class="res-grid">`;
-    section.items.forEach(item=>{
-      h+=`<a class="res-card" href="${item.url}" target="_blank"><div class="res-card-title">${item.title}</div><div class="res-card-desc">${item.desc}</div></a>`;
-    });
-    h+=`</div></div>`;
-  });
-  c.innerHTML=h;
-}
-
-function showPage(page,btn){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
-  if(btn)btn.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function goToLibrary(){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-library').classList.add('active');
-  document.querySelectorAll('.nav-tab')[1].classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-const OBS=["Late or early to class","Frequently absent","Bangs on desk in frustration","Having side conversations","Rough play","Off task","Out of seat","Stealing/Theft","Upset/Crying","Isolated play","Picked last in games/activities","Refuses to work with peers","Inappropriate language or tone","Name calling","Does not maintain eye contact","Complaints of boredom","Head down","Hood up","Repetitive behaviors","Cheating","Frequent bathroom breaks/trips to nurse","Negative self-talk","Messy desk / materials","Texting / Off task with technology","Unprepared for class","Always first or last to turn in work","Picking nails or skin","Tapping / Fidgeting","Blames others","Argues with others","Expresses instant remorse","Does not complete work","Does not turn in work","Excessively asks for help/reassurance","Refuses help when offered","Gives frequent excuses","Yells or screams","Makes noises","Interrupts others","Stands too close to others","Calls out","Touches others/Doesn't keep hands to self","Other (describe below)"];
-const FIGHT=new Set(["Bangs on desk in frustration","Having side conversations","Rough play","Inappropriate language or tone","Name calling","Blames others","Argues with others","Yells or screams","Interrupts others","Calls out","Touches others/Doesn't keep hands to self","Stealing/Theft"]);
-const FLIGHT=new Set(["Late or early to class","Frequently absent","Off task","Out of seat","Head down","Hood up","Frequent bathroom breaks/trips to nurse","Texting / Off task with technology","Refuses to work with peers","Isolated play","Cheating"]);
-const FREEZE=new Set(["Does not complete work","Does not turn in work","Does not maintain eye contact","Repetitive behaviors","Tapping / Fidgeting","Complaints of boredom","Negative self-talk","Picking nails or skin","Makes noises","Upset/Crying"]);
-const FAWN=new Set(["Excessively asks for help/reassurance","Gives frequent excuses","Expresses instant remorse","Refuses help when offered","Unprepared for class"]);
-const BUCKETS=[
-  {id:"connection",label:"Connection",desc:"Relationship to self, others, the work",bg:"#EDE9FE",text:"#5B21B6",border:"#7C3AED"},
-  {id:"awareness",label:"Awareness",desc:"Recognition that the behavior is happening",bg:"#DCFCE7",text:"#14532D",border:"#16A34A"},
-  {id:"skills",label:"Skills",desc:"Specific social, behavioral, academic training",bg:"#DBEAFE",text:"#1E3A8A",border:"#1D4ED8"},
-  {id:"regulation",label:"Regulation",desc:"Identify and cope with feelings",bg:"#FEF3C7",text:"#78350F",border:"#D97706"}
-];
-const SECTIONS=[
-  {id:"what",num:"#1",label:"WHAT",title:"What is happening (or not happening)?",focus:"Focus on the concrete action you can see. Must be observable — not a judgement.",bg:"#DBEAFE",text:"#1E3A8A",questions:[
-    {id:"observables",label:"Select all observable behaviors you notice",hint:"Pick everything that applies. Select 'Other' and describe below if the behavior is not listed.",type:"obs"},
-    {id:"describe",label:"Describe exactly what you see or hear",hint:"Specific and observable only. If you selected Other, describe it here.",type:"textarea"},
-    {id:"not_happening",label:"Is there anything NOT happening that concerns you?",hint:"e.g. Not completing any written work or Not engaging with peers at all.",type:"textarea"}
-  ]},
-  {id:"when",num:"#2",label:"WHEN",title:"When is it happening?",focus:"Focus on frequency, time of day, type of task, subject area. Look for patterns.",bg:"#DCFCE7",text:"#14532D",questions:[
-    {id:"frequency",label:"How often does this occur?",type:"chips",options:["First time","A few times this week","Daily","Multiple times per day","Almost every class"]},
-    {id:"time_of_day",label:"What time of day?",type:"chips",options:["Morning arrival","Early class","Mid-morning","Lunch / unstructured","Afternoon class","End of day","During transitions","Throughout the day"]},
-    {id:"task_type",label:"During what type of task or activity?",type:"chips",options:["Independent work","Whole group lesson","Small group","Partner work","Transitions","Unstructured / free time","Test or assessment","Any / all tasks"]},
-    {id:"pattern",label:"Any patterns you have noticed?",hint:"e.g. Every Monday or After lunch or When a sub is in or Before a test",type:"textarea"}
-  ]},
-  {id:"who",num:"#3",label:"WHO",title:"Who is involved?",focus:"Focus on the relationship between the parties. Look at dynamics.",bg:"#EDE9FE",text:"#5B21B6",questions:[
-    {id:"grade",label:"What grade is this student in?",type:"select",options:["Pre-K / Kindergarten","Grade 1","Grade 2","Grade 3","Grade 4","Grade 5","Grade 6","Grade 7","Grade 8","Grade 9","Grade 10","Grade 11","Grade 12"]},
-    {id:"others",label:"Who is present when the behavior occurs?",type:"chips",options:["Specific peer(s)","Whole class","Teacher / me","Teaching assistant","Admin / other staff","Happens when alone","Across all settings"]},
-    {id:"dynamics",label:"Describe the dynamics",hint:"e.g. Calls out only when teacher is talking or Out of seat to visit friends",type:"textarea"},
-    {id:"whats_worked",label:"What have you already tried? What worked, even a little?",type:"textarea"}
-  ]},
-  {id:"where",num:"#4",label:"WHERE",title:"Where is it happening?",focus:"Focus on the specific location the observable is happening. Look at location.",bg:"#FEE2E2",text:"#991B1B",questions:[
-    {id:"location",label:"Where does this behavior occur?",type:"chips",options:["Specific classroom","Hallway","Cafeteria","Playground","Gym","Nurse's office","Transportation / bus","On school grounds","Outside of school","Multiple / all locations"]},
-    {id:"location_detail",label:"Describe the environment at that location",hint:"Noise level, class size, seating arrangement, structure level.",type:"textarea"},
-    {id:"safe_location",label:"Is there a location where this behavior does NOT occur?",hint:"This reveals protective environmental factors worth replicating.",type:"textarea"}
-  ]},
-  {id:"why",num:"#5",label:"WHY",title:"Why is it happening?",focus:"Focus on what the student may need. Determine the intervention bucket.",bg:"#F3F4F6",text:"#374151",questions:[
-    {id:"buckets",label:"Which intervention bucket(s) does this most likely fall into?",hint:"Connection, Awareness, Skills, Regulation — select all that apply.",type:"buckets"},
-    {id:"student_need",label:"What do you think this student needs most right now?",hint:"Relationship to self/others, recognition of behavior, lagging skills, or emotional regulation.",type:"textarea"},
-    {id:"context",label:"Any relevant student context? (optional)",hint:"Learning needs, recent events, known diagnoses — only what is appropriate to share.",type:"textarea"}
-  ]},
-  {id:"how",num:"#6",label:"HOW",title:"How will we specifically meet this student's needs?",focus:"Focus on all variables. Put it all together: Student, Teacher, Environment.",bg:"#DCFCE7",text:"#14532D",questions:[
-    {id:"teacher_fit",label:"What approaches feel manageable for you as the educator right now?",hint:"The best intervention is one you can implement consistently. Be honest about capacity.",type:"textarea"},
-    {id:"env_constraints",label:"Environmental constraints or opportunities?",hint:"e.g. No TA available or Can rearrange seating or Student responds to movement",type:"textarea"},
-    {id:"goal",label:"What does success look like in 2 weeks?",hint:"Describe the specific observable change you hope to see.",type:"textarea"}
-  ]}
-];
-
-let current=0,data={},insights={},done=new Set();
-
-function detectTrauma(obs){
-  let f=0,fl=0,fr=0,fw=0;
-  obs.forEach(o=>{if(FIGHT.has(o))f++;if(FLIGHT.has(o))fl++;if(FREEZE.has(o))fr++;if(FAWN.has(o))fw++;});
-  const mx=Math.max(f,fl,fr,fw);
-  if(mx===0)return null;
-  if(f===mx)return{type:"Fight",desc:"The student may be engaging with a perceived threat. Avoid power struggles. Use calm neutral tone and relational discipline moves."};
-  if(fl===mx)return{type:"Flight",desc:"The student may be trying to escape the perceived threat. Provide safe, predictable options and increase connection before demanding compliance."};
-  if(fr===mx)return{type:"Freeze",desc:"The student may be shutting down in response to overwhelm. Reduce demands first. Use gentle check-ins and breathing before expecting engagement."};
-  return{type:"Fawn",desc:"The student may be appeasing to avoid conflict. Build authentic relationship. Validate genuine effort and help student find their voice."};
-}
-
-async function callAPI(messages){
-  const res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages})});
-  const j=await res.json();
-  if(!res.ok)throw new Error(j.error||'Server error');
-  return j.content?.[0]?.text||'';
-}
-
-function render(){
-  document.getElementById('form').innerHTML='';
-  SECTIONS.forEach((s,i)=>{
-    const div=document.createElement('div');
-    div.id='sec_'+s.id;
-    div.className='card'+(i!==current&&!done.has(s.id)?' hidden':'');
-    div.innerHTML=buildSec(s,i);
-    document.getElementById('form').appendChild(div);
-    initSec(s);
-  });
-  updateSteps();showCurrent();
-}
-
-function buildSec(s,idx){
-  let h=`<div class="card-header"><div class="sec-badge" style="background:${s.bg};color:${s.text}">${s.num}: ${s.label}</div><div><div class="card-title">${s.title}</div><div class="card-focus">${s.focus}</div></div></div>`;
-  s.questions.forEach(q=>{
-    h+=`<div class="q"><label>${q.label}</label>`;
-    if(q.hint)h+=`<div class="hint">${q.hint}</div>`;
-    if(q.type==='textarea')h+=`<textarea id="q_${q.id}" placeholder="Type your response here..."></textarea>`;
-    else if(q.type==='select'){
-      h+=`<select id="q_${q.id}"><option value="">Select grade level...</option>`;
-      q.options.forEach(o=>h+=`<option value="${o}">${o}</option>`);
-      h+=`</select>`;
-    }else if(q.type==='chips'){
-      h+=`<div class="chip-group" id="c_${q.id}">`;
-      q.options.forEach(o=>h+=`<div class="chip" data-v="${o}">${o}</div>`);
-      h+=`</div>`;
-    }else if(q.type==='obs'){
-      h+=`<div class="obs-grid" id="c_${q.id}">`;
-      OBS.forEach(o=>h+=`<div class="obs-chip" data-v="${o}">${o}</div>`);
-      h+=`</div>`;
-    }else if(q.type==='buckets'){
-      h+=`<div class="bucket-grid" id="c_${q.id}">`;
-      BUCKETS.forEach(b=>h+=`<div class="bucket-card" data-v="${b.id}" data-bg="${b.bg}" data-border="${b.border}" data-text="${b.text}"><div class="bucket-title" style="color:${b.text}">${b.label}</div><div class="bucket-desc">${b.desc}</div></div>`);
-      h+=`</div>`;
-    }
-    h+=`</div>`;
-  });
-  h+=`<div class="insight-box" id="ins_${s.id}"><div class="insight-label">AI coaching note</div><p class="insight-text" id="ins_t_${s.id}"></p></div>`;
-  const isLast=idx===SECTIONS.length-1;
-  h+=`<div class="btn-row"><button class="btn btn-primary" id="btn_${s.id}" onclick="submit('${s.id}',${isLast})">${isLast?'Generate My Intervention Plan':'Analyze &amp; Continue &#8250;'}<span class="dots hidden" id="d_${s.id}"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span></button></div>`;
-  return h;
-}
-
-function initSec(s){
-  s.questions.forEach(q=>{
-    if(q.type==='chips'||q.type==='obs'){
-      const c=document.getElementById('c_'+q.id);if(!c)return;
-      const cls=q.type==='obs'?'obs-chip':'chip';
-      c.querySelectorAll('.'+cls).forEach(el=>el.addEventListener('click',()=>el.classList.toggle('sel')));
-    }else if(q.type==='buckets'){
-      const c=document.getElementById('c_'+q.id);if(!c)return;
-      c.querySelectorAll('.bucket-card').forEach(el=>el.addEventListener('click',()=>{
-        const on=el.classList.toggle('sel');
-        el.style.background=on?el.dataset.bg:'';
-        el.style.borderColor=on?el.dataset.border:'';
-      }));
-    }
-  });
-}
-
-function getVal(id){const e=document.getElementById('q_'+id);return e?e.value.trim():'';}
-function getChips(id){const c=document.getElementById('c_'+id);if(!c)return[];return[...c.querySelectorAll('.chip.sel,.obs-chip.sel')].map(e=>e.dataset.v);}
-function getBuckets(id){const c=document.getElementById('c_'+id);if(!c)return[];return[...c.querySelectorAll('.bucket-card.sel')].map(e=>e.dataset.v);}
-
-function collect(sid){
-  const s=SECTIONS.find(x=>x.id===sid),d={};
-  s.questions.forEach(q=>{
-    if(q.type==='chips'||q.type==='obs')d[q.id]=getChips(q.id);
-    else if(q.type==='buckets')d[q.id]=getBuckets(q.id);
-    else d[q.id]=getVal(q.id);
-  });
-  return d;
-}
-
-function sumSection(sid,d){
-  const s=SECTIONS.find(x=>x.id===sid);
-  return s.questions.map(q=>{const v=Array.isArray(d[q.id])?d[q.id].join(', '):d[q.id];return v?`${q.label}: ${v}`:''}).filter(Boolean).join('\n');
-}
-
-function fullSummary(){
-  return SECTIONS.map(s=>{const d=data[s.id];if(!d)return'';return`=== ${s.num} ${s.title} ===\n${sumSection(s.id,d)}`;}).join('\n\n');
-}
-
-function showCurrent(){
-  SECTIONS.forEach((s,i)=>{
-    const el=document.getElementById('sec_'+s.id);if(!el)return;
-    if(i===current){el.classList.remove('hidden');setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),100);}
-    else if(!done.has(s.id))el.classList.add('hidden');
-  });
-}
-
-function updateSteps(){
-  const labels=['What','When','Who','Where','Why','How'];
-  document.getElementById('stepRow').innerHTML=SECTIONS.map((s,i)=>{
-    let cls='step';
-    if(done.has(s.id))cls+=' done';
-    else if(i===current)cls+=' active';
-    return`<div class="${cls}"><span class="step-num">${done.has(s.id)?'&#10003;':i+1}</span>${s.num} ${labels[i]}</div>`;
-  }).join('');
-  const pct=Math.round(done.size/SECTIONS.length*100);
-  document.getElementById('pbar').style.width=pct+'%';
-  const curr=SECTIONS[current];
-  document.getElementById('pbarLabel').textContent=done.size===SECTIONS.length?'All 6 steps complete — review your plan below':`Step ${current+1} of 6 — ${curr?curr.title:''}`;
-}
-
-async function submit(sid,isFinal){
-  const d=collect(sid);data[sid]=d;
-  const btn=document.getElementById('btn_'+sid),dots=document.getElementById('d_'+sid);
-  btn.disabled=true;dots.classList.remove('hidden');
-  const sum=sumSection(sid,d);
-  try{
-    if(!isFinal){
-      const sec=SECTIONS.find(s=>s.id===sid);
-      const txt=await callAPI([{role:'user',content:`You are a supportive E.S.C. Educational Engagement Coaching specialist using the Be a Scientist framework at Ephrata Area School District. The educator just completed step ${sec.num} ${sec.title}.\n\nTheir responses:\n${sum}\n\nAll data so far:\n${JSON.stringify(data)}\n\nWrite a 2-3 sentence coaching note. Acknowledge what they shared, name one specific insight this step reveals, and briefly note what the next step will clarify. Be warm, trauma-informed, and practical. Do NOT recommend interventions yet.`}]);
-      insights[sid]=txt;
-      document.getElementById('ins_t_'+sid).textContent=txt;
-      document.getElementById('ins_'+sid).style.display='block';
-      done.add(sid);current++;
-      await new Promise(r=>setTimeout(r,400));
-      btn.disabled=false;dots.classList.add('hidden');
-      updateSteps();showCurrent();
-    }else{
-      done.add(sid);updateSteps();
-      await buildPlan(btn,dots);
-    }
-  }catch(e){btn.disabled=false;dots.classList.add('hidden');showError(e.message);}
-}
-
-async function buildPlan(btn,dots){
-  const observables=data.what?.observables||[];
-  const traumaR=detectTrauma(observables);
-  const KNOWLEDGE=`E.S.C. STRATEGY LIBRARY (Ephrata Area School District Behavior Coaching):\n\nCONNECTION: 2x10 (2 min non-academic conversation daily for 10 days — student drives topic, NOT about work or behavior), Morning Greeting (Name+Eye contact+Nonverbal+Positive — increases engagement 20%, decreases disruption 9%), Check In/Check Out (pair with adult, 3-5 target behaviors, focus on listening not compliance), Responsibilities (Hospitality/Service/Leadership roles — SACRED, never taken away, never a reward or punishment — schedule at most challenging time of day), Peer Buddy, Assigned Partner, Classroom Job, Morning Meeting, Circles, Affirmations (mantras/totems/mirrors), Success Jar, Sticky Note Check In, Empathy Interview, Student Consulting, Positive Praise (effort-based + behavior-specific, Gratitude Formula: When I see + I feel + because + Thank you), Model Positive Relationships, Shadow Day.\n\nAWARENESS: Secret Signal (co-created, discrete, two-way — student can also initiate to request break), Self-Monitoring (target behavior defined in observables, timed intervals, feedback loop), Zones of Regulation, Mood Meter (Green=calm, Blue=sad, Yellow=anxious, Red=angry, linked to regulation menu), Behavioral Monitoring/Tracking, Blurt Tokens, Talking Tokens, Daily Planner, Organizational Checklist, Color Coding, Class Values, Natural Consequences, Clear Consistent Consequences, Logical Consequences, Behavior Contract, Restitution, Planned Ignoring.\n\nSKILLS: Specific Skills Training (explicit instruction + modeling + role play + transference + continuous feedback — NOT one and done), Social Skills Instruction, Controlled Choices, Avoid Power Struggle, I-Messages, If-Then Statements, Calm Neutral Tone, Simplify Directions, Chunking Material, Alternative Ways to Complete Assignments, Help Start/Jumpstart Assignments, Visual Schedule, Forewarning of Changes, Structured Routine, Supervised Transitions, Preferential/Strategic Seating, Environmental Modifications (rows=independent/testing, clusters=collaboration, pairs=connection, circle=community; maximize muted colors/soft music/natural light), Relational Discipline Moves (extended eye contact to nonverbal cue to quiet verbal to whole-class redirect — stop behavior + express care + redirect), Intermittent Incentives (random experience-based, verbalize the why), Community Systems (All For One/One For All/Mystery Student/To Each Their Own), Counseling/SAP, Schedule Adaptations.\n\nREGULATION: Break Card (co-designed two-way, menu of regulation options, practice before needed), Reset Plan (3 options: seat/room/outside — practiced before needed, used AFTER crisis before reflection), Breathing Techniques (7-11 breathing, belly breathing, Rapid Resets: Tense+Release/Alphabet Soup/Stop Sign/Escape Space/Hand to Heart), Sensory/Movement Breaks, Fidgets, Weighted Items, Headphones, Music, Visual Timer, Mood Meter, Affirmations, Chill-Out options (seat: breathing/fidget/headphones/journal; room: sensory corner/movement; outside: walk/gym/errand/mentor/trusted adult), Mindfulness, Journal Writing.\n\nTRAUMA LENS (Fight/Flight/Freeze/Fawn): Fight = avoid power struggles, calm neutral tone, relational discipline. Flight = connection before compliance, provide safe exits. Freeze = reduce demands, gentle check-ins, breathing before expecting engagement. Fawn = authentic relationship, validate genuine effort, help find voice. ALL = Social Discipline Window: work WITH not TO or FOR (High Firm + High Fair = Relational/Authoritative).`;
-
-  try{
-    const response=await callAPI([{role:'user',content:`You are an E.S.C. Educational Engagement Coaching specialist at Ephrata Area School District. An educator completed all 6 steps of the Be a Scientist process. Generate a personalized intervention plan using ONLY the strategies from the provided library.\n\nFULL OBSERVATION:\n${fullSummary()}\n\nCOACHING NOTES:\n${Object.entries(insights).map(([k,v])=>`${k}: ${v}`).join('\n')}\n\nTRAUMA RESPONSE: ${traumaR?`${traumaR.type} — ${traumaR.desc}`:'None detected from observables'}\n\n${KNOWLEDGE}\n\nCRITICAL: Work WITH the student (Social Discipline Window). Best intervention fits the STUDENT, TEACHER, and ENVIRONMENT. Use effort-based and behavior-specific praise only. Reference 6-8 consecutive school weeks for review.\n\nRespond ONLY with valid JSON, no markdown:\n{"scientist_summary":"2-3 sentence Be a Scientist summary using their actual observables","trauma_type":"${traumaR?traumaR.type:'none'}","trauma_guidance":"${traumaR?traumaR.desc.replace(/"/g,"'"):''}","social_discipline_note":"1 sentence on working WITH this specific student","primary_bucket":"connection|awareness|skills|regulation","secondary_bucket":"connection|awareness|skills|regulation|none","bucket_rationale":"1-2 sentences tied to their specific data","priority":"low|moderate|high","tags":["tag1","tag2","tag3"],"try_first":[{"name":"exact strategy name","bucket":"connection|awareness|skills|regulation","why":"rationale tied to their data","the_moves":"2-4 specific implementation steps adapted to THIS student and THIS teacher capacity"},{"name":"...","bucket":"...","why":"...","the_moves":"..."},{"name":"...","bucket":"...","why":"...","the_moves":"..."}],"also_consider":[{"name":"strategy name","bucket":"...","why":"brief rationale"},{"name":"...","bucket":"...","why":"..."},{"name":"...","bucket":"...","why":"..."}],"what_to_say":"2-4 sentences the educator can say tomorrow — effort-based or behavior-specific only, no personal praise","what_not_to_do":"1-2 sentences on what to avoid based on data and trauma lens","environment_fits":["specific adjustment 1","specific adjustment 2","specific adjustment 3"],"two_week_trial":"Days 1-3 (start here), Days 4-7 (build on this), Days 8-14 (monitor and adjust) — specific to their context","what_to_track":"exact observable data to collect and what change signals it is working","who_to_loop_in":["specific person or role 1","specific person or role 2"],"review_by":"specific recommendation referencing 6-8 consecutive school weeks"}`}]);
-
-    let txt=response.replace(/```json|```/g,'').trim();
-    const start=txt.indexOf('{'),end=txt.lastIndexOf('}');
-    if(start>-1&&end>-1)txt=txt.slice(start,end+1);
-    const plan=JSON.parse(txt);
-    btn.disabled=false;dots.classList.add('hidden');
-    showResults(plan);
-  }catch(e){btn.disabled=false;dots.classList.add('hidden');showError(e.message);}
-}
-
-function showError(msg){
-  document.getElementById('results').style.display='block';
-  document.getElementById('results').innerHTML=`<div class="error-card"><p>Something went wrong generating the plan.</p><p>${msg||'Please try again.'}</p><div class="btn-row" style="margin-top:1rem"><button class="btn btn-outline" onclick="startOver()">Start over</button></div></div>`;
-}
-
-function bColor(b){const m={connection:'#5B21B6',awareness:'#14532D',skills:'#1E3A8A',regulation:'#78350F'};return m[b]||'#374151';}
-function bBg(b){const m={connection:'#EDE9FE',awareness:'#DCFCE7',skills:'#DBEAFE',regulation:'#FEF3C7'};return m[b]||'#F3F4F6';}
-function slug(n){return n.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
-
-function showResults(p){
-  const rs=document.getElementById('results');
-  rs.style.display='block';
-  document.getElementById('form').style.display='none';
-  setTimeout(()=>rs.scrollIntoView({behavior:'smooth',block:'start'}),100);
-  const prTag=p.priority==='high'?'tag-high':p.priority==='moderate'?'tag-moderate':'tag-low';
-  let h=`<div class="r-header"><div class="r-eyebrow">E.S.C. Be a Scientist &mdash; Put It All Together</div><div class="r-title">Behavior Intervention Plan</div><div class="tags"><span class="tag ${prTag}">${p.priority} priority</span>${(p.tags||[]).map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div><div class="r-summary">${p.scientist_summary}</div></div>`;
-  if(p.trauma_type&&p.trauma_type!=='none'&&p.trauma_guidance)h+=`<div class="trauma-banner"><div class="trauma-banner-title">Trauma lens &mdash; ${p.trauma_type} response pattern detected</div><div class="trauma-banner-body">${p.trauma_guidance}</div></div>`;
-  if(p.social_discipline_note)h+=`<div class="window-banner"><div class="window-banner-title">Social Discipline Window &mdash; Work WITH, not TO or FOR</div><div class="window-banner-body">${p.social_discipline_note}</div></div>`;
-  const buckets=[p.primary_bucket];
-  if(p.secondary_bucket&&p.secondary_bucket!=='none')buckets.push(p.secondary_bucket);
-  h+=`<div class="bucket-row">`;
-  buckets.forEach(b=>{h+=`<div class="bucket-pill" style="background:${bBg(b)};border:1.5px solid ${bColor(b)}40"><div class="bucket-pill-title" style="color:${bColor(b)}">${b.charAt(0).toUpperCase()+b.slice(1)} bucket</div><div class="bucket-pill-body" style="color:${bColor(b)}">${p.bucket_rationale}</div></div>`;});
-  h+=`</div>`;
-  h+=`<div class="rcard"><div class="rcard-title">Start with these strategies &mdash; from your E.S.C. library</div>`;
-  (p.try_first||[]).forEach(s=>{h+=`<div class="int-item"><div class="int-name">${s.name}</div><div class="int-meta"><span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span><a class="int-link" href="${BASE+slug(s.name)}" target="_blank">view one-pager &#8599;</a></div><div class="int-why">${s.why}</div>${s.the_moves?`<div class="int-moves"><strong>How to start with this student:</strong> ${s.the_moves}</div>`:''}</div>`;});
-  h+=`</div>`;
-  h+=`<div class="rcard"><div class="rcard-title">Also consider</div>`;
-  (p.also_consider||[]).forEach(s=>{h+=`<div class="int-item"><div class="int-name">${s.name}</div><div class="int-meta"><span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span><a class="int-link" href="${BASE+slug(s.name)}" target="_blank">view one-pager &#8599;</a></div><div class="int-why">${s.why}</div></div>`;});
-  h+=`</div>`;
-  h+=`<div class="rcard"><div class="rcard-title">What to say to this student</div><div class="rcard-body" style="font-style:italic;font-size:14px">"${p.what_to_say}"</div></div>`;
-  if(p.what_not_to_do)h+=`<div class="warning-card"><div class="warning-card-title">What NOT to do with this student</div><div class="warning-card-body">${p.what_not_to_do}</div></div>`;
-  h+=`<div class="rcard"><div class="rcard-title">Environmental adjustments</div><ul style="padding-left:1.4rem">`;
-  (p.environment_fits||[]).forEach(t=>h+=`<li style="font-size:13px;color:#4B5563;margin-bottom:7px;line-height:1.6">${t}</li>`);
-  h+=`</ul></div>`;
-  h+=`<div class="trial-card"><div class="trial-title">2-Week Trial Plan &mdash; Start Here</div><div class="trial-body">${p.two_week_trial}</div></div>`;
-  h+=`<div class="two-col"><div class="rcard"><div class="rcard-title">What to track</div><div class="rcard-body">${p.what_to_track}</div></div><div class="rcard"><div class="rcard-title">Who to loop in</div><ul style="padding-left:1.4rem">${(p.who_to_loop_in||[]).map(x=>`<li style="font-size:13px;color:#4B5563;margin-bottom:5px">${x}</li>`).join('')}</ul></div></div>`;
-  h+=`<div class="review-card"><div class="review-title">Review by</div><div class="review-body">${p.review_by}</div></div>`;
-  h+=`<div class="action-row"><button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button><button class="btn btn-gold" onclick="goToLibrary()">&#128218; Browse Strategy Library</button><button class="btn btn-outline" onclick="startOver()">Start a New Observation</button></div>`;
-  rs.innerHTML=h;
-}
-
-function startOver(){
-  current=0;data={};insights={};done=new Set();
-  document.getElementById('results').style.display='none';
-  document.getElementById('form').style.display='block';
-  render();window.scrollTo({top:0,behavior:'smooth'});
-}
-
-render();
-renderLibrary();
-renderResources();
-</script>
+<script src="/app.js"></script>
 </body>
 </html>
