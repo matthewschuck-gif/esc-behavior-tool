@@ -573,14 +573,14 @@ function buildRapportPanel() {
   ];
   let h = `<div class="card" style="border-left:4px solid #F59E0B">
     <div class="card-header">
-      <div class="sec-badge" style="background:#FEF3C7;color:#B45309">&#127775; RAPPORT</div>
+      <div class="sec-badge" style="background:#FEF3C7;color:#B45309">RAPPORT</div>
       <div>
         <div class="card-title">Rapport Builders</div>
         <div class="card-focus">Share what this student loves and optionally add your own interests. The AI weaves these directly into the intervention — connecting strategies to their world and finding genuine connection points between you and the student.</div>
       </div>
     </div>
 
-    <div style="font-size:13px;font-weight:700;color:#B45309;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #FDE68A">&#127775; Student Interests &amp; Hobbies</div>`;
+    <div style="font-size:13px;font-weight:700;color:#B45309;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #FDE68A">Student Interests &amp; Hobbies</div>`;
 
   studentCategories.forEach(cat => {
     h += `<div class="q">
@@ -589,7 +589,7 @@ function buildRapportPanel() {
     </div>`;
   });
 
-  h += `<div style="font-size:13px;font-weight:700;color:#B45309;margin-top:1.25rem;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #FDE68A;padding-top:1rem;border-top:1px solid #FDE68A">&#128100; Your Interests &amp; Hobbies <span style="font-size:12px;font-weight:400;color:#D97706">(optional)</span></div>
+  h += `<div style="font-size:13px;font-weight:700;color:#B45309;margin-top:1.25rem;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #FDE68A;padding-top:1rem;border-top:1px solid #FDE68A">Your Interests &amp; Hobbies <span style="font-size:12px;font-weight:400;color:#D97706">(optional)</span></div>
     <div class="q">
       <div class="hint">Adding your own interests helps the AI find genuine connection points between you and this student — especially useful for 2x10 and rapport-building strategies.</div>
       <input type="text" id="rapport_educator" placeholder="e.g. hiking, fantasy football, cooking, dogs, woodworking, 90s music">
@@ -608,7 +608,7 @@ function buildTriedPanel() {
 
   let h = `<div class="card" style="border-left:4px solid #DC2626">
     <div class="card-header">
-      <div class="sec-badge" style="background:#FEE2E2;color:#991B1B">&#128683; TRIED</div>
+      <div class="sec-badge" style="background:#FEE2E2;color:#991B1B">TRIED</div>
       <div>
         <div class="card-title">What We've Already Tried</div>
         <div class="card-focus">Log strategies that have been attempted. The AI will exclude these from recommendations and suggest genuinely new approaches based on what did or didn't work.</div>
@@ -632,7 +632,7 @@ function buildTriedPanel() {
       <textarea id="triedOther" placeholder="e.g. Parent meeting was held in October, student was moved to a new seat twice, tried a daily check-in for 2 weeks but it faded out..."></textarea>
     </div>
     <div class="q" style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200)">
-      <label>&#128337; How long have you been working on this concern?</label>
+      <label>How long have you been working on this concern?</label>
       <div class="hint">This helps calibrate the plan — new concerns get foundational strategies; longer-standing ones get deeper, more intensive approaches.</div>
       <div class="chip-group" id="intensityChips">
         <div class="chip" data-v="new" onclick="selectIntensity(this)">New this week</div>
@@ -643,7 +643,7 @@ function buildTriedPanel() {
     </div>
     <div class="btn-row">
       <button class="btn btn-primary" id="btnGenerate" onclick="generatePlan()">
-        &#9889; Generate My Intervention Plan
+        Generate My Intervention Plan
         <span class="dots hidden" id="dGenerate"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>
       </button>
     </div>
@@ -1016,7 +1016,7 @@ function showResults(p) {
   // Rapport connection highlight
   if (p.rapport_connection || p.educator_connection) {
     h += `<div class="card" style="border-left:4px solid #F59E0B;background:#FFFBEB">
-      <div style="font-size:13px;font-weight:700;color:#B45309;margin-bottom:8px">&#127775; Rapport &amp; Connection Opportunities</div>`;
+      <div style="font-size:13px;font-weight:700;color:#B45309;margin-bottom:8px">Rapport &amp; Connection Opportunities</div>`;
     if (p.rapport_connection) h += `<div style="font-size:13px;color:#92400E;line-height:1.7;margin-bottom:6px"><strong>Student interests in action:</strong> ${p.rapport_connection}</div>`;
     if (p.educator_connection) h += `<div style="font-size:13px;color:#92400E;line-height:1.7"><strong>Educator-student connection:</strong> ${p.educator_connection}</div>`;
     h += `</div>`;
@@ -1070,9 +1070,9 @@ function showResults(p) {
   h += `<div class="review-card"><div class="review-title">Review by</div><div class="review-body">${p.review_by}</div></div>`;
 
   h += `<div class="action-row">
-    <button class="btn btn-primary" onclick="window.print()">&#128424; Print / Save as PDF</button>
-    <button class="btn btn-teal" onclick="savePlanCurrentResults()">&#128190; Save to Log</button>
-    <button class="btn btn-gold" onclick="goToPage('library')">&#128218; Browse Strategy Library</button>
+    <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+    <button class="btn btn-teal" onclick="savePlanCurrentResults()">Save to Log</button>
+    <button class="btn btn-gold" onclick="goToPage('library')">Browse Strategy Library</button>
     <button class="btn btn-outline" onclick="startOver()">Start a New Observation</button>
   </div>`;
 
@@ -1141,7 +1141,7 @@ function renderLogs() {
       h += `<div class="log-card" id="log_${log.id}">
         <div class="log-card-header">
           <div>
-            <div class="log-card-title">&#128203; Intervention Plan &mdash; ${log.dateStr}</div>
+            <div class="log-card-title">Intervention Plan &mdash; ${log.dateStr}</div>
             <div class="log-card-meta">${log.dateStr} &middot; ${log.bucket} bucket &middot;
               <span class="status-badge" style="background:${statusColors[log.status]||'#6B7280'}20;color:${statusColors[log.status]||'#6B7280'}">${statusLabels[log.status]||'Active'}</span>
             </div>
@@ -1151,16 +1151,16 @@ function renderLogs() {
         <div class="log-card-summary">${log.summary}</div>`;
 
       if (log.rapport) {
-        h += `<div style="font-size:12px;color:#B45309;background:#FFFBEB;border-radius:6px;padding:6px 10px;margin-bottom:8px"><strong>&#127775; Rapport:</strong> ${log.rapport}</div>`;
+        h += `<div style="font-size:12px;color:#B45309;background:#FFFBEB;border-radius:6px;padding:6px 10px;margin-bottom:8px"><strong>Rapport:</strong> ${log.rapport}</div>`;
       }
       if (log.tried) {
-        h += `<div style="font-size:12px;color:#991B1B;background:#FEF2F2;border-radius:6px;padding:6px 10px;margin-bottom:8px"><strong>&#128683; Tried:</strong> ${log.tried}</div>`;
+        h += `<div style="font-size:12px;color:#991B1B;background:#FEF2F2;border-radius:6px;padding:6px 10px;margin-bottom:8px"><strong>Tried:</strong> ${log.tried}</div>`;
       }
 
       h += `<div class="log-card-strategies">${(log.strategies||[]).map(s=>`<span class="log-strategy-tag" style="background:${bBg(log.bucket)};color:${bColor(log.bucket)}">${s}</span>`).join('')}</div>`;
 
       if (log.progress && log.progress.length > 0) {
-        h += `<div class="progress-section"><div class="progress-section-title">&#128200; Progress Notes</div>`;
+        h += `<div class="progress-section"><div class="progress-section-title">Progress Notes</div>`;
         log.progress.forEach(p => {
           h += `<div class="progress-entry"><div class="progress-entry-date">${p.date}</div>${p.note}</div>`;
         });
@@ -1170,14 +1170,14 @@ function renderLogs() {
       h += `<div class="add-progress-form">
         <textarea id="note_${log.id}" placeholder="Add a progress note — what did you try? What happened? What changed?"></textarea>
         <div class="log-actions" style="margin-top:8px">
-          <button class="btn btn-teal btn-sm" onclick="addProgress('${log.id}')">&#128200; Add Progress Note</button>
-          <button class="btn btn-primary btn-sm" onclick="goDeeper('${log.id}')">&#128200; Go Deeper &#8250;</button>
+          <button class="btn btn-teal btn-sm" onclick="addProgress('${log.id}')">Add Progress Note</button>
+          <button class="btn btn-primary btn-sm" onclick="goDeeper('${log.id}')">Go Deeper &#8250;</button>
           <select onchange="updateStatus('${log.id}',this.value)" style="width:auto;padding:6px 10px;font-size:12px;border-radius:8px">
             <option value="active" ${log.status==='active'?'selected':''}>Active</option>
             <option value="reviewing" ${log.status==='reviewing'?'selected':''}>Under Review</option>
             <option value="closed" ${log.status==='closed'?'selected':''}>Closed</option>
           </select>
-          <button class="btn btn-sm" style="color:var(--red-mid);border-color:#FCA5A5" onclick="deleteLog('${log.id}')">&#128465; Delete</button>
+          <button class="btn btn-sm" style="color:var(--red-mid);border-color:#FCA5A5" onclick="deleteLog('${log.id}')">Delete</button>
         </div>
       </div></div>`;
     });
@@ -1230,7 +1230,7 @@ async function goDeeper(id) {
     document.getElementById('form').style.display = 'none';
     document.getElementById('results').style.display = 'block';
     document.getElementById('results').innerHTML = `<div class="card" style="text-align:center;padding:2rem">
-      <div style="font-size:32px;margin-bottom:12px">&#128300;</div>
+      <div style="font-size:32px;margin-bottom:12px"></div>
       <div style="font-size:16px;font-weight:700;color:var(--purple);margin-bottom:8px">Going deeper...</div>
       <div style="font-size:13px;color:var(--gray-500);margin-bottom:1rem">Analyzing what was tried and generating a more intensive plan. This takes about 15 seconds.</div>
       <div class="dots" style="justify-content:center"><span class="dot" style="background:var(--purple)"></span><span class="dot" style="background:var(--purple)"></span><span class="dot" style="background:var(--purple)"></span></div>
@@ -1295,7 +1295,7 @@ function showDeeperResults(p, originalLog) {
 
   let h = `<div class="r-header" style="border-bottom-color:#DC2626">
     <div class="r-eyebrow">E.S.C. Going Deeper &mdash; Escalated Intervention Plan</div>
-    <div class="r-title">&#128200; Deeper Plan &mdash; ${dateStr}</div>
+    <div class="r-title">Deeper Plan &mdash; ${dateStr}</div>
     <div class="tags">
       <span class="tag" style="background:${tierBg};color:${tierColor}">${p.tier_recommendation}</span>
       <span class="tag tag-high">${p.priority} priority</span>
@@ -1331,15 +1331,15 @@ function showDeeperResults(p, originalLog) {
   h += `<div class="rcard"><div class="rcard-title">What to say to this student now</div><div class="rcard-body" style="font-style:italic">"${p.what_to_say}"</div></div>`;
 
   if (p.formal_referral === 'yes') {
-    h += `<div class="trauma-banner"><div class="trauma-banner-title">&#9888; Formal Referral / Team Meeting Recommended</div><div class="trauma-banner-body">${p.referral_rationale}</div></div>`;
+    h += `<div class="trauma-banner"><div class="trauma-banner-title">Formal Referral / Team Meeting Recommended</div><div class="trauma-banner-body">${p.referral_rationale}</div></div>`;
   }
 
   h += `<div class="rcard"><div class="rcard-title">Who to loop in now</div><ul style="padding-left:1.4rem">${(p.who_to_loop_in||[]).map(x=>`<li style="font-size:13px;color:#4B5563;margin-bottom:5px">${x}</li>`).join('')}</ul></div>`;
   h += `<div class="review-card"><div class="review-title">Review by</div><div class="review-body">${p.review_by}</div></div>`;
 
   h += `<div class="action-row">
-    <button class="btn btn-primary" onclick="window.print()">&#128424; Print / Save as PDF</button>
-    <button class="btn btn-outline" onclick="goToPage('logs')">&#8592; Back to Saved Plans</button>
+    <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
+    <button class="btn btn-outline" onclick="goToPage('logs')">Back to Saved Plans</button>
     <button class="btn btn-outline" onclick="startOver()">Start a New Observation</button>
   </div>`;
 
@@ -1469,7 +1469,7 @@ function renderStrategyOfDay() {
   const container = document.getElementById('sotdCard');
   if (!container) return;
   container.innerHTML = `<div class="sotd-card">
-    <div class="sotd-eyebrow">&#127775; Strategy of the Day</div>
+    <div class="sotd-eyebrow">Strategy of the Day</div>
     <div class="sotd-name">${s.name}</div>
     <span class="sotd-bucket" style="background:${s.bg};color:${s.color}">${s.bucket}</span>
     <div class="sotd-desc">${s.desc}</div>
