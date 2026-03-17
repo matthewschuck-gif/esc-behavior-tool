@@ -13,6 +13,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 .header h1{font-size:26px;font-weight:800;margin-bottom:4px}
 .header h1 span{color:var(--gold)}
 .header-sub{font-size:13px;opacity:.85;margin-bottom:12px}
+.header-scientist{font-size:15px;font-weight:700;color:var(--gold);letter-spacing:.04em;margin-bottom:14px;text-transform:uppercase}
 .header-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .hlink{display:inline-flex;align-items:center;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;font-size:12px;font-weight:600;padding:6px 12px;border-radius:20px;text-decoration:none;transition:all .15s}
 .hlink:hover{background:rgba(255,255,255,.25);color:var(--gold)}
@@ -287,8 +288,9 @@ body.dark .sotd-desc{color:#94A3B8}
 /* GLOSSARY TOOLTIPS */
 .gterm{border-bottom:1px dashed var(--purple);cursor:help;color:inherit;position:relative;display:inline}
 .gterm:hover .gtooltip{display:block}
-.gtooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--gray-900);color:white;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;width:240px;z-index:999;font-weight:400;box-shadow:0 4px 12px rgba(0,0,0,.3);pointer-events:none}
-.gtooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--gray-900)}
+.gtooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:white;color:var(--gray-800);font-size:12px;line-height:1.6;padding:10px 14px;border-radius:10px;width:260px;z-index:999;font-weight:400;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--gray-200);pointer-events:none}
+.gtooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:white}
+.gtooltip::before{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--gray-200);margin-top:1px}
 </style>
 </head>
 <body>
@@ -297,20 +299,20 @@ body.dark .sotd-desc{color:#94A3B8}
     <button class="dark-toggle" onclick="toggleDark()" id="darkBtn">&#9790; Dark</button>
     <div class="header-badge">Ephrata Area School District</div>
     <h1>Behavior <span>Intervention</span> Center</h1>
-    <div class="header-sub">E.S.C. Educational Engagement Coaching &middot; Be a Scientist Framework</div>
+    <div class="header-scientist">Be a Scientist Framework</div>
     <div class="header-links">
-      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">&#8599; E.S.C. Strategy Site</a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">E.S.C. Strategy Site</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist" target="_blank" class="hlink">Be a Scientist</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit" target="_blank" class="hlink">Find the Right Fit</a>
     </div>
   </div>
 </div>
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showPage('tool',this)">&#128300; Intervention Tool</button>
-  <button class="nav-tab" onclick="showPage('emotions',this)">&#129505; Emotions Hub</button>
-  <button class="nav-tab" onclick="showPage('library',this)">&#128218; Strategy Library</button>
-  <button class="nav-tab" onclick="showPage('logs',this)">&#128203; Saved Plans <span class="nbadge" id="logBadge" style="display:none">0</span></button>
-  <button class="nav-tab" onclick="showPage('resources',this)">&#128279; Resources</button>
+  <button class="nav-tab active" onclick="showPage('tool',this)">Intervention Tool</button>
+  <button class="nav-tab" onclick="showPage('emotions',this)">Emotions Hub</button>
+  <button class="nav-tab" onclick="showPage('library',this)">Strategy Library</button>
+  <button class="nav-tab" onclick="showPage('logs',this)">Saved Plans <span class="nbadge" id="logBadge" style="display:none">0</span></button>
+  <button class="nav-tab" onclick="showPage('resources',this)">Resources</button>
 </div>
 <div class="page active" id="page-tool">
   <div class="rule-bar">
@@ -334,15 +336,15 @@ body.dark .sotd-desc{color:#94A3B8}
 </div>
 <div class="page" id="page-emotions">
   <div class="main">
-    <div class="hero"><h2>&#129505; Emotions Hub</h2><p>Emotions are messengers. Understanding the emotional landscape behind behavior helps us respond to what a student needs rather than just what they are doing.</p></div>
+    <div class="hero"><h2>Emotions Hub</h2><p>Emotions are messengers. Understanding the emotional landscape behind behavior helps us respond to what a student needs rather than just what they are doing.</p></div>
     <div class="emotion-section">
       <div class="emotion-section-title">Mood Meter &mdash; The Four Zones</div>
       <div class="emotion-section-sub">"If you can name it, you can tame it." &mdash; Marc Brackett, Permission to Feel</div>
       <div class="mood-meter-grid">
-        <div class="mood-zone" style="background:#DCFCE7;border-color:#16A34A"><div class="mood-zone-title" style="color:#14532D">&#129001; Green Zone</div><div class="mood-zone-sub" style="color:#166534">Calm, Happy, Ready to Learn</div><div class="mood-zone-desc" style="color:#166534">High pleasantness, low-moderate energy. The student is regulated, engaged, and able to access learning.</div><div class="mood-zone-strategies" style="color:#14532D">Strategies that work well:</div><div class="mood-zone-list" style="color:#166534">2x10 &middot; Morning Greeting &middot; Responsibilities &middot; Morning Meeting &middot; Positive Praise</div></div>
-        <div class="mood-zone" style="background:#DBEAFE;border-color:#1D4ED8"><div class="mood-zone-title" style="color:#1E3A8A">&#128309; Blue Zone</div><div class="mood-zone-sub" style="color:#1E40AF">Sad, Tired, Withdrawn, Sick</div><div class="mood-zone-desc" style="color:#1E40AF">Low pleasantness, low energy. The student may appear shut down, disengaged, or emotionally flat.</div><div class="mood-zone-strategies" style="color:#1E3A8A">Strategies that work well:</div><div class="mood-zone-list" style="color:#1E40AF">Check In &middot; Pulse Check &middot; Empathetic Listening &middot; Responsibilities &middot; Gentle Movement Break</div></div>
-        <div class="mood-zone" style="background:#FEF3C7;border-color:#D97706"><div class="mood-zone-title" style="color:#78350F">&#128993; Yellow Zone</div><div class="mood-zone-sub" style="color:#92400E">Anxious, Nervous, Frustrated, Excited</div><div class="mood-zone-desc" style="color:#92400E">Low-moderate pleasantness, high energy. The student may be agitated, unfocused, or escalating.</div><div class="mood-zone-strategies" style="color:#78350F">Strategies that work well:</div><div class="mood-zone-list" style="color:#92400E">Break Card &middot; Secret Signal &middot; Breathing Techniques &middot; Fidget &middot; Forewarning &middot; Controlled Choices</div></div>
-        <div class="mood-zone" style="background:#FEE2E2;border-color:#DC2626"><div class="mood-zone-title" style="color:#991B1B">&#128308; Red Zone</div><div class="mood-zone-sub" style="color:#B91C1C">Angry, Frustrated, Terrified, Overwhelmed</div><div class="mood-zone-desc" style="color:#B91C1C">Low pleasantness, high energy. The student is dysregulated and likely in a Fight/Flight/Freeze/Fawn response.</div><div class="mood-zone-strategies" style="color:#991B1B">Strategies that work well:</div><div class="mood-zone-list" style="color:#B91C1C">Reset Plan &middot; Break Card &middot; Calm Neutral Tone &middot; Rapid Resets &middot; Avoid Power Struggle</div></div>
+        <div class="mood-zone" style="background:#DCFCE7;border-color:#16A34A"><div class="mood-zone-title" style="color:#14532D">Green Zone</div><div class="mood-zone-sub" style="color:#166534">Calm, Happy, Ready to Learn</div><div class="mood-zone-desc" style="color:#166534">High pleasantness, low-moderate energy. The student is regulated, engaged, and able to access learning.</div><div class="mood-zone-strategies" style="color:#14532D">Strategies that work well:</div><div class="mood-zone-list" style="color:#166534">2x10 &middot; Morning Greeting &middot; Responsibilities &middot; Morning Meeting &middot; Positive Praise</div></div>
+        <div class="mood-zone" style="background:#DBEAFE;border-color:#1D4ED8"><div class="mood-zone-title" style="color:#1E3A8A">Blue Zone</div><div class="mood-zone-sub" style="color:#1E40AF">Sad, Tired, Withdrawn, Sick</div><div class="mood-zone-desc" style="color:#1E40AF">Low pleasantness, low energy. The student may appear shut down, disengaged, or emotionally flat.</div><div class="mood-zone-strategies" style="color:#1E3A8A">Strategies that work well:</div><div class="mood-zone-list" style="color:#1E40AF">Check In &middot; Pulse Check &middot; Empathetic Listening &middot; Responsibilities &middot; Gentle Movement Break</div></div>
+        <div class="mood-zone" style="background:#FEF3C7;border-color:#D97706"><div class="mood-zone-title" style="color:#78350F">Yellow Zone</div><div class="mood-zone-sub" style="color:#92400E">Anxious, Nervous, Frustrated, Excited</div><div class="mood-zone-desc" style="color:#92400E">Low-moderate pleasantness, high energy. The student may be agitated, unfocused, or escalating.</div><div class="mood-zone-strategies" style="color:#78350F">Strategies that work well:</div><div class="mood-zone-list" style="color:#92400E">Break Card &middot; Secret Signal &middot; Breathing Techniques &middot; Fidget &middot; Forewarning &middot; Controlled Choices</div></div>
+        <div class="mood-zone" style="background:#FEE2E2;border-color:#DC2626"><div class="mood-zone-title" style="color:#991B1B">Red Zone</div><div class="mood-zone-sub" style="color:#B91C1C">Angry, Frustrated, Terrified, Overwhelmed</div><div class="mood-zone-desc" style="color:#B91C1C">Low pleasantness, high energy. The student is dysregulated and likely in a Fight/Flight/Freeze/Fawn response.</div><div class="mood-zone-strategies" style="color:#991B1B">Strategies that work well:</div><div class="mood-zone-list" style="color:#B91C1C">Reset Plan &middot; Break Card &middot; Calm Neutral Tone &middot; Rapid Resets &middot; Avoid Power Struggle</div></div>
       </div>
     </div>
     <div class="emotion-section">
@@ -351,10 +353,10 @@ body.dark .sotd-desc{color:#94A3B8}
       <div class="emotion-framework">
         <div class="emotion-framework-title">What you see &rarr; What it may mean &rarr; How to respond</div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
-          <div style="background:#FEE2E2;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#991B1B;margin-bottom:6px">&#128293; Fight</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Aggression, arguing, defiance, yelling, throwing objects, provoking, slamming doors, talking back, hands in fists</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7"><strong>Respond with:</strong> Calm neutral tone &middot; Relational Discipline Moves &middot; Avoid power struggles &middot; Reduce audience</div></div>
-          <div style="background:#FEF3C7;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:6px">&#127939; Flight</div><div style="font-size:12px;color:#78350F;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Walking out, ignoring, head down/hood up, avoiding tasks, daydreaming, cutting class, frequent bathroom trips</div><div style="font-size:12px;color:#78350F;line-height:1.7"><strong>Respond with:</strong> Connection before compliance &middot; Break Card &middot; Provide safe exits &middot; Responsibilities</div></div>
-          <div style="background:#DBEAFE;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#1E3A8A;margin-bottom:6px">&#10052; Freeze</div><div style="font-size:12px;color:#1E3A8A;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Blank stares, dissociation, numb shrug, head on desk, inability to move or respond, appears forgetful, avoids tasks</div><div style="font-size:12px;color:#1E3A8A;line-height:1.7"><strong>Respond with:</strong> Reduce demands first &middot; Gentle check-in &middot; Breathing &middot; Wait before expecting engagement</div></div>
-          <div style="background:#DCFCE7;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#14532D;margin-bottom:6px">&#129419; Fawn</div><div style="font-size:12px;color:#166534;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Perfectionism, over-preparing, overly helpful, befriends bullies, submits to pressure, exaggerated people pleasing, lacks boundaries</div><div style="font-size:12px;color:#166534;line-height:1.7"><strong>Respond with:</strong> Build authentic relationship &middot; Validate genuine effort &middot; Help student find their voice &middot; Secret Signal</div></div>
+          <div style="background:#FEE2E2;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#991B1B;margin-bottom:6px">Fight</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Aggression, arguing, defiance, yelling, throwing objects, provoking, slamming doors, talking back, hands in fists</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7"><strong>Respond with:</strong> Calm neutral tone &middot; Relational Discipline Moves &middot; Avoid power struggles &middot; Reduce audience</div></div>
+          <div style="background:#FEF3C7;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:6px">Flight</div><div style="font-size:12px;color:#78350F;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Walking out, ignoring, head down/hood up, avoiding tasks, daydreaming, cutting class, frequent bathroom trips</div><div style="font-size:12px;color:#78350F;line-height:1.7"><strong>Respond with:</strong> Connection before compliance &middot; Break Card &middot; Provide safe exits &middot; Responsibilities</div></div>
+          <div style="background:#DBEAFE;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#1E3A8A;margin-bottom:6px">Freeze</div><div style="font-size:12px;color:#1E3A8A;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Blank stares, dissociation, numb shrug, head on desk, inability to move or respond, appears forgetful, avoids tasks</div><div style="font-size:12px;color:#1E3A8A;line-height:1.7"><strong>Respond with:</strong> Reduce demands first &middot; Gentle check-in &middot; Breathing &middot; Wait before expecting engagement</div></div>
+          <div style="background:#DCFCE7;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#14532D;margin-bottom:6px">Fawn</div><div style="font-size:12px;color:#166534;line-height:1.7;margin-bottom:6px"><strong>You may see:</strong> Perfectionism, over-preparing, overly helpful, befriends bullies, submits to pressure, exaggerated people pleasing, lacks boundaries</div><div style="font-size:12px;color:#166534;line-height:1.7"><strong>Respond with:</strong> Build authentic relationship &middot; Validate genuine effort &middot; Help student find their voice &middot; Secret Signal</div></div>
         </div>
       </div>
     </div>
@@ -374,11 +376,11 @@ body.dark .sotd-desc{color:#94A3B8}
       <div class="emotion-section-title">Five Domains of Regulation</div>
       <div class="emotion-section-sub">Understanding different types of regulation helps us develop the right skills to improve them. &mdash; Brummer, adapted from Sorrels (2015)</div>
       <div class="domains-grid">
-        <div class="domain-card"><div class="domain-icon" style="background:#EDE9FE">&#129361;</div><div><div class="domain-name">Physical Regulation</div><div class="domain-desc">The ability to regulate our bodies in response to sensory input — equilibrium, hunger cues, movement, and sensory processing.</div></div></div>
-        <div class="domain-card"><div class="domain-icon" style="background:#DBEAFE">&#129504;</div><div><div class="domain-name">Cognitive Regulation</div><div class="domain-desc">The ability to control and purposefully use our minds — holding information, blocking distractions, and maintaining focus on a task.</div></div></div>
-        <div class="domain-card"><div class="domain-icon" style="background:#FEF3C7">&#128149;</div><div><div class="domain-name">Emotional Regulation</div><div class="domain-desc">The ability to control and manage unpleasant or overwhelming emotions, or to feel and enjoy the pleasant ones.</div></div></div>
-        <div class="domain-card"><div class="domain-icon" style="background:#DCFCE7">&#129309;</div><div><div class="domain-name">Social Regulation</div><div class="domain-desc">The ability to adapt behaviors based on how they impact others — empathy, reading facial cues, voice tones, and relational messages.</div></div></div>
-        <div class="domain-card"><div class="domain-icon" style="background:#FEE2E2">&#127775;</div><div><div class="domain-name">Pro-Social Regulation</div><div class="domain-desc">The capacity to empathize AND act on that information — responding in caring ways to a friend's distress or excitement.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#EDE9FE"></div><div><div class="domain-name">Physical Regulation</div><div class="domain-desc">The ability to regulate our bodies in response to sensory input — equilibrium, hunger cues, movement, and sensory processing.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#DBEAFE"></div><div><div class="domain-name">Cognitive Regulation</div><div class="domain-desc">The ability to control and purposefully use our minds — holding information, blocking distractions, and maintaining focus on a task.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#FEF3C7"></div><div><div class="domain-name">Emotional Regulation</div><div class="domain-desc">The ability to control and manage unpleasant or overwhelming emotions, or to feel and enjoy the pleasant ones.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#DCFCE7"></div><div><div class="domain-name">Social Regulation</div><div class="domain-desc">The ability to adapt behaviors based on how they impact others — empathy, reading facial cues, voice tones, and relational messages.</div></div></div>
+        <div class="domain-card"><div class="domain-icon" style="background:#FEE2E2"></div><div><div class="domain-name">Pro-Social Regulation</div><div class="domain-desc">The capacity to empathize AND act on that information — responding in caring ways to a friend's distress or excitement.</div></div></div>
       </div>
     </div>
     <div class="emotion-section">
@@ -388,14 +390,14 @@ body.dark .sotd-desc{color:#94A3B8}
         <div class="reg-card" style="border-top-color:#5B21B6"><div class="reg-card-title" style="color:#5B21B6">&#128168; Mindful Breathing</div><div class="reg-card-desc">Calms the body and mind. "Hits the brake" on the stress response.</div><div class="reg-strategies"><strong>Strategies:</strong> 7-11 Breathing &middot; Belly Breathing &middot; Rapid Resets &middot; Shape Breathing &middot; Thich Nhat Hahn Breathing &middot; Slow Counting</div></div>
         <div class="reg-card" style="border-top-color:#1D4ED8"><div class="reg-card-title" style="color:#1D4ED8">&#128336; Forward-Looking</div><div class="reg-card-desc">Anticipate what will cause an unwanted emotion. Plan ahead to alter the emotional impact.</div><div class="reg-strategies"><strong>Strategies:</strong> Reset Plan &middot; Forewarning &middot; Implementation Intention &middot; Scheduled Breaks</div></div>
         <div class="reg-card" style="border-top-color:#D97706"><div class="reg-card-title" style="color:#D97706">&#128065; Attention-Shifting</div><div class="reg-card-desc">Tempers the impact of an emotion by diverting attention away from its source.</div><div class="reg-strategies"><strong>Strategies:</strong> Drinking Water &middot; Look Up &middot; Fidgets &middot; Music &middot; Doodle Notes &middot; Movement Break &middot; Visualization</div></div>
-        <div class="reg-card" style="border-top-color:#16A34A"><div class="reg-card-title" style="color:#16A34A">&#129504; Cognitive Reframing</div><div class="reg-card-desc">Analyze what is triggering the emotional experience and find a new way of seeing it.</div><div class="reg-strategies"><strong>Strategies:</strong> Meta-Moment &middot; Q-Tip &middot; Affirmations &middot; Mantra &middot; Journal Writing &middot; Positive Self-Talk</div></div>
+        <div class="reg-card" style="border-top-color:#16A34A"><div class="reg-card-title" style="color:#16A34A"> Cognitive Reframing</div><div class="reg-card-desc">Analyze what is triggering the emotional experience and find a new way of seeing it.</div><div class="reg-strategies"><strong>Strategies:</strong> Meta-Moment &middot; Q-Tip &middot; Affirmations &middot; Mantra &middot; Journal Writing &middot; Positive Self-Talk</div></div>
       </div>
     </div>
     <div class="emotion-section">
       <div class="emotion-section-title">3 Components of Co-Regulation</div>
       <div class="emotion-section-sub">When we meet students' dysregulated behaviors with co-regulation, they learn how to self-regulate. &mdash; Micere Keels, Trauma Responsive Educational Practices</div>
       <div class="coregulation-grid">
-        <div class="coreg-card" style="background:#EDE9FE;border-color:#7C3AED"><div class="coreg-title" style="color:#5B21B6">&#129309; Build</div><div class="coreg-desc" style="color:#5B21B6">Cultivate a warm, responsive relationship by displaying care and affection.</div><div class="coreg-list" style="color:#5B21B6">2x10 &middot; Greeting at the Door &middot; Affirmations &middot; Morning Meeting &middot; Circles &middot; Teach Kindness</div></div>
+        <div class="coreg-card" style="background:#EDE9FE;border-color:#7C3AED"><div class="coreg-title" style="color:#5B21B6"> Build</div><div class="coreg-desc" style="color:#5B21B6">Cultivate a warm, responsive relationship by displaying care and affection.</div><div class="coreg-list" style="color:#5B21B6">2x10 &middot; Greeting at the Door &middot; Affirmations &middot; Morning Meeting &middot; Circles &middot; Teach Kindness</div></div>
         <div class="coreg-card" style="background:#DBEAFE;border-color:#1D4ED8"><div class="coreg-title" style="color:#1E3A8A">&#128203; Structure</div><div class="coreg-desc" style="color:#1E3A8A">Structure the environment to make self-regulation manageable. Avoid vague expectations and prolonged quiet seated work.</div><div class="coreg-list" style="color:#1E3A8A">Getting Class Ready &middot; TROGS &middot; Visual Schedule &middot; Structured Routine &middot; Belonging Cues</div></div>
         <div class="coreg-card" style="background:#DCFCE7;border-color:#16A34A"><div class="coreg-title" style="color:#14532D">&#127979; Coach</div><div class="coreg-desc" style="color:#14532D">Modeling, instruction, and positive reinforcement of even modest progress toward regulation.</div><div class="coreg-list" style="color:#14532D">Zones of Regulation &middot; 100 Coping Strategies &middot; Mood Shifters &middot; Positive Self-Talk</div></div>
       </div>
@@ -409,7 +411,7 @@ body.dark .sotd-desc{color:#94A3B8}
         <div class="praise-card" style="background:#EDE9FE;border:1.5px solid #C4B5FD"><div class="praise-type" style="color:#5B21B6">Behavior-Specific</div><div class="praise-example" style="color:#6D28D9">"You did ___ well!"</div><div class="praise-rec" style="background:#C4B5FD;color:#3B0764">Maximize This Type</div><div class="praise-why" style="color:#4C1D95">Objective because it is observable. Clear communication benefits all learners.</div></div>
       </div>
       <div class="gratitude-formula">
-        <div class="gf-title">&#127381; The Gratitude Formula &mdash; Trading Praise for Gratitude (Brummer, 2021)</div>
+        <div class="gf-title">The Gratitude Formula &mdash; Trading Praise for Gratitude (Brummer, 2021)</div>
         <div class="gf-steps">
           <div class="gf-step">When I see...<br><span style="font-weight:400;font-size:11px">Observation</span></div>
           <div class="gf-plus">+</div>
@@ -433,20 +435,20 @@ body.dark .sotd-desc{color:#94A3B8}
 </div>
 <div class="page" id="page-library">
   <div class="main">
-    <div class="hero"><h2>&#128218; Full Strategy Library</h2><p>Every intervention from the E.S.C. Find the Right Fit library organized by bucket. Click any strategy to open its full one-pager on the E.S.C. site.</p></div>
+    <div class="hero"><h2>Full Strategy Library</h2><p>Every intervention from the E.S.C. Find the Right Fit library organized by bucket. Click any strategy to open its full one-pager on the E.S.C. site.</p></div>
     <input class="lib-search" placeholder="Search strategies... (e.g. break card, fidget, 2x10)" oninput="filterLibrary(this.value)" id="libSearch">
     <div id="libraryContent"></div>
   </div>
 </div>
 <div class="page" id="page-logs">
   <div class="main">
-    <div class="hero"><h2>&#128203; Saved Intervention Plans</h2><p>All completed plans saved here in this browser. Add progress notes to track what you tried and what happened over time. Plans are stored locally on this device.</p></div>
+    <div class="hero"><h2>Saved Intervention Plans</h2><p>All completed plans saved here in this browser. Add progress notes to track what you tried and what happened over time. Plans are stored locally on this device.</p></div>
     <div id="logsContent"></div>
   </div>
 </div>
 <div class="page" id="page-resources">
   <div class="main">
-    <div class="hero"><h2>&#128279; Additional Resources</h2><p>Curated resources to support behavior coaching, SEL, trauma-informed practices, and the Be a Scientist framework.</p></div>
+    <div class="hero"><h2>Additional Resources</h2><p>Curated resources to support behavior coaching, SEL, trauma-informed practices, and the Be a Scientist framework.</p></div>
     <div id="resourcesContent"></div>
   </div>
 </div>
