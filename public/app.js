@@ -1446,7 +1446,6 @@ function checkPassword() {
   const input = document.getElementById('pwInput').value;
   const error = document.getElementById('pwError');
   if (input === SITE_PASSWORD) {
-    localStorage.setItem('bic_auth', btoa(SITE_PASSWORD));
     document.getElementById('pwGate').style.display = 'none';
   } else {
     error.style.display = 'block';
@@ -1456,10 +1455,7 @@ function checkPassword() {
 }
 
 function initAuth() {
-  const stored = localStorage.getItem('bic_auth');
-  if (stored && atob(stored) === SITE_PASSWORD) {
-    document.getElementById('pwGate').style.display = 'none';
-  }
+  // Always show password screen on every visit
 }
 
 // ============================================================
