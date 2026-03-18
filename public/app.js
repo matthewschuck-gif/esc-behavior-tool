@@ -251,10 +251,10 @@ const RESOURCES = [
     {title:"The Brain",desc:"Affect Script Theory, Mental Health, Trauma, Basic Needs, and Engagement.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/the-brain"},
     {title:"Behavior Coaching",desc:"Direct coaching support and consultation resources.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist/behavior-coaching"}
   ]},
-  {section:"SEL & Emotional Literacy",items:[
-    {title:"CASEL — Fundamentals of SEL",desc:"Research-based framework for social emotional learning implementation.",url:"https://casel.org/fundamentals-of-sel/"},
-    {title:"Character Strong Weeklies",desc:"2-3 minute videos with quick ideas to embed SEL topics.",url:"https://characterstrong.com"},
-    {title:"Character Lab Tips",desc:"2-minute reads on SEL topics for students or educators.",url:"https://characterlab.org/tips-of-the-week/"},
+  {section:"Mental Health & Well-Being",items:[
+    {title:"CASEL — Fundamentals of Mental Health & Well-Being",desc:"Research-based framework for student well-being and student well-being development.",url:"https://casel.org/fundamentals-of-sel/"},
+    {title:"Character Strong Weeklies",desc:"2-3 minute videos with quick ideas to embed mental health and well-being topics.",url:"https://characterstrong.com"},
+    {title:"Character Lab Tips",desc:"2-minute reads on mental health and well-being topics for students or educators.",url:"https://characterlab.org/tips-of-the-week/"},
     {title:"Greater Good Science Center",desc:"Science-based insights on wellbeing including articles and podcasts.",url:"https://greatergood.berkeley.edu"},
     {title:"Search Institute",desc:"Bank of activities filtered by time, type, age, and group size.",url:"https://www.search-institute.org"},
     {title:"Atlas of Emotions",desc:"Interactive website to explore emotions and understand our responses.",url:"http://atlasofemotions.org"},
