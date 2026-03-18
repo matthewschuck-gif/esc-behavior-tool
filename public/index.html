@@ -272,6 +272,8 @@ body.dark .add-progress-form textarea{background:#0F0F1A;border-color:#2D2D4E;co
 body.dark .sotd-card{background:#1A1A2E;border-color:#2D2D4E}
 body.dark .sotd-name{color:#E2E8F0}
 body.dark .sotd-desc{color:#94A3B8}
+body.dark #siteFooter{background:#0A0A14;border-color:#2D2D4E}
+body.dark #siteFooter div{color:#64748B}
 
 /* DARK MODE TOGGLE */
 .dark-toggle{position:absolute;right:1rem;top:1rem;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:white;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px}
@@ -291,17 +293,48 @@ body.dark .sotd-desc{color:#94A3B8}
 .gtooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:white;color:var(--gray-800);font-size:12px;line-height:1.6;padding:10px 14px;border-radius:10px;width:260px;z-index:999;font-weight:400;box-shadow:0 4px 20px rgba(0,0,0,.18);border:1px solid var(--gray-200);pointer-events:none}
 .gtooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:white}
 .gtooltip::before{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:var(--gray-200);margin-top:1px}
+
+/* PASSWORD GATE */
+.pw-gate{position:fixed;inset:0;background:linear-gradient(135deg,var(--purple-dark) 0%,var(--purple) 100%);display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem}
+.pw-box{background:white;border-radius:20px;padding:2.5rem 2rem;max-width:380px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.pw-logo{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--purple);margin-bottom:10px}
+.pw-title{font-size:22px;font-weight:800;color:var(--gray-900);margin-bottom:6px}
+.pw-sub{font-size:13px;color:var(--gray-500);margin-bottom:1.5rem;line-height:1.5}
+.pw-input{width:100%;padding:12px 16px;font-size:16px;font-family:inherit;border:2px solid var(--gray-200);border-radius:10px;text-align:center;letter-spacing:.15em;margin-bottom:12px;transition:border-color .15s}
+.pw-input:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,33,182,.1)}
+.pw-btn{width:100%;padding:12px;background:var(--purple);color:white;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:background .15s}
+.pw-btn:hover{background:var(--purple-mid)}
+.pw-error{font-size:13px;color:var(--red-mid);margin-top:10px;display:none;font-weight:600}
+.pw-bottom{font-size:11px;color:var(--gray-400);margin-top:1.5rem}
 </style>
 </head>
 <body>
+
+<div class="pw-gate" id="pwGate">
+  <div class="pw-box">
+    <div class="pw-logo">Behavior Coaching</div>
+    <div class="pw-title">Behavior Intervention Center</div>
+    <div class="pw-sub">This tool is for authorized staff only.<br>Enter the access password to continue.</div>
+    <input class="pw-input" type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkPassword()">
+    <button class="pw-btn" onclick="checkPassword()">Enter</button>
+    <div class="pw-error" id="pwError">Incorrect password. Please try again.</div>
+    <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--gray-200);text-align:left">
+      <div style="font-size:11px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Disclaimer</div>
+      <div style="font-size:11px;color:var(--gray-500);line-height:1.65">
+        This tool is for <strong>informational purposes only</strong> and does not constitute clinical, psychological, or legal advice. AI-generated recommendations are not a substitute for professional judgment. By using this tool, you accept full responsibility for how you interpret and apply any recommendations. The creator of this tool is not liable for any student outcomes based on its use. Data you enter is processed by the AI model and is not stored on any server controlled by this tool.
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="header">
   <div class="header-inner">
     <button class="dark-toggle" onclick="toggleDark()" id="darkBtn">&#9790; Dark</button>
-    <div class="header-badge">Ephrata Area School District</div>
+    <div class="header-badge">Behavior Coaching</div>
     <h1>Behavior <span>Intervention</span> Center</h1>
     <div class="header-scientist">Be a Scientist Framework</div>
     <div class="header-links">
-      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">E.S.C. Strategy Site</a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">Strategy Site</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist" target="_blank" class="hlink">Be a Scientist</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit" target="_blank" class="hlink">Find the Right Fit</a>
     </div>
@@ -328,7 +361,7 @@ body.dark .sotd-desc{color:#94A3B8}
   <div class="main">
 <!-- Hidden fields for name/building still used in plan header -->
 <input type="hidden" id="teacherName" value="Educator">
-<input type="hidden" id="teacherBuilding" value="EASD">
+<input type="hidden" id="teacherBuilding" value="">
     <div id="sotdCard"></div>
     <div id="form"></div>
     <div id="results"></div>
@@ -425,17 +458,17 @@ body.dark .sotd-desc{color:#94A3B8}
     </div>
     <div class="emotion-section">
       <div class="emotion-section-title">Explore More</div>
-      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">Coping Strategies One-Pager &#8599;</div><div class="emotion-link-desc">Full list of regulation strategies with implementation steps from E.S.C.</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
-      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/the-brain" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">The Brain &mdash; E.S.C. Site &#8599;</div><div class="emotion-link-desc">Affect Script Theory, Mental Health, Trauma, Basic Needs, and Engagement resources</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">Coping Strategies One-Pager &#8599;</div><div class="emotion-link-desc">Full list of regulation strategies with implementation steps from </div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      <a href="https://sites.google.com/easdpa.org/behaviorcoaching/the-brain" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">The Brain &mdash;  Site &#8599;</div><div class="emotion-link-desc">Affect Script Theory, Mental Health, Trauma, Basic Needs, and Engagement resources</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
       <a href="https://www.zonesofregulation.com" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">Zones of Regulation &#8599;</div><div class="emotion-link-desc">Curriculum for teaching students to identify emotional states and apply strategies</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
-      <a href="https://howwefeel.org" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">How We Feel App &#8599;</div><div class="emotion-link-desc">Free app for students to identify, track, and respond to daily emotions</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
+      
       <a href="https://emotionalintelligence.yale.edu/ruler" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">RULER / Mood Meter &mdash; Yale Center for Emotional Intelligence &#8599;</div><div class="emotion-link-desc">Research and tools for emotional literacy from Marc Brackett and Yale</div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
     </div>
   </div>
 </div>
 <div class="page" id="page-library">
   <div class="main">
-    <div class="hero"><h2>Full Strategy Library</h2><p>Every intervention from the E.S.C. Find the Right Fit library organized by bucket. Click any strategy to open its full one-pager on the E.S.C. site.</p></div>
+    <div class="hero"><h2>Full Strategy Library</h2><p>Every intervention from the  Find the Right Fit library organized by bucket. Click any strategy to open its full one-pager on the  site.</p></div>
     <input class="lib-search" placeholder="Search strategies... (e.g. break card, fidget, 2x10)" oninput="filterLibrary(this.value)" id="libSearch">
     <div id="libraryContent"></div>
   </div>
@@ -453,5 +486,17 @@ body.dark .sotd-desc{color:#94A3B8}
   </div>
 </div>
 <script src="/app.js"></script>
+
+<footer id="siteFooter" style="background:var(--gray-100);border-top:1px solid var(--gray-200);padding:1rem 1.5rem;margin-top:2rem">
+  <div style="max-width:760px;margin:0 auto;display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap">
+    <div style="flex:1;min-width:260px">
+      <div style="font-size:11px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Disclaimer</div>
+      <div style="font-size:11px;color:var(--gray-500);line-height:1.65">
+        This tool is for <strong>informational purposes only</strong> and does not constitute clinical, psychological, or legal advice. AI-generated recommendations are not a substitute for professional educator judgment. By using this tool, you accept full responsibility for how you interpret and apply any recommendations. The creator of this tool is not liable for any student outcomes based on its use. Data entered is processed by the AI model and is not stored on any server controlled by this tool.
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--gray-400);padding-top:1.5rem">Behavior Intervention Center &copy; 2025</div>
+  </div>
+</footer>
 </body>
 </html>
