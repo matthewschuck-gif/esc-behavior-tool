@@ -244,8 +244,8 @@ const LIBRARY = {
 // RESOURCES
 // ============================================================
 const RESOURCES = [
-  {section:"E.S.C. Behavior Coaching Site",items:[
-    {title:"Strategies Homepage",desc:"Full hub for all E.S.C. behavior coaching resources.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage"},
+  {section:"Behavior Coaching Site",items:[
+    {title:"Strategies Homepage",desc:"Full hub for all behavior coaching resources.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage"},
     {title:"Be a Scientist",desc:"The full 6-step Educational Engagement Coaching Process.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist"},
     {title:"Find the Right Fit — Full Library",desc:"Complete intervention library with one-pagers for every strategy.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit"},
     {title:"The Brain",desc:"Affect Script Theory, Mental Health, Trauma, Basic Needs, and Engagement.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/the-brain"},
@@ -258,7 +258,7 @@ const RESOURCES = [
     {title:"Greater Good Science Center",desc:"Science-based insights on wellbeing including articles and podcasts.",url:"https://greatergood.berkeley.edu"},
     {title:"Search Institute",desc:"Bank of activities filtered by time, type, age, and group size.",url:"https://www.search-institute.org"},
     {title:"Atlas of Emotions",desc:"Interactive website to explore emotions and understand our responses.",url:"http://atlasofemotions.org"},
-    {title:"How We Feel App",desc:"Free app for students to identify, track, and respond to daily emotions.",url:"https://howwefeel.org"},
+    
     {title:"Permission to Feel — Marc Brackett",desc:"Resources on emotional literacy and the RULER approach from Yale.",url:"https://www.marcbrackett.com/permission-to-feel/"}
   ]},
   {section:"Trauma-Informed Practices",items:[
@@ -270,7 +270,7 @@ const RESOURCES = [
   {section:"Restorative Practices",items:[
     {title:"IIRP — Restorative Practices",desc:"International Institute for Restorative Practices — research and training.",url:"https://www.iirp.edu"},
     {title:"Social Discipline Window — Wachtel",desc:"Working WITH people rather than TO or FOR them.",url:"https://www.iirp.edu/defining-restorative/social-discipline-window"},
-    {title:"Circles — E.S.C. Resources",desc:"Guides for implementing community-building and restorative circles.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/informal-classroom-circles"}
+    {title:"Circles — Resources",desc:"Guides for implementing community-building and restorative circles.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/informal-classroom-circles"}
   ]},
   {section:"Behavior & Classroom Management",items:[
     {title:"Intervention Central",desc:"Free tools and resources for behavior intervention.",url:"https://www.interventioncentral.org"},
@@ -280,8 +280,8 @@ const RESOURCES = [
     {title:"Drive — Daniel Pink",desc:"Research on intrinsic motivation behind Intermittent Incentives.",url:"https://www.danpink.com/books/drive/"}
   ]},
   {section:"Regulation & Brain Science",items:[
-    {title:"Rapid Resets — E.S.C.",desc:"Quick in-the-moment regulation techniques.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
-    {title:"Emotional Regulation Strategies — E.S.C.",desc:"Four types: Mindful Breathing, Forward-Looking, Attention-Shifting, Cognitive Reframing.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
+    {title:"Rapid Resets",desc:"Quick in-the-moment regulation techniques.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
+    {title:"Emotional Regulation Strategies",desc:"Four types: Mindful Breathing, Forward-Looking, Attention-Shifting, Cognitive Reframing.",url:"https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies"},
     {title:"Zones of Regulation",desc:"Curriculum for teaching students to identify emotional states.",url:"https://www.zonesofregulation.com"},
     {title:"Mood Meter — Yale Center for Emotional Intelligence",desc:"RULER approach research and tools for emotional literacy.",url:"https://emotionalintelligence.yale.edu/ruler"}
   ]}
@@ -853,7 +853,7 @@ async function submit(sid, isFinal) {
   const sum = sumSection(sid, d);
   try {
     const sec = SECTIONS.find(s => s.id === sid);
-    const txt = await callAPI([{role:'user',content:`You are a supportive E.S.C. Educational Engagement Coaching specialist at Ephrata Area School District using the Be a Scientist framework. The educator just completed step ${sec.num} ${sec.title}.\n\nResponses:\n${sum}\n\nAll data so far:\n${JSON.stringify(data)}\n\nWrite a 2-3 sentence coaching note. Acknowledge what they shared, name one specific insight this step reveals, and note what the next step will clarify. Be warm, trauma-informed, and practical. Do NOT recommend interventions yet.`}]);
+    const txt = await callAPI([{role:'user',content:`You are a supportive Behavior Coaching specialist using the Be a Scientist framework. The educator just completed step ${sec.num} ${sec.title}.\n\nResponses:\n${sum}\n\nAll data so far:\n${JSON.stringify(data)}\n\nWrite a 2-3 sentence coaching note. Acknowledge what they shared, name one specific insight this step reveals, and note what the next step will clarify. Be warm, trauma-informed, and practical. Do NOT recommend interventions yet.`}]);
     insights[sid] = txt;
     document.getElementById('ins_t_' + sid).textContent = txt;
     document.getElementById('ins_' + sid).style.display = 'block';
@@ -876,7 +876,7 @@ async function submitLastStep() {
   const sum = sumSection(sid, d);
   try {
     const sec = SECTIONS[SECTIONS.length - 1];
-    const txt = await callAPI([{role:'user',content:`You are a supportive E.S.C. Educational Engagement Coaching specialist at Ephrata Area School District. The educator just completed the final step ${sec.num} ${sec.title}.\n\nResponses:\n${sum}\n\nAll data collected:\n${JSON.stringify(data)}\n\nWrite a warm 2-3 sentence coaching note acknowledging what they shared. Note that the educator is now moments away from generating a personalized plan. Mention they can add the student's interests and log any previous strategies before generating for the most personalized output.`}]);
+    const txt = await callAPI([{role:'user',content:`You are a supportive Behavior Coaching specialist. The educator just completed the final step ${sec.num} ${sec.title}.\n\nResponses:\n${sum}\n\nAll data collected:\n${JSON.stringify(data)}\n\nWrite a warm 2-3 sentence coaching note acknowledging what they shared. Note that the educator is now moments away from generating a personalized plan. Mention they can add the student's interests and log any previous strategies before generating for the most personalized output.`}]);
     insights[sid] = txt;
     document.getElementById('ins_t_' + sid).textContent = txt;
     document.getElementById('ins_' + sid).style.display = 'block';
@@ -908,9 +908,9 @@ async function generatePlan() {
   const triedSummary = getTriedSummary();
   const intensity = getIntensity();
   const teacherName = 'Educator';
-  const teacherBuilding = 'EASD';
+  const teacherBuilding = '';
 
-  const KNOWLEDGE = `E.S.C. STRATEGY LIBRARY (Ephrata Area School District Behavior Coaching):
+  const KNOWLEDGE = `STRATEGY LIBRARY:
 
 CONNECTION: 2x10 (2 min non-academic conversation daily for 10 days — student drives topic, NOT about work or behavior), Morning Greeting (Name+Eye contact+Nonverbal+Positive), Check In/Check Out, Responsibilities (SACRED — never taken away, never a reward or punishment), Peer Buddy, Classroom Job, Morning Meeting, Circles, Affirmations, Empathy Interview, Student Consulting, Sticky Note Check In, Positive Praise (effort-based + behavior-specific, Gratitude Formula: When I see + I feel + because + Thank you), Shadow Day, Smile, Personalized Notes At Desk.
 
@@ -923,7 +923,7 @@ REGULATION: Break Card (co-designed two-way, menu of options, practice before ne
 TRAUMA LENS: Fight = avoid power struggles, calm neutral tone. Flight = connection before compliance, safe exits. Freeze = reduce demands, gentle check-ins, breathing. Fawn = authentic relationship, validate effort, help find voice. ALL = Social Discipline Window: work WITH not TO or FOR.`;
 
   try {
-    const response = await callAPI([{role:'user',content:`You are an E.S.C. Educational Engagement Coaching specialist at Ephrata Area School District. An educator completed all 6 steps of Be a Scientist AND provided additional context. Generate a deeply personalized intervention plan.
+    const response = await callAPI([{role:'user',content:`You are an Behavior Coaching specialist. An educator completed all 6 steps of Be a Scientist AND provided additional context. Generate a deeply personalized intervention plan.
 
 FULL OBSERVATION:
 ${fullSummary()}
@@ -999,9 +999,9 @@ function showResults(p) {
   const prTag = p.priority==='high'?'tag-high':p.priority==='moderate'?'tag-moderate':'tag-low';
 
   let h = `<div class="r-header">
-    <div class="r-eyebrow">E.S.C. Be a Scientist &mdash; Put It All Together</div>
+    <div class="r-eyebrow">Be a Scientist &mdash; Put It All Together</div>
     <div class="r-title">Behavior Intervention Plan</div>
-    <div class="r-meta">E.S.C. Ephrata Area School District &middot; ${dateStr}</div>
+    <div class="r-meta">Behavior Coaching &middot; ${dateStr}</div>
     <div class="tags"><span class="tag ${prTag}">${p.priority} priority</span>${(p.tags||[]).map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div>
     <div class="r-summary">${p.scientist_summary}</div>
   </div>`;
@@ -1242,14 +1242,14 @@ async function goDeeper(id) {
     const progressNotes = (log.progress || []).map(p => `${p.date}: ${p.note}`).join('\n') || 'No progress notes added';
     const originalSummary = log.summary || '';
 
-    const KNOWLEDGE = `E.S.C. STRATEGY LIBRARY (Ephrata Area School District):
+    const KNOWLEDGE = `STRATEGY LIBRARY:
 CONNECTION: 2x10, Morning Greeting, Check In/Check Out, Responsibilities (SACRED), Peer Buddy, Classroom Job, Morning Meeting, Circles, Affirmations, Empathy Interview, Student Consulting, Sticky Note Check In, Positive Praise (Gratitude Formula), Shadow Day, Empathetic Listening, Active Listening, Personalized Notes At Desk.
 AWARENESS: Secret Signal (two-way), Self-Monitoring (target behavior, timed intervals), Mood Meter (Green/Blue/Yellow/Red), Zones of Regulation, Behavioral Monitoring/Tracking, Blurt/Talking Tokens, Daily Planner, Organizational Checklist, Color Coding, Class Values, Behavior Contract, Restitution, Planned Ignoring.
 SKILLS: Specific Skills Training (instruction+modeling+role play+transference+feedback), Social Skills Instruction, Controlled Choices, Avoid Power Struggle, I-Messages, If-Then Statements, Calm Neutral Tone, Simplify Directions, Chunking, Alternative Assignments, Help Start/Jumpstart, Visual Schedule, Forewarning, Structured Routine, Supervised Transitions, Preferential Seating, Environmental Modifications, Relational Discipline Moves, Intermittent Incentives, Community Systems, Counseling/SAP, Schedule Adaptations, Family Group Decision Making, High Stakes Conferencing.
 REGULATION: Break Card (co-designed two-way), Reset Plan (3 options, used AFTER crisis), Breathing Techniques (7-11, belly breathing, Rapid Resets), Sensory/Movement Breaks, Fidgets, Weighted Items, Headphones, Music, Visual Timer, Mood Meter, Affirmations, Chill-Out options.
 TRAUMA: Fight=calm neutral tone, avoid power struggles. Flight=connection before compliance, safe exits. Freeze=reduce demands, gentle check-ins. Fawn=authentic relationship, validate effort. ALL=work WITH not TO or FOR.`;
 
-    const response = await callAPI([{role:'user',content:`You are an E.S.C. Educational Engagement Coaching specialist at Ephrata Area School District. An educator's previous intervention plan has not produced sufficient change and they need to go DEEPER.
+    const response = await callAPI([{role:'user',content:`You are an Behavior Coaching specialist. An educator's previous intervention plan has not produced sufficient change and they need to go DEEPER.
 
 ORIGINAL CONCERN:
 ${originalSummary}
@@ -1294,7 +1294,7 @@ function showDeeperResults(p, originalLog) {
   const tierBg = p.tier_recommendation === 'Tier 3' ? '#FEE2E2' : '#FEF3C7';
 
   let h = `<div class="r-header" style="border-bottom-color:#DC2626">
-    <div class="r-eyebrow">E.S.C. Going Deeper &mdash; Escalated Intervention Plan</div>
+    <div class="r-eyebrow">Going Deeper &mdash; Escalated Intervention Plan</div>
     <div class="r-title">Deeper Plan &mdash; ${dateStr}</div>
     <div class="tags">
       <span class="tag" style="background:${tierBg};color:${tierColor}">${p.tier_recommendation}</span>
@@ -1438,6 +1438,31 @@ function startOver() {
 }
 
 // ============================================================
+// PASSWORD GATE
+// ============================================================
+const SITE_PASSWORD = 'BehaviorCoach25'; // Change this to your preferred password
+
+function checkPassword() {
+  const input = document.getElementById('pwInput').value;
+  const error = document.getElementById('pwError');
+  if (input === SITE_PASSWORD) {
+    localStorage.setItem('bic_auth', btoa(SITE_PASSWORD));
+    document.getElementById('pwGate').style.display = 'none';
+  } else {
+    error.style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+function initAuth() {
+  const stored = localStorage.getItem('bic_auth');
+  if (stored && atob(stored) === SITE_PASSWORD) {
+    document.getElementById('pwGate').style.display = 'none';
+  }
+}
+
+// ============================================================
 // DARK MODE
 // ============================================================
 function toggleDark() {
@@ -1481,7 +1506,7 @@ function renderStrategyOfDay() {
 // GLOSSARY TOOLTIPS
 // ============================================================
 const GLOSSARY = {
-  'Be a Scientist': 'The E.S.C. 6-step framework: What, When, Who, Where, Why, How. Narrows your focus to observable data before recommending any intervention.',
+  'Be a Scientist': 'The 6-step Be a Scientist framework: What, When, Who, Where, Why, How. Narrows your focus to observable data before recommending any intervention.',
   'Social Discipline Window': 'Wachtel (1999): work WITH students (High Firm + High Fair = Relational). Working TO them is punitive; working FOR them is permissive.',
   'Fight response': 'A trauma response where the student engages aggressively with a perceived threat — arguing, defiance, outbursts, physical behavior.',
   'Flight response': 'A trauma response where the student escapes a perceived threat — avoidance, leaving tasks, frequent bathroom trips, head down.',
@@ -1528,5 +1553,6 @@ renderLibrary();
 renderResources();
 updateLogBadge();
 initDark();
+initAuth();
 renderStrategyOfDay();
 setTimeout(applyGlossaryTooltips, 200);
