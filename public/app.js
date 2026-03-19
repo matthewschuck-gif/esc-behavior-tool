@@ -485,6 +485,13 @@ async function callAPI(messages) {
 // ============================================================
 function render() {
   document.getElementById('form').innerHTML = '';
+
+  // Returning student panel at top
+  const returningPanel = document.createElement('div');
+  returningPanel.id = 'returningPanel';
+  returningPanel.innerHTML = buildReturningPanel();
+  document.getElementById('form').appendChild(returningPanel);
+
   SECTIONS.forEach((s, i) => {
     const div = document.createElement('div');
     div.id = 'sec_' + s.id;
@@ -911,6 +918,7 @@ async function generatePlan() {
   const teacherInterests = getEducatorInterests();
   const triedSummary = getTriedSummary();
   const intensity = getIntensity();
+  const returningContext = getReturningContext();
   const teacherName = 'Educator';
   const teacherBuilding = '';
 
@@ -946,7 +954,7 @@ STUDENT RAPPORT BUILDERS (interests, hobbies, strengths):
 ${rapportSummary || 'Not provided'}
 
 COACHING INTENSITY: ${intensity}
-
+${returningContext}
 WHAT HAS ALREADY BEEN TRIED (EXCLUDE THESE FROM PRIMARY RECOMMENDATIONS):
 ${triedSummary || 'Nothing logged — this may be a first attempt at formal intervention'}
 
@@ -1001,87 +1009,147 @@ function showResults(p) {
 
   const dateStr = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
   const prTag = p.priority==='high'?'tag-high':p.priority==='moderate'?'tag-moderate':'tag-low';
+  const prColor = p.priority==='high'?'#DC2626':p.priority==='moderate'?'#D97706':'#16A34A';
 
+  // ── HEADER ──────────────────────────────────────────────
   let h = `<div class="r-header">
-    <div class="r-eyebrow">Be a Scientist &mdash; Put It All Together</div>
-    <div class="r-title">Behavior Intervention Plan</div>
-    <div class="r-meta">Behavior Coaching &middot; ${dateStr}</div>
-    <div class="tags"><span class="tag ${prTag}">${p.priority} priority</span>${(p.tags||[]).map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div class="r-eyebrow">Be a Scientist &mdash; Put It All Together</div>
+        <div class="r-title">Behavior Intervention Plan</div>
+        <div class="r-meta">${dateStr}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:8px 12px;display:inline-block">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.7;margin-bottom:3px">Priority</div>
+          <div style="font-size:18px;font-weight:800;color:${p.priority==='high'?'#FCA5A5':p.priority==='moderate'?'#FDE68A':'#86EFAC'}">${p.priority.charAt(0).toUpperCase()+p.priority.slice(1)}</div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:10px;margin-bottom:10px">${(p.tags||[]).map(t=>`<span class="tag tag-info">${t}</span>`).join('')}</div>
     <div class="r-summary">${p.scientist_summary}</div>
   </div>`;
 
-  if (p.trauma_type && p.trauma_type !== 'none' && p.trauma_guidance) {
-    h += `<div class="trauma-banner"><div class="trauma-banner-title">Trauma lens &mdash; ${p.trauma_type} response pattern detected</div><div class="trauma-banner-body">${p.trauma_guidance}</div></div>`;
-  }
-  if (p.social_discipline_note) {
-    h += `<div class="window-banner"><div class="window-banner-title">Social Discipline Window &mdash; Work WITH, not TO or FOR</div><div class="window-banner-body">${p.social_discipline_note}</div></div>`;
-  }
+  // ── TRAUMA + SOCIAL DISCIPLINE (compact inline) ──────────
+  const alerts = [];
+  if (p.trauma_type && p.trauma_type !== 'none' && p.trauma_guidance)
+    alerts.push({color:'#D97706',bg:'#FEF3C7',border:'#FDE68A',label:`Trauma: ${p.trauma_type}`,text:p.trauma_guidance});
+  if (p.social_discipline_note)
+    alerts.push({color:'#5B21B6',bg:'#EDE9FE',border:'#C4B5FD',label:'Work WITH',text:p.social_discipline_note});
 
-  // Rapport connection highlight
-  if (p.rapport_connection || p.educator_connection) {
-    h += `<div class="card" style="border-left:4px solid #F59E0B;background:#FFFBEB">
-      <div style="font-size:13px;font-weight:700;color:#B45309;margin-bottom:8px">Rapport &amp; Connection Opportunities</div>`;
-    if (p.rapport_connection) h += `<div style="font-size:13px;color:#92400E;line-height:1.7;margin-bottom:6px"><strong>Student interests in action:</strong> ${p.rapport_connection}</div>`;
-    if (p.educator_connection) h += `<div style="font-size:13px;color:#92400E;line-height:1.7"><strong>Educator-student connection:</strong> ${p.educator_connection}</div>`;
+  if (alerts.length) {
+    h += `<div style="display:grid;grid-template-columns:${alerts.length>1?'1fr 1fr':'1fr'};gap:10px;margin-bottom:1rem">`;
+    alerts.forEach(a => {
+      h += `<div style="background:${a.bg};border:1px solid ${a.border};border-radius:10px;padding:10px 12px">
+        <div style="font-size:11px;font-weight:700;color:${a.color};text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${a.label}</div>
+        <div style="font-size:12px;color:${a.color};line-height:1.5">${a.text}</div>
+      </div>`;
+    });
     h += `</div>`;
   }
 
+  // ── BUCKET + RAPPORT (side by side) ─────────────────────
   const buckets = [p.primary_bucket];
   if (p.secondary_bucket && p.secondary_bucket !== 'none') buckets.push(p.secondary_bucket);
-  h += `<div class="bucket-row">`;
-  buckets.forEach(b => { h += `<div class="bucket-pill" style="background:${bBg(b)};border:1.5px solid ${bColor(b)}40"><div class="bucket-pill-title" style="color:${bColor(b)}">${b.charAt(0).toUpperCase()+b.slice(1)} bucket</div><div class="bucket-pill-body" style="color:${bColor(b)}">${p.bucket_rationale}</div></div>`; });
-  h += `</div>`;
+  const hasRapport = p.rapport_connection || p.educator_connection;
 
-  h += `<div class="rcard"><div class="rcard-title">Start with these strategies &mdash; personalized to this student</div>`;
-  (p.try_first||[]).forEach(s => {
-    h += `<div class="int-item">
-      <div class="int-name">${s.name}</div>
-      <div class="int-meta">
-        <span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span>
-        <a class="int-link" href="${BASE+slugify(s.name)}" target="_blank">view one-pager &#8599;</a>
-      </div>
-      <div class="int-why">${s.why}</div>
-      ${s.the_moves ? `<div class="int-moves"><strong>How to start with this student:</strong> ${s.the_moves}</div>` : ''}
-    </div>`;
-  });
-  h += `</div>`;
+  h += `<div style="display:grid;grid-template-columns:${hasRapport?'1fr 1fr':'1fr'};gap:10px;margin-bottom:1rem">`;
 
-  h += `<div class="rcard"><div class="rcard-title">Also consider</div>`;
-  (p.also_consider||[]).forEach(s => {
-    h += `<div class="int-item">
-      <div class="int-name">${s.name}</div>
-      <div class="int-meta">
-        <span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span>
-        <a class="int-link" href="${BASE+slugify(s.name)}" target="_blank">view one-pager &#8599;</a>
-      </div>
-      <div class="int-why">${s.why}</div>
-    </div>`;
-  });
-  h += `</div>`;
-
-  h += `<div class="rcard"><div class="rcard-title">What to say to this student</div><div class="rcard-body" style="font-style:italic;font-size:14px">"${p.what_to_say}"</div></div>`;
-  if (p.what_not_to_do) h += `<div class="warning-card"><div class="warning-card-title">What NOT to do with this student</div><div class="warning-card-body">${p.what_not_to_do}</div></div>`;
-
-  h += `<div class="rcard"><div class="rcard-title">Environmental adjustments</div><ul style="padding-left:1.4rem">`;
-  (p.environment_fits||[]).forEach(t => h += `<li style="font-size:13px;color:#4B5563;margin-bottom:7px;line-height:1.6">${t}</li>`);
-  h += `</ul></div>`;
-
-  h += `<div class="trial-card"><div class="trial-title">2-Week Trial Plan &mdash; Start Here</div><div class="trial-body">${p.two_week_trial}</div></div>`;
-  h += `<div class="two-col">
-    <div class="rcard"><div class="rcard-title">What to track</div><div class="rcard-body">${p.what_to_track}</div></div>
-    <div class="rcard"><div class="rcard-title">Who to loop in</div><ul style="padding-left:1.4rem">${(p.who_to_loop_in||[]).map(x=>`<li style="font-size:13px;color:#4B5563;margin-bottom:5px">${x}</li>`).join('')}</ul></div>
+  // Bucket pills
+  h += `<div style="background:${bBg(p.primary_bucket)};border:1px solid ${bColor(p.primary_bucket)}40;border-radius:10px;padding:12px">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:${bColor(p.primary_bucket)};margin-bottom:4px">
+      ${buckets.map(b=>b.charAt(0).toUpperCase()+b.slice(1)).join(' + ')} Focus
+    </div>
+    <div style="font-size:12px;color:${bColor(p.primary_bucket)};line-height:1.5">${p.bucket_rationale}</div>
   </div>`;
-  h += `<div class="review-card"><div class="review-title">Review by</div><div class="review-body">${p.review_by}</div></div>`;
 
+  // Rapport
+  if (hasRapport) {
+    h += `<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#B45309;margin-bottom:4px">Rapport</div>
+      ${p.rapport_connection ? `<div style="font-size:12px;color:#92400E;line-height:1.5;margin-bottom:4px">${p.rapport_connection}</div>` : ''}
+      ${p.educator_connection ? `<div style="font-size:12px;color:#92400E;line-height:1.5;font-style:italic">${p.educator_connection}</div>` : ''}
+    </div>`;
+  }
+  h += `</div>`;
+
+  // ── START WITH THESE ─────────────────────────────────────
+  h += `<div class="rcard"><div class="rcard-title">Start with these strategies</div>`;
+  (p.try_first||[]).forEach((s,i) => {
+    h += `<div class="int-item">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+        <div class="int-name" style="margin:0">${s.name}</div>
+        <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+          <span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span>
+          <a class="int-link" href="${BASE+slugify(s.name)}" target="_blank">one-pager &#8599;</a>
+        </div>
+      </div>
+      <div class="int-why">${s.why}</div>
+      ${s.the_moves ? `<div class="int-moves"><strong>How to start:</strong> ${s.the_moves}</div>` : ''}
+    </div>`;
+  });
+  h += `</div>`;
+
+  // ── ALSO CONSIDER (compact) ──────────────────────────────
+  if ((p.also_consider||[]).length) {
+    h += `<div class="rcard"><div class="rcard-title">Also consider</div>
+      <div style="display:flex;flex-direction:column;gap:6px">`;
+    (p.also_consider||[]).forEach(s => {
+      h += `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray-100)">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px">
+            <span style="font-size:13px;font-weight:700;color:var(--gray-800)">${s.name}</span>
+            <span class="int-bucket-tag" style="background:${bBg(s.bucket)};color:${bColor(s.bucket)}">${s.bucket}</span>
+            <a class="int-link" href="${BASE+slugify(s.name)}" target="_blank">one-pager &#8599;</a>
+          </div>
+          <div style="font-size:12px;color:var(--gray-500);line-height:1.5">${s.why}</div>
+        </div>
+      </div>`;
+    });
+    h += `</div></div>`;
+  }
+
+  // ── WHAT TO SAY + WHAT NOT TO DO (side by side) ──────────
+  h += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+    <div class="rcard" style="margin:0;background:#F0FDF4;border-color:#86EFAC">
+      <div class="rcard-title" style="color:#14532D">What to say</div>
+      <div style="font-size:13px;color:#166534;line-height:1.6;font-style:italic">"${p.what_to_say}"</div>
+    </div>`;
+  if (p.what_not_to_do) {
+    h += `<div class="rcard" style="margin:0;background:#FEF2F2;border-color:#FCA5A5">
+      <div class="rcard-title" style="color:#991B1B">What NOT to do</div>
+      <div style="font-size:13px;color:#7F1D1D;line-height:1.6">${p.what_not_to_do}</div>
+    </div>`;
+  }
+  h += `</div>`;
+
+  // ── ENVIRONMENT + REVIEW (side by side) ─────────────────
+  h += `<div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-bottom:1rem">
+    <div class="rcard" style="margin:0">
+      <div class="rcard-title">Environmental adjustments</div>
+      <ul style="padding-left:1.2rem;margin:0">
+        ${(p.environment_fits||[]).map(t=>`<li style="font-size:13px;color:#4B5563;margin-bottom:5px;line-height:1.5">${t}</li>`).join('')}
+      </ul>
+    </div>
+    <div class="rcard" style="margin:0;background:var(--blue-light);border-color:#93C5FD">
+      <div class="rcard-title" style="color:var(--blue-mid)">Review by</div>
+      <div style="font-size:13px;color:var(--blue-dark);line-height:1.6">${p.review_by}</div>
+    </div>
+  </div>`;
+
+  // ── ACTIONS ──────────────────────────────────────────────
   h += `<div class="action-row">
     <button class="btn btn-primary" onclick="window.print()">Print / Save as PDF</button>
     <button class="btn btn-teal" onclick="savePlanCurrentResults()">Save to Log</button>
+    <button class="btn" id="copyPlanBtn" onclick="copyPlanAsText()" style="border-color:var(--gray-300)">Copy as Text</button>
     <button class="btn btn-gold" onclick="goToPage('library')">Browse Strategy Library</button>
     <button class="btn btn-outline" onclick="startOver()">Start a New Observation</button>
   </div>`;
 
   rs.innerHTML = h;
 }
+
+
 
 // ============================================================
 // SAVE & LOG
@@ -2159,7 +2227,7 @@ function goToPage(page) {
 
 function startOver() {
   current = 0; data = {}; insights = {}; done = new Set(); triedStrategies = [];
-  _lastPlan = null; _lastDate = null;
+  _lastPlan = null; _lastDate = null; _returningPlanId = null;
   document.getElementById('results').style.display = 'none';
   document.getElementById('form').style.display = 'block';
   render();
@@ -2169,19 +2237,25 @@ function startOver() {
 // ============================================================
 // PASSWORD GATE
 // ============================================================
-const SITE_PASSWORD = 'BehaviorCoach25'; // Change this to your preferred password
-const ADMIN_PASSWORD = 'AdminCoach25';   // Change this to your preferred admin password
+const SITE_PASSWORD = 'Thew26';      // Staff password
+const ADMIN_PASSWORD = 'Hope4';       // Admin password
+const TRIAL_PASSWORD = 'TrialCoach26'; // Trial group password
 let isAdminMode = false;
+let isTrialMode = false;
 
 function checkPassword() {
   const input = document.getElementById('pwInput').value;
   const error = document.getElementById('pwError');
   if (input === ADMIN_PASSWORD) {
-    isAdminMode = true;
+    isAdminMode = true; isTrialMode = false;
     document.getElementById('pwGate').style.display = 'none';
     enableAdminMode();
+  } else if (input === TRIAL_PASSWORD) {
+    isTrialMode = true; isAdminMode = false;
+    document.getElementById('pwGate').style.display = 'none';
+    enableTrialMode();
   } else if (input === SITE_PASSWORD) {
-    isAdminMode = false;
+    isAdminMode = false; isTrialMode = false;
     document.getElementById('pwGate').style.display = 'none';
   } else {
     error.style.display = 'block';
@@ -2194,6 +2268,15 @@ function initAuth() {
   // Clear any previously stored auth on every visit — password required every time
   localStorage.removeItem('bic_auth');
   sessionStorage.removeItem('bic_auth');
+}
+
+function enableTrialMode() {
+  const banner = document.createElement('div');
+  banner.id = 'trialBanner';
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#D97706;color:white;text-align:center;padding:6px;font-size:12px;font-weight:700;z-index:500;letter-spacing:.02em';
+  banner.textContent = 'Trial Access — You are using a preview version of this tool. Thank you for your feedback!';
+  document.body.appendChild(banner);
+  document.querySelector('.header').style.marginTop = '28px';
 }
 
 function enableAdminMode() {
@@ -2332,6 +2415,244 @@ function applyGlossaryTooltips() {
 }
 
 // ============================================================
+// RETURNING STUDENT
+// ============================================================
+let _returningPlanId = null;
+
+function buildReturningPanel() {
+  try {
+    const logs = JSON.parse(localStorage.getItem('bic_logs') || '[]');
+    if (logs.length === 0) return '';
+
+    let h = `<div class="returning-banner">
+      <div class="returning-banner-title">Returning student? Pull up a previous plan</div>
+      <div style="font-size:12px;color:var(--gray-500);margin-bottom:10px">Select a saved plan below and the AI will build on it — automatically excluding what was already tried.</div>
+      <div id="returningList">`;
+
+    logs.slice(0, 5).forEach(log => {
+      h += `<div class="returning-plan-card" id="rpc_${log.id}" onclick="selectReturningPlan('${log.id}')">
+        <div class="returning-plan-date">${log.dateStr} &middot; ${log.bucket} bucket &middot; ${log.priority} priority</div>
+        <div class="returning-plan-summary">${log.summary?.slice(0,120)}${log.summary?.length>120?'...':''}</div>
+        <div class="returning-plan-tags">${(log.strategies||[]).slice(0,3).map(s=>`<span style="font-size:10px;font-weight:600;padding:1px 6px;border-radius:6px;background:var(--purple-light);color:var(--purple)">${s}</span>`).join('')}</div>
+      </div>`;
+    });
+
+    h += `</div>
+      <button class="btn btn-sm btn-outline" style="margin-top:8px;font-size:12px" onclick="clearReturningPlan()">Start fresh instead</button>
+    </div>`;
+    return h;
+  } catch(e) { return ''; }
+}
+
+function selectReturningPlan(id) {
+  _returningPlanId = id;
+  document.querySelectorAll('.returning-plan-card').forEach(c => c.classList.remove('selected'));
+  const card = document.getElementById('rpc_' + id);
+  if (card) card.classList.add('selected');
+}
+
+function clearReturningPlan() {
+  _returningPlanId = null;
+  document.querySelectorAll('.returning-plan-card').forEach(c => c.classList.remove('selected'));
+}
+
+function getReturningContext() {
+  if (!_returningPlanId) return '';
+  try {
+    const logs = JSON.parse(localStorage.getItem('bic_logs') || '[]');
+    const log = logs.find(l => l.id === _returningPlanId);
+    if (!log) return '';
+    return `\n\nPREVIOUS PLAN FOR THIS STUDENT (${log.dateStr}):
+Summary: ${log.summary}
+Strategies that were tried: ${(log.strategies||[]).join(', ')}
+Previously logged tried strategies: ${log.tried || 'none'}
+Progress notes: ${(log.progress||[]).map(p=>`${p.date}: ${p.note}`).join('; ') || 'none'}
+IMPORTANT: Do not repeat the strategies that were already tried unless noting how to implement them differently.`;
+  } catch(e) { return ''; }
+}
+
+// ============================================================
+// QUICK STRATEGY SEARCH
+// ============================================================
+let _qsOpen = false;
+
+function toggleQuickSearch() {
+  _qsOpen = !_qsOpen;
+  const panel = document.getElementById('qsPanel');
+  const input = document.getElementById('qsInput');
+  panel.classList.toggle('open', _qsOpen);
+  if (_qsOpen) { setTimeout(() => input?.focus(), 100); }
+}
+
+// Close when clicking outside
+document.addEventListener('click', (e) => {
+  if (_qsOpen && !e.target.closest('#qsPanel') && !e.target.closest('#qsFab')) {
+    _qsOpen = false;
+    document.getElementById('qsPanel')?.classList.remove('open');
+  }
+});
+
+function runQuickSearch(q) {
+  const results = document.getElementById('qsResults');
+  if (!results) return;
+  const v = q.toLowerCase().trim();
+  if (!v) { results.innerHTML = '<div class="qs-empty">Type to search all strategies</div>'; return; }
+
+  const matches = [];
+  Object.entries(LIBRARY).forEach(([key, bucket]) => {
+    bucket.strategies.forEach(s => {
+      if (s.name.toLowerCase().includes(v) || s.desc.toLowerCase().includes(v)) {
+        matches.push({...s, bucketKey:key, bucketLabel:bucket.label, color:bucket.color, bg:bucket.bg});
+      }
+    });
+  });
+
+  if (matches.length === 0) { results.innerHTML = '<div class="qs-empty">No strategies found</div>'; return; }
+
+  results.innerHTML = matches.slice(0,12).map(s => {
+    const url = BASE + s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    return `<div class="qs-item">
+      <div class="qs-item-name">${s.name}</div>
+      <span class="qs-item-bucket" style="background:${s.bg};color:${s.color}">${s.bucketLabel}</span>
+      <a class="qs-item-link" href="${url}" target="_blank">one-pager ↗</a>
+      <div class="qs-item-desc">${s.desc.slice(0,90)}${s.desc.length>90?'...':''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// COPY PLAN AS TEXT
+// ============================================================
+function copyPlanAsText() {
+  if (!_lastPlan) return;
+  const p = _lastPlan;
+  const date = _lastDate || new Date().toLocaleDateString();
+
+  let text = `BEHAVIOR INTERVENTION PLAN\n`;
+  text += `${'='.repeat(40)}\n`;
+  text += `Date: ${date}\n\n`;
+
+  text += `SUMMARY\n${'-'.repeat(20)}\n${p.scientist_summary}\n\n`;
+  text += `Priority: ${p.priority?.toUpperCase()}\n`;
+  if (p.tags?.length) text += `Tags: ${p.tags.join(', ')}\n`;
+  text += '\n';
+
+  if (p.trauma_type && p.trauma_type !== 'none') {
+    text += `TRAUMA LENS: ${p.trauma_type}\n${p.trauma_guidance}\n\n`;
+  }
+
+  if (p.rapport_connection) text += `RAPPORT\n${'-'.repeat(20)}\n${p.rapport_connection}\n\n`;
+
+  text += `FOCUS AREA: ${p.primary_bucket?.toUpperCase()}${p.secondary_bucket && p.secondary_bucket !== 'none' ? ' + ' + p.secondary_bucket.toUpperCase() : ''}\n${p.bucket_rationale}\n\n`;
+
+  text += `START WITH THESE STRATEGIES\n${'-'.repeat(20)}\n`;
+  (p.try_first||[]).forEach((s,i) => {
+    text += `${i+1}. ${s.name} [${s.bucket}]\n`;
+    text += `   Why: ${s.why}\n`;
+    if (s.the_moves) text += `   How to start: ${s.the_moves}\n`;
+    text += '\n';
+  });
+
+  if (p.also_consider?.length) {
+    text += `ALSO CONSIDER\n${'-'.repeat(20)}\n`;
+    p.also_consider.forEach(s => { text += `- ${s.name} [${s.bucket}]: ${s.why}\n`; });
+    text += '\n';
+  }
+
+  text += `WHAT TO SAY\n${'-'.repeat(20)}\n"${p.what_to_say}"\n\n`;
+  if (p.what_not_to_do) text += `WHAT NOT TO DO\n${'-'.repeat(20)}\n${p.what_not_to_do}\n\n`;
+
+  if (p.environment_fits?.length) {
+    text += `ENVIRONMENTAL ADJUSTMENTS\n${'-'.repeat(20)}\n`;
+    p.environment_fits.forEach(e => { text += `- ${e}\n`; });
+    text += '\n';
+  }
+
+  text += `REVIEW BY\n${'-'.repeat(20)}\n${p.review_by}\n`;
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyPlanBtn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy as Text', 2000); }
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    const btn = document.getElementById('copyPlanBtn');
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = 'Copy as Text', 2000); }
+  });
+}
+
+// ============================================================
+// ONBOARDING TOUR
+// ============================================================
+const TOUR_STEPS = [
+  {
+    icon: '🔬',
+    title: 'Welcome to the Behavior Intervention Center',
+    desc: 'This tool walks you through the 6-step Be a Scientist framework to generate a personalized, data-driven intervention plan for any student.'
+  },
+  {
+    icon: '📋',
+    title: 'Complete all 6 steps',
+    desc: 'Each step narrows your focus — What, When, Who, Where, Why, and How. After each step the AI gives you a coaching note. Take your time and be specific.'
+  },
+  {
+    icon: '🌟',
+    title: 'Add Rapport Builders',
+    desc: 'After Step 6, you\'ll add the student\'s interests and hobbies. The AI weaves these directly into recommendations — making strategies feel personal, not generic.'
+  },
+  {
+    icon: '🔍',
+    title: 'Quick Strategy Search',
+    desc: 'See the purple search button in the bottom-right corner? Tap it anytime to instantly search all 130+ strategies without leaving the page.'
+  },
+  {
+    icon: '📚',
+    title: 'Explore the tabs',
+    desc: 'The Emotions Hub, Strategy Library, and Resources tabs are packed with frameworks and tools. Saved Plans lets you track progress over time.'
+  }
+];
+
+let _tourStep = 0;
+
+function startTour() {
+  _tourStep = 0;
+  document.getElementById('tourOverlay')?.classList.remove('hidden');
+  renderTourStep();
+}
+
+function renderTourStep() {
+  const step = TOUR_STEPS[_tourStep];
+  if (!step) { endTour(); return; }
+  document.getElementById('tourIcon').textContent = step.icon;
+  document.getElementById('tourTitle').textContent = step.title;
+  document.getElementById('tourDesc').textContent = step.desc;
+  const nextBtn = document.getElementById('tourNext');
+  if (nextBtn) nextBtn.textContent = _tourStep === TOUR_STEPS.length - 1 ? "Let's go!" : 'Next';
+  // Dots
+  const dots = document.getElementById('tourDots');
+  if (dots) dots.innerHTML = TOUR_STEPS.map((_,i) =>
+    `<div class="tour-dot${i===_tourStep?' active':''}"></div>`).join('');
+}
+
+function nextTourStep() {
+  _tourStep++;
+  if (_tourStep >= TOUR_STEPS.length) { endTour(); return; }
+  renderTourStep();
+}
+
+function endTour() {
+  document.getElementById('tourOverlay')?.classList.add('hidden');
+  localStorage.setItem('bic_tour_done', '1');
+}
+
+function maybeShowTour() {
+  if (!localStorage.getItem('bic_tour_done')) {
+    setTimeout(startTour, 800);
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
 render();
@@ -2341,8 +2662,9 @@ initDark();
 initAuth();
 renderStrategyOfDay();
 setTimeout(applyGlossaryTooltips, 200);
-// Load all overrides from server then render
 loadOverrides().then(() => {
   renderLibrary();
   applyHeaderOverrides();
 });
+// Show onboarding tour for first-time users (after password)
+setTimeout(maybeShowTour, 1200);
