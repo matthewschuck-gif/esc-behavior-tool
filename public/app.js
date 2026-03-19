@@ -864,7 +864,11 @@ async function submit(sid, isFinal) {
   const sum = sumSection(sid, d);
   try {
     const sec = SECTIONS.find(s => s.id === sid);
-    const txt = await callAPI([{role:'user',content:`You are a supportive Behavior Coaching specialist using the Be a Scientist framework. The educator just completed step ${sec.num} ${sec.title}.\n\nResponses:\n${sum}\n\nAll data so far:\n${JSON.stringify(data)}\n\nWrite a 2-3 sentence coaching note. Acknowledge what they shared, name one specific insight this step reveals, and note what the next step will clarify. Be warm, trauma-informed, and practical. Do NOT recommend interventions yet.`}]);
+    const allStepsContext = Object.entries(data).map(([k,v]) => {
+      const s = SECTIONS.find(s=>s.id===k);
+      return s ? `Step ${s.num} (${s.title}): ${sumSection(k,v)}` : '';
+    }).filter(Boolean).join('\n');
+    const txt = await callAPI([{role:'user',content:`You are a supportive Behavior Coaching specialist using the Be a Scientist framework. The educator just completed step ${sec.num}: ${sec.title}.\n\nThis step's responses:\n${sum}\n\nAll steps completed so far:\n${allStepsContext}\n\nWrite a 2-3 sentence coaching note. Acknowledge what they shared in THIS step, name one specific insight or pattern this step reveals when combined with previous steps, and note what the next step will help clarify. Be warm, trauma-informed, and specific to their actual data. Do NOT recommend interventions yet.`}]);
     insights[sid] = txt;
     document.getElementById('ins_t_' + sid).textContent = txt;
     document.getElementById('ins_' + sid).style.display = 'block';
@@ -887,7 +891,11 @@ async function submitLastStep() {
   const sum = sumSection(sid, d);
   try {
     const sec = SECTIONS[SECTIONS.length - 1];
-    const txt = await callAPI([{role:'user',content:`You are a supportive Behavior Coaching specialist. The educator just completed the final step ${sec.num} ${sec.title}.\n\nResponses:\n${sum}\n\nAll data collected:\n${JSON.stringify(data)}\n\nWrite a warm 2-3 sentence coaching note acknowledging what they shared. Note that the educator is now moments away from generating a personalized plan. Mention they can add the student's interests and log any previous strategies before generating for the most personalized output.`}]);
+    const allStepsContext = Object.entries(data).map(([k,v]) => {
+      const s = SECTIONS.find(s=>s.id===k);
+      return s ? `Step ${s.num} (${s.title}): ${sumSection(k,v)}` : '';
+    }).filter(Boolean).join('\n');
+    const txt = await callAPI([{role:'user',content:`You are a supportive Behavior Coaching specialist. The educator just completed the final step ${sec.num}: ${sec.title}.\n\nThis step's responses:\n${sum}\n\nAll 6 steps:\n${allStepsContext}\n\nWrite a warm 2-3 sentence coaching note. Acknowledge a specific pattern you see across all 6 steps that paints a picture of this student's experience. Note they are moments away from a personalized plan and can add student interests and previous strategies for the most tailored output.`}]);
     insights[sid] = txt;
     document.getElementById('ins_t_' + sid).textContent = txt;
     document.getElementById('ins_' + sid).style.display = 'block';
@@ -905,6 +913,12 @@ async function submitLastStep() {
 // GENERATE PLAN
 // ============================================================
 async function generatePlan() {
+  // Run confidence check first
+  const issues = runConfidenceCheck();
+  if (issues.length > 0) {
+    showConfidenceCheck(generatePlan);
+    return;
+  }
   const btn = document.getElementById('btnGenerate');
   const dots = document.getElementById('dGenerate');
   btn.disabled = true; dots.classList.remove('hidden');
@@ -1244,6 +1258,7 @@ function renderLogs() {
         <div class="log-actions" style="margin-top:8px">
           <button class="btn btn-teal btn-sm" onclick="addProgress('${log.id}')">Add Progress Note</button>
           <button class="btn btn-primary btn-sm" onclick="goDeeper('${log.id}')">Go Deeper &#8250;</button>
+          <button class="btn btn-sm" onclick="generateShareableLink('${log.id}')" style="font-size:12px;color:var(--blue-mid);border-color:#93C5FD">Share Link</button>
           <select onchange="updateStatus('${log.id}',this.value)" style="width:auto;padding:6px 10px;font-size:12px;border-radius:8px">
             <option value="active" ${log.status==='active'?'selected':''}>Active</option>
             <option value="reviewing" ${log.status==='reviewing'?'selected':''}>Under Review</option>
@@ -2250,13 +2265,16 @@ function checkPassword() {
     isAdminMode = true; isTrialMode = false;
     document.getElementById('pwGate').style.display = 'none';
     enableAdminMode();
+    maybeShowSharedPlan();
   } else if (input === TRIAL_PASSWORD) {
     isTrialMode = true; isAdminMode = false;
     document.getElementById('pwGate').style.display = 'none';
     enableTrialMode();
+    maybeShowSharedPlan();
   } else if (input === SITE_PASSWORD) {
     isAdminMode = false; isTrialMode = false;
     document.getElementById('pwGate').style.display = 'none';
+    maybeShowSharedPlan();
   } else {
     error.style.display = 'block';
     document.getElementById('pwInput').value = '';
@@ -2289,6 +2307,7 @@ function enableAdminMode() {
     <button onclick="goToPage('resources')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Resources</button>
     <button onclick="goToPage('emotions')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Emotions</button>
     <button onclick="goToPage('tool')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Steps</button>
+    <button onclick="viewFeedback()" style="background:var(--gold);color:var(--purple-dark);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Feedback</button>
     <span style="font-size:11px;font-weight:400;opacity:.8">Changes sync for all users</span>`;
   document.body.appendChild(banner);
   // Pad footer so banner doesn't cover content
@@ -2653,12 +2672,208 @@ function maybeShowTour() {
 }
 
 // ============================================================
+// BRAIN CARD TOGGLE
+// ============================================================
+function toggleBrainCard(id) {
+  const card = document.getElementById(id);
+  if (card) card.classList.toggle('open');
+}
+
+// ============================================================
+// FEEDBACK SYSTEM
+// ============================================================
+function openFeedback() {
+  const existing = document.getElementById('feedbackModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'feedbackModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:4px">Share Your Feedback</div>
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:1.25rem">Your input helps improve this tool for all educators.</div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:6px">How useful was this tool?</label>
+      <div style="display:flex;gap:8px" id="ratingBtns">
+        ${[1,2,3,4,5].map(n=>`<button onclick="setRating(${n})" id="rb${n}" style="width:40px;height:40px;border-radius:50%;border:2px solid var(--gray-200);background:white;font-size:18px;cursor:pointer;transition:all .15s">${['😞','😕','😐','🙂','😄'][n-1]}</button>`).join('')}
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Your name <span style="font-weight:400;color:var(--gray-400)">(optional)</span></label>
+      <input type="text" id="fbName" placeholder="e.g. Ms. Johnson" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:inherit">
+    </div>
+    <div style="margin-bottom:1.25rem">
+      <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Comments or suggestions</label>
+      <textarea id="fbComment" placeholder="What worked well? What would make this more useful?" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;min-height:80px;resize:vertical"></textarea>
+    </div>
+    <div id="fbStatus" style="font-size:12px;color:var(--gray-500);margin-bottom:10px;min-height:16px"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="document.getElementById('feedbackModal').remove()" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+      <button onclick="submitFeedback()" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Submit</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+let _feedbackRating = 0;
+function setRating(n) {
+  _feedbackRating = n;
+  [1,2,3,4,5].forEach(i => {
+    const btn = document.getElementById('rb'+i);
+    if (btn) btn.style.cssText = `width:40px;height:40px;border-radius:50%;border:2px solid ${i<=n?'var(--purple)':'var(--gray-200)'};background:${i<=n?'var(--purple-light)':'white'};font-size:18px;cursor:pointer;transition:all .15s`;
+  });
+}
+
+async function submitFeedback() {
+  const name = document.getElementById('fbName')?.value.trim() || 'Anonymous';
+  const comment = document.getElementById('fbComment')?.value.trim() || '';
+  const status = document.getElementById('fbStatus');
+  if (!_feedbackRating) { if(status) status.textContent = 'Please select a rating first.'; return; }
+  if (status) status.textContent = 'Submitting...';
+  try {
+    await fetch('/api/overrides-set', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        key: `feedback_${Date.now()}`,
+        value: { name, rating: _feedbackRating, comment, date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), timestamp: Date.now() }
+      })
+    });
+    document.getElementById('feedbackModal').remove();
+    alert('Thank you for your feedback!');
+  } catch(e) {
+    if (status) status.textContent = 'Could not submit. Please try again.';
+  }
+}
+
+// Admin feedback viewer
+async function viewFeedback() {
+  try {
+    const res = await fetch('/api/overrides-get?key=_all_keys');
+    // Fetch all feedback entries
+    const allRes = await fetch('/api/overrides-get');
+    const allData = await allRes.json();
+    const feedbackEntries = Object.entries(allData.overrides || {})
+      .filter(([k]) => k.startsWith('feedback_'))
+      .map(([,v]) => v)
+      .sort((a,b) => (b.timestamp||0) - (a.timestamp||0));
+
+    const existing = document.getElementById('feedbackViewModal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'feedbackViewModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto';
+    const avgRating = feedbackEntries.length ? (feedbackEntries.reduce((s,e)=>s+(e.rating||0),0)/feedbackEntries.length).toFixed(1) : 'N/A';
+    let rows = feedbackEntries.length ? feedbackEntries.map(e=>`
+      <div style="padding:10px 0;border-bottom:1px solid var(--gray-100)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-size:13px;font-weight:600">${e.name||'Anonymous'}</span>
+          <span style="font-size:12px;color:var(--gray-400)">${e.date||''} &bull; ${'⭐'.repeat(e.rating||0)}</span>
+        </div>
+        <div style="font-size:13px;color:var(--gray-600)">${e.comment||'<em>No comment</em>'}</div>
+      </div>`).join('') : '<div style="text-align:center;color:var(--gray-400);padding:2rem">No feedback submitted yet</div>';
+    modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div><div style="font-size:16px;font-weight:700">Feedback Responses</div><div style="font-size:12px;color:var(--gray-500)">${feedbackEntries.length} responses &bull; Avg rating: ${avgRating}/5</div></div>
+        <button onclick="document.getElementById('feedbackViewModal').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--gray-400)">&times;</button>
+      </div>
+      ${rows}
+    </div>`;
+    document.body.appendChild(modal);
+  } catch(e) { alert('Could not load feedback: ' + e.message); }
+}
+
+// ============================================================
+// SHAREABLE PLAN LINK
+// ============================================================
+function generateShareableLink(logId) {
+  try {
+    const logs = JSON.parse(localStorage.getItem('bic_logs') || '[]');
+    const log = logs.find(l => l.id === logId);
+    if (!log) return;
+    // Encode plan data into URL hash
+    const encoded = btoa(encodeURIComponent(JSON.stringify({
+      plan: log.fullPlan,
+      date: log.dateStr,
+      bucket: log.bucket,
+      priority: log.priority
+    })));
+    const url = `${window.location.origin}${window.location.pathname}#plan=${encoded}`;
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Shareable link copied to clipboard! Anyone with the password can view this plan.');
+    }).catch(() => {
+      prompt('Copy this link:', url);
+    });
+  } catch(e) { alert('Could not generate link: ' + e.message); }
+}
+
+function checkShareableLink() {
+  const hash = window.location.hash;
+  if (!hash.startsWith('#plan=')) return;
+  try {
+    const encoded = hash.replace('#plan=','');
+    const data = JSON.parse(decodeURIComponent(atob(encoded)));
+    if (data.plan) {
+      // Show the plan after auth
+      window._sharedPlan = data;
+    }
+  } catch(e) { console.warn('Invalid plan link'); }
+}
+
+function maybeShowSharedPlan() {
+  if (window._sharedPlan) {
+    const {plan, date, bucket, priority} = window._sharedPlan;
+    _lastPlan = plan; _lastDate = date;
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('form').style.display = 'none';
+    showResults(plan);
+    window._sharedPlan = null;
+    history.replaceState(null,'',window.location.pathname);
+  }
+}
+
+// ============================================================
+// CONFIDENCE CHECK
+// ============================================================
+function runConfidenceCheck() {
+  const issues = [];
+  if (!data.what?.observables?.length) issues.push('No observables selected in Step 1');
+  if (!data.what?.describe?.trim()) issues.push('No behavior description in Step 1');
+  if (!data.when?.frequency?.length) issues.push('Frequency not selected in Step 2');
+  if (!data.where?.location?.length) issues.push('Location not selected in Step 4');
+  if (!data.why?.buckets?.length) issues.push('No intervention bucket selected in Step 5');
+  if (!data.how?.goal?.trim()) issues.push('No success goal described in Step 6');
+  return issues;
+}
+
+function showConfidenceCheck(onProceed) {
+  const issues = runConfidenceCheck();
+  if (issues.length === 0) { onProceed(); return; }
+  const existing = document.getElementById('confidenceModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'confidenceModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:4px">Before you generate...</div>
+    <div style="font-size:13px;color:var(--gray-500);margin-bottom:1rem">A few fields look incomplete. The plan will be more accurate with this information — but you can still generate now.</div>
+    <ul style="padding-left:1.2rem;margin-bottom:1.25rem">
+      ${issues.map(i=>`<li style="font-size:13px;color:#D97706;margin-bottom:5px;line-height:1.5">${i}</li>`).join('')}
+    </ul>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="document.getElementById('confidenceModal').remove()" style="padding:8px 16px;border:1.5px solid var(--purple);color:var(--purple);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Go back &amp; complete</button>
+      <button onclick="document.getElementById('confidenceModal').remove();(${onProceed.toString()})()" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Generate anyway</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+// ============================================================
 // INIT
 // ============================================================
 render();
 renderResources();
 updateLogBadge();
 initDark();
+checkShareableLink();
 initAuth();
 renderStrategyOfDay();
 setTimeout(applyGlossaryTooltips, 200);
@@ -2666,5 +2881,4 @@ loadOverrides().then(() => {
   renderLibrary();
   applyHeaderOverrides();
 });
-// Show onboarding tour for first-time users (after password)
 setTimeout(maybeShowTour, 1200);
