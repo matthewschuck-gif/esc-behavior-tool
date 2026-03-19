@@ -334,11 +334,11 @@ body.dark #siteFooter div{color:#64748B}
 </div>
 
 <div class="header">
-  <div class="header-inner">
+  <div class="header-inner"><div id="headerImageWrap" style="display:none;margin-bottom:10px"><img id="headerImage" style="max-height:80px;border-radius:8px;opacity:.9" alt="Header image"></div>
     <button class="dark-toggle" onclick="toggleDark()" id="darkBtn">&#9790; Dark</button>
-    <div class="header-badge">Behavior Coaching</div>
-    <h1>Behavior <span>Intervention</span> Center</h1>
-    <div class="header-scientist">Be a Scientist Framework</div>
+    <div class="header-badge" data-hkey="h_badge">Behavior Coaching</div>
+    <h1 data-hkey="h_title">Behavior <span>Intervention</span> Center</h1>
+    <div class="header-scientist" data-hkey="h_scientist">Be a Scientist Framework</div>
     <div class="header-links">
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">Strategy Site</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist" target="_blank" class="hlink">Be a Scientist</a>
@@ -347,17 +347,17 @@ body.dark #siteFooter div{color:#64748B}
   </div>
 </div>
 <div class="nav-tabs">
-  <button class="nav-tab active" onclick="showPage('tool',this)">Intervention Tool</button>
-  <button class="nav-tab" onclick="showPage('emotions',this)">Emotions Hub</button>
-  <button class="nav-tab" onclick="showPage('library',this)">Strategy Library</button>
-  <button class="nav-tab" onclick="showPage('logs',this)">Saved Plans <span class="nbadge" id="logBadge" style="display:none">0</span></button>
-  <button class="nav-tab" onclick="showPage('resources',this)">Resources</button>
+  <button class="nav-tab active" onclick="showPage('tool',this)" data-nkey="nav_tool">Intervention Tool</button>
+  <button class="nav-tab" onclick="showPage('emotions',this)" data-nkey="nav_emotions">Emotions Hub</button>
+  <button class="nav-tab" onclick="showPage('library',this)" data-nkey="nav_library">Strategy Library</button>
+  <button class="nav-tab" onclick="showPage('logs',this)" data-nkey="nav_logs">Saved Plans <span class="nbadge" id="logBadge" style="display:none">0</span></button>
+  <button class="nav-tab" onclick="showPage('resources',this)" data-nkey="nav_resources">Resources</button>
 </div>
 <div class="page active" id="page-tool">
   <div class="rule-bar">
-    <div class="rule"><strong>Observable, not a judgement</strong> &middot; Head down &middot; Calling out &middot; Out of seat</div>
-    <div class="rule"><strong>Look for patterns</strong> &middot; Frequency &middot; Time &middot; Task &middot; Setting</div>
-    <div class="rule"><strong>Work WITH, not TO or FOR</strong> &middot; Social Discipline Window</div>
+    <div class="rule" data-rkey="rule_1"><strong>Observable, not a judgement</strong> &middot; Head down &middot; Calling out &middot; Out of seat</div>
+    <div class="rule" data-rkey="rule_2"><strong>Look for patterns</strong> &middot; Frequency &middot; Time &middot; Task &middot; Setting</div>
+    <div class="rule" data-rkey="rule_3"><strong>Work WITH, not TO or FOR</strong> &middot; Social Discipline Window</div>
   </div>
   <div class="progress-wrap">
     <div class="step-row" id="stepRow"></div>
