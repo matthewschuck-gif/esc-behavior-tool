@@ -2204,6 +2204,7 @@ enableTrialMode();
 } else if (input === SITE_PASSWORD) {
 isAdminMode = false; isTrialMode = false;
 document.getElementById(‘pwGate’).style.display = ‘none’;
+setTimeout(maybeShowTour, 800);
 } else {
 error.style.display = ‘block’;
 document.getElementById(‘pwInput’).value = ‘’;
@@ -2583,9 +2584,11 @@ localStorage.setItem(‘bic_tour_done’, ‘1’);
 }
 
 function maybeShowTour() {
+try {
 if (!localStorage.getItem(‘bic_tour_done’)) {
-setTimeout(startTour, 800);
+setTimeout(startTour, 500);
 }
+} catch(e) {}
 }
 
 // ============================================================
@@ -2778,9 +2781,10 @@ updateLogBadge();
 initDark();
 initAuth();
 renderStrategyOfDay();
-setTimeout(applyGlossaryTooltips, 200);
+setTimeout(applyGlossaryTooltips, 500);
+try {
 loadOverrides().then(() => {
 renderLibrary();
 applyHeaderOverrides();
-});
-setTimeout(maybeShowTour, 1200);
+}).catch(() => renderLibrary());
+} catch(e) { renderLibrary(); }
