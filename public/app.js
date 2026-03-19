@@ -2184,38 +2184,30 @@ window.scrollTo({top:0,behavior:‘smooth’});
 // ============================================================
 // PASSWORD GATE
 // ============================================================
-const SITE_PASSWORD = ‘Thew26’;      // Staff password
-const ADMIN_PASSWORD = ‘Hope4’;       // Admin password
-const TRIAL_PASSWORD = ‘TrialCoach26’; // Trial group password
-let isAdminMode = false;
-let isTrialMode = false;
+var SITE_PASSWORD = ‘Thew26’;
+var ADMIN_PASSWORD = ‘Hope4’;
+var TRIAL_PASSWORD = ‘TrialCoach26’;
+var isAdminMode = false;
+var isTrialMode = false;
 
 function checkPassword() {
-const input = document.getElementById(‘pwInput’).value;
-const error = document.getElementById(‘pwError’);
-if (input === ADMIN_PASSWORD) {
-isAdminMode = true; isTrialMode = false;
+try {
+var val = document.getElementById(‘pwInput’).value;
+var err = document.getElementById(‘pwError’);
+if (val === SITE_PASSWORD || val === ADMIN_PASSWORD || val === TRIAL_PASSWORD) {
 document.getElementById(‘pwGate’).style.display = ‘none’;
-enableAdminMode();
-} else if (input === TRIAL_PASSWORD) {
-isTrialMode = true; isAdminMode = false;
-document.getElementById(‘pwGate’).style.display = ‘none’;
-enableTrialMode();
-} else if (input === SITE_PASSWORD) {
-isAdminMode = false; isTrialMode = false;
-document.getElementById(‘pwGate’).style.display = ‘none’;
-setTimeout(maybeShowTour, 800);
+if (val === ADMIN_PASSWORD) { isAdminMode = true; try { enableAdminMode(); } catch(e) {} }
+if (val === TRIAL_PASSWORD) { isTrialMode = true; try { enableTrialMode(); } catch(e) {} }
+if (val === SITE_PASSWORD) { try { setTimeout(maybeShowTour, 800); } catch(e) {} }
 } else {
-error.style.display = ‘block’;
+if (err) err.style.display = ‘block’;
 document.getElementById(‘pwInput’).value = ‘’;
-document.getElementById(‘pwInput’).focus();
 }
+} catch(e) { console.error(‘checkPassword error:’, e); }
 }
 
 function initAuth() {
-// Clear any previously stored auth on every visit — password required every time
-localStorage.removeItem(‘bic_auth’);
-sessionStorage.removeItem(‘bic_auth’);
+try { localStorage.removeItem(‘bic_auth’); } catch(e) {}
 }
 
 function enableTrialMode() {
@@ -2775,16 +2767,19 @@ modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5re
 // ============================================================
 // INIT
 // ============================================================
-render();
-renderResources();
-updateLogBadge();
-initDark();
-initAuth();
-renderStrategyOfDay();
-setTimeout(applyGlossaryTooltips, 500);
+// SAFE INIT — every call wrapped to prevent password screen crash
+try { render(); } catch(e) { console.error(‘render’,e); }
+try { renderResources(); } catch(e) { console.error(‘renderResources’,e); }
+try { updateLogBadge(); } catch(e) {}
+try { initDark(); } catch(e) {}
+try { initAuth(); } catch(e) { console.error(‘initAuth’,e); }
+try { renderStrategyOfDay(); } catch(e) {}
+setTimeout(() => { try { applyGlossaryTooltips(); } catch(e) {} }, 500);
+setTimeout(() => {
 try {
 loadOverrides().then(() => {
-renderLibrary();
-applyHeaderOverrides();
-}).catch(() => renderLibrary());
-} catch(e) { renderLibrary(); }
+try { renderLibrary(); } catch(e) {}
+try { applyHeaderOverrides(); } catch(e) {}
+}).catch((e) => { console.error(‘loadOverrides’,e); try { renderLibrary(); } catch(e2) {} });
+} catch(e) { try { renderLibrary(); } catch(e2) {} }
+}, 100);
