@@ -2197,16 +2197,13 @@ if (input === ADMIN_PASSWORD) {
 isAdminMode = true; isTrialMode = false;
 document.getElementById(‘pwGate’).style.display = ‘none’;
 enableAdminMode();
-maybeShowSharedPlan();
 } else if (input === TRIAL_PASSWORD) {
 isTrialMode = true; isAdminMode = false;
 document.getElementById(‘pwGate’).style.display = ‘none’;
 enableTrialMode();
-maybeShowSharedPlan();
 } else if (input === SITE_PASSWORD) {
 isAdminMode = false; isTrialMode = false;
 document.getElementById(‘pwGate’).style.display = ‘none’;
-maybeShowSharedPlan();
 } else {
 error.style.display = ‘block’;
 document.getElementById(‘pwInput’).value = ‘’;
@@ -2723,20 +2720,8 @@ prompt(‘Copy this link:’, url);
 } catch(e) { alert(’Could not generate link: ’ + e.message); }
 }
 
-function checkShareableLink() {
-try {
-const hash = window.location.hash;
-if (!hash || !hash.startsWith(’#plan=’)) return;
-const encoded = hash.replace(’#plan=’,’’);
-if (!encoded) return;
-const decoded = decodeURIComponent(atob(encoded));
-const data = JSON.parse(decoded);
-if (data && data.plan) window._sharedPlan = data;
-} catch(e) {
-// Invalid or missing hash — ignore silently
-history.replaceState(null,’’,window.location.pathname);
-}
-}
+function checkShareableLink() { /* disabled */ }
+function maybeShowSharedPlan() { /* disabled */ }
 
 function maybeShowSharedPlan() {
 if (window._sharedPlan) {
@@ -2791,7 +2776,6 @@ render();
 renderResources();
 updateLogBadge();
 initDark();
-checkShareableLink();
 initAuth();
 renderStrategyOfDay();
 setTimeout(applyGlossaryTooltips, 200);
