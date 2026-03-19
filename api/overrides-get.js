@@ -10,7 +10,8 @@ export default async function handler(req, res) {
   if (!url || !token) return res.status(500).json({ error: 'KV not configured' });
 
   try {
-    const getRes = await fetch(`${url}/get/strategy_overrides`, {
+    const key = req.query?.key || 'strategy_overrides';
+    const getRes = await fetch(`${url}/get/${encodeURIComponent(key)}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     const getData = await getRes.json();
