@@ -345,6 +345,49 @@ body.dark .res-card-desc{color:#94A3B8}
 body.dark .res-section h3{border-color:#F59E0B}
 body.dark .insight-box{background:#1E3A5F;border-color:#3B82F6}
 body.dark .int-moves{background:#0F0F1A}
+body.dark .r-header{background:linear-gradient(135deg,#0A0514 0%,#1E0A3C 100%)!important}
+body.dark .warning-card{background:#2D0A0A;border-color:#7F1D1D}
+body.dark .warning-card-title{color:#FCA5A5}
+body.dark .warning-card-body{color:#FCA5A5}
+body.dark .int-item{border-color:#2D2D4E}
+body.dark .int-name{color:#E2E8F0}
+body.dark .int-why{color:#94A3B8}
+body.dark .int-link{color:#93C5FD}
+body.dark .action-row{border-color:#2D2D4E}
+/* Dark mode for inline report grids */
+body.dark [style*="background:#FEF3C7"]{background:#2D1A00!important}
+body.dark [style*="background:#EDE9FE"]{background:#1A0D2E!important}
+body.dark [style*="background:#DCFCE7"]{background:#0A1F0F!important}
+body.dark [style*="background:#DBEAFE"]{background:#0A1020!important}
+body.dark [style*="background:#FFFBEB"]{background:#1F1500!important}
+body.dark [style*="background:#F0FDF4"]{background:#0A1F0F!important}
+body.dark [style*="background:#FEF2F2"]{background:#2D0A0A!important}
+body.dark [style*="color:#D97706"]{color:#FCD34D!important}
+body.dark [style*="color:#5B21B6"]{color:#C4B5FD!important}
+body.dark [style*="color:#14532D"]{color:#4ADE80!important}
+body.dark [style*="color:#166534"]{color:#4ADE80!important}
+body.dark [style*="color:#7F1D1D"]{color:#FCA5A5!important}
+body.dark [style*="color:#92400E"]{color:#FCD34D!important}
+body.dark [style*="color:#78350F"]{color:#FCD34D!important}
+body.dark [style*="color:#1E3A8A"]{color:#93C5FD!important}
+body.dark [style*="color:#4B5563"]{color:#94A3B8!important}
+/* Brain science expand cards */
+.brain-card{background:white;border:1px solid var(--gray-200);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:all .2s}
+.brain-card-header{padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;user-select:none}
+.brain-card-header:hover{background:var(--gray-50)}
+.brain-card-icon{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.brain-card-title{font-size:14px;font-weight:700;color:var(--gray-800)}
+.brain-card-subtitle{font-size:12px;color:var(--gray-500);margin-top:2px}
+.brain-card-chevron{font-size:16px;color:var(--gray-400);transition:transform .2s;flex-shrink:0}
+.brain-card.open .brain-card-chevron{transform:rotate(180deg)}
+.brain-card-body{display:none;padding:0 1.25rem 1.25rem;border-top:1px solid var(--gray-100)}
+.brain-card.open .brain-card-body{display:block}
+.brain-tag{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-right:5px;margin-bottom:5px}
+body.dark .brain-card{background:#1A1A2E;border-color:#2D2D4E}
+body.dark .brain-card-header:hover{background:#2D2D4E}
+body.dark .brain-card-title{color:#E2E8F0}
+body.dark .brain-card-subtitle{color:#94A3B8}
+body.dark .brain-card-body{border-color:#2D2D4E;color:#94A3B8}
 body.dark .progress-entry{background:#0F0F1A;color:#CBD5E1}
 body.dark .pbar-track{background:#2D2D4E}
 body.dark .step{background:#1A1A2E;border-color:#2D2D4E;color:#94A3B8}
@@ -463,6 +506,7 @@ body.dark #siteFooter div{color:#64748B}
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/strategies-homepage" target="_blank" class="hlink gold">Strategy Site</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/be-a-scientist" target="_blank" class="hlink">Be a Scientist</a>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit" target="_blank" class="hlink">Find the Right Fit</a>
+      <button onclick="openFeedback()" class="hlink" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);cursor:pointer;font-family:inherit">Leave Feedback</button>
     </div>
   </div>
 </div>
@@ -589,6 +633,154 @@ body.dark #siteFooter div{color:#64748B}
         </div>
       </div>
     </div>
+    <div class="emotion-section" id="brainScienceSection">
+      <div class="emotion-section-title" data-ekey="em_brain_title">Brain Science &mdash; Understanding the Thinking Brain</div>
+      <div class="emotion-section-sub" data-ekey="em_brain_sub">When we understand how the brain works under stress, we stop asking "why won't they just behave?" and start asking "what does this brain need right now?"</div>
+
+      <div style="background:linear-gradient(135deg,var(--purple-dark),var(--purple));color:white;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem;border-bottom:4px solid var(--gold)">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.75;margin-bottom:8px">Focal Framework</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:10px">Reptile Mode &middot; Mammal Mode &middot; Human Mode</div>
+        <div style="font-size:13px;opacity:.9;line-height:1.7;margin-bottom:1rem">Behavior that confuses us makes complete sense when we understand which part of the brain is driving it. The three brain modes give educators a simple, powerful lens for reading any student at any moment.</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;margin-bottom:6px">&#129422;</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px">Reptile Mode</div>
+            <div style="font-size:11px;opacity:.85;line-height:1.5">Brainstem. Survival only. Fight, flight, freeze, fawn. Cannot learn, connect, or reason.</div>
+            <div style="margin-top:8px;font-size:11px;font-weight:700;background:rgba(220,38,38,.3);border-radius:6px;padding:3px 6px">Regulate first</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;margin-bottom:6px">&#128024;</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px">Mammal Mode</div>
+            <div style="font-size:11px;opacity:.85;line-height:1.5">Limbic system. Emotions, relationships, belonging. Needs connection before compliance.</div>
+            <div style="margin-top:8px;font-size:11px;font-weight:700;background:rgba(245,158,11,.3);border-radius:6px;padding:3px 6px">Connect first</div>
+          </div>
+          <div style="background:rgba(255,255,255,.12);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:24px;margin-bottom:6px">&#129504;</div>
+            <div style="font-size:13px;font-weight:800;margin-bottom:4px">Human Mode</div>
+            <div style="font-size:11px;opacity:.85;line-height:1.5">Prefrontal cortex. Reasoning, empathy, planning. Where learning lives. Only accessible when regulated and connected.</div>
+            <div style="margin-top:8px;font-size:11px;font-weight:700;background:rgba(22,163,74,.3);border-radius:6px;padding:3px 6px">Ready to learn</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="brainCards">
+        <div class="brain-card" id="bc_upstairs">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_upstairs')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#EDE9FE">&#127968;</div><div><div class="brain-card-title">Upstairs &amp; Downstairs Brain &mdash; Dan Siegel</div><div class="brain-card-subtitle">Why flipping your lid happens and what to do when it does</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:1rem">
+              <div style="background:#EDE9FE;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#5B21B6;margin-bottom:6px">Upstairs Brain (PFC)</div><div style="font-size:12px;color:#4C1D95;line-height:1.6">Decision-making, empathy, impulse control, planning. Under construction until age 25. Cannot function when the downstairs brain is in control.</div></div>
+              <div style="background:#FEE2E2;border-radius:10px;padding:12px"><div style="font-size:13px;font-weight:700;color:#991B1B;margin-bottom:6px">Downstairs Brain (Amygdala)</div><div style="font-size:12px;color:#7F1D1D;line-height:1.6">Survival, strong emotions, fight/flight/freeze. "Flipping the lid" = downstairs takes over. The brain is not being defiant — it is being protected.</div></div>
+            </div>
+            <div style="background:var(--gray-50);border-radius:10px;padding:12px;margin-top:10px"><div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:6px">Classroom application</div><div style="font-size:12px;color:var(--gray-600);line-height:1.7">When a student is in the downstairs brain: stop instructing, stop redirecting. Regulate first. Once calm, the upstairs brain reconnects and learning is possible again.</div></div>
+          </div>
+        </div>
+
+        <div class="brain-card" id="bc_polyvagal">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_polyvagal')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#DCFCE7">&#9889;</div><div><div class="brain-card-title">Polyvagal Theory &mdash; Stephen Porges</div><div class="brain-card-subtitle">Safety, danger, and life-threat states in the nervous system</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-top:1rem;margin-bottom:10px">The nervous system has three states. Behavior is the nervous system communicating — not a choice, a signal.</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:#DCFCE7;border-radius:10px;padding:12px;display:flex;gap:12px;align-items:flex-start"><div style="font-size:18px">&#128994;</div><div><div style="font-size:13px;font-weight:700;color:#14532D;margin-bottom:3px">Ventral Vagal &mdash; Safe &amp; Social</div><div style="font-size:12px;color:#166534;line-height:1.5">Calm, connected, regulated. Learning is accessible. <strong>Build here with connection strategies.</strong></div></div></div>
+              <div style="background:#FEF3C7;border-radius:10px;padding:12px;display:flex;gap:12px;align-items:flex-start"><div style="font-size:18px">&#128993;</div><div><div style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:3px">Sympathetic &mdash; Fight or Flight</div><div style="font-size:12px;color:#78350F;line-height:1.5">Activated, anxious, explosive. Body mobilizing for danger. <strong>Use regulation strategies, reduce demands, avoid power struggles.</strong></div></div></div>
+              <div style="background:#DBEAFE;border-radius:10px;padding:12px;display:flex;gap:12px;align-items:flex-start"><div style="font-size:18px">&#128309;</div><div><div style="font-size:13px;font-weight:700;color:#1E3A8A;margin-bottom:3px">Dorsal Vagal &mdash; Shutdown</div><div style="font-size:12px;color:#1E3A8A;line-height:1.5">Collapsed, dissociated, numb. Body conserving energy. <strong>Gentle connection, reduce demands, no confrontation.</strong></div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="brain-card" id="bc_stress">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_stress')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#FEF3C7">&#128293;</div><div><div class="brain-card-title">The Stress Response Cycle</div><div class="brain-card-subtitle">Cortisol, adrenaline, and what happens in the body under threat</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-top:1rem;margin-bottom:12px">When the brain perceives threat, it floods the body with stress hormones before the thinking brain has a chance to assess the situation.</div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+              <div style="background:#FEF3C7;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;margin-bottom:4px">&#128065;</div><div style="font-size:11px;font-weight:700;color:#92400E">Perceive</div><div style="font-size:10px;color:#92400E;line-height:1.4">Brain detects threat</div></div>
+              <div style="background:#FEE2E2;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;margin-bottom:4px">&#9889;</div><div style="font-size:11px;font-weight:700;color:#991B1B">Activate</div><div style="font-size:10px;color:#991B1B;line-height:1.4">Cortisol &amp; adrenaline flood body</div></div>
+              <div style="background:#DBEAFE;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;margin-bottom:4px">&#127754;</div><div style="font-size:11px;font-weight:700;color:#1E3A8A">React</div><div style="font-size:10px;color:#1E3A8A;line-height:1.4">Fight, flight, freeze, or fawn</div></div>
+              <div style="background:#DCFCE7;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;margin-bottom:4px">&#128167;</div><div style="font-size:11px;font-weight:700;color:#14532D">Recover</div><div style="font-size:10px;color:#14532D;line-height:1.4">Cortisol metabolizes, regulation returns</div></div>
+            </div>
+            <div style="background:var(--gray-50);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:4px">Key insight</div><div style="font-size:12px;color:var(--gray-600);line-height:1.7">The stress response fires 80,000x faster than the thinking brain. A student cannot "choose" to calm down — the body must metabolize the cortisol first. This takes 20–30 minutes minimum. Drinking water speeds cortisol metabolism. This is why the Reset Plan works.</div></div>
+          </div>
+        </div>
+
+        <div class="brain-card" id="bc_affect">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_affect')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#FEE2E2">&#128221;</div><div><div class="brain-card-title">Affect Script Theory &mdash; Silvan Tomkins</div><div class="brain-card-subtitle">Why emotions drive behavior more than thoughts do</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-top:1rem;margin-bottom:12px">Tomkins proposed that humans are born with 9 innate affects — biological programs that drive behavior before we have language for them. These form "scripts" — automatic patterns of response.</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px">
+              <div style="background:#DCFCE7;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#14532D">Interest-Excitement</div><div style="font-size:10px;color:#166534;margin-top:2px">Motivates exploration</div></div>
+              <div style="background:#DCFCE7;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#14532D">Enjoyment-Joy</div><div style="font-size:10px;color:#166534;margin-top:2px">Signals safety &amp; reward</div></div>
+              <div style="background:#FEF3C7;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#92400E">Surprise-Startle</div><div style="font-size:10px;color:#78350F;margin-top:2px">Resets attention</div></div>
+              <div style="background:#FEE2E2;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#991B1B">Distress-Anguish</div><div style="font-size:10px;color:#7F1D1D;margin-top:2px">Signals unmet needs</div></div>
+              <div style="background:#FEE2E2;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#991B1B">Fear-Terror</div><div style="font-size:10px;color:#7F1D1D;margin-top:2px">Activates threat response</div></div>
+              <div style="background:#FEE2E2;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#991B1B">Anger-Rage</div><div style="font-size:10px;color:#7F1D1D;margin-top:2px">Responds to obstruction</div></div>
+              <div style="background:#DBEAFE;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#1E3A8A">Disgust</div><div style="font-size:10px;color:#1E3A8A;margin-top:2px">Rejects the offensive</div></div>
+              <div style="background:#DBEAFE;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#1E3A8A">Dissmell</div><div style="font-size:10px;color:#1E3A8A;margin-top:2px">Avoids contamination</div></div>
+              <div style="background:#EDE9FE;border-radius:8px;padding:8px;text-align:center"><div style="font-size:11px;font-weight:700;color:#5B21B6">Shame-Humiliation</div><div style="font-size:10px;color:#5B21B6;margin-top:2px">Interrupts connection</div></div>
+            </div>
+            <div style="background:var(--gray-50);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:4px">Why shame matters most in schools</div><div style="font-size:12px;color:var(--gray-600);line-height:1.7">Shame-Humiliation is the most socially powerful affect. Public correction, sarcasm, and embarrassment trigger shame, which shuts down connection. This is why private redirection and effort-based praise are neurobiologically necessary — not just kind.</div></div>
+          </div>
+        </div>
+
+        <div class="brain-card" id="bc_neuroplasticity">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_neuroplasticity')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#DCFCE7">&#127807;</div><div><div class="brain-card-title">Neuroplasticity &mdash; The Brain Changes</div><div class="brain-card-subtitle">How consistent positive experiences literally rewire the brain</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-top:1rem;margin-bottom:12px">The brain is not fixed. Every interaction either strengthens or weakens neural pathways. <strong>What gets practiced gets wired.</strong></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div style="background:#FEE2E2;border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:#991B1B;margin-bottom:6px">Stress pathways strengthen when...</div><div style="font-size:12px;color:#7F1D1D;line-height:1.7">Threats are unpredictable &bull; Adults are unsafe &bull; Shame is frequent &bull; Regulation is never modeled</div></div>
+              <div style="background:#DCFCE7;border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:#14532D;margin-bottom:6px">Regulation pathways strengthen when...</div><div style="font-size:12px;color:#166534;line-height:1.7">Adults are predictable &bull; Relationships feel safe &bull; Co-regulation is consistent &bull; Effort is recognized</div></div>
+            </div>
+            <div style="background:var(--purple-light);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px">The 6-8 week window</div><div style="font-size:12px;color:var(--purple-dark);line-height:1.7">This is why interventions need 6-8 consecutive school weeks. That is the minimum time for new neural pathways to begin forming. Consistency is not just good practice — it is how the brain changes.</div></div>
+          </div>
+        </div>
+
+        <div class="brain-card" id="bc_aces">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_aces')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#FEE2E2">&#128737;</div><div><div class="brain-card-title">ACEs &amp; PCEs &mdash; Adversity and Protection</div><div class="brain-card-subtitle">The 10 adverse experiences and the 7 protective factors that buffer them</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-top:1rem;margin-bottom:12px">ACEs are the 10 categories of childhood trauma from the landmark CDC-Kaiser study. Higher ACE scores correlate with significantly worse outcomes. But PCEs buffer ACE impact — and educators provide them every day.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+              <div><div style="font-size:12px;font-weight:700;color:#991B1B;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #FCA5A5">The 10 ACEs</div><div style="font-size:12px;color:var(--gray-600);line-height:1.9">1. Physical abuse<br>2. Emotional abuse<br>3. Sexual abuse<br>4. Physical neglect<br>5. Emotional neglect<br>6. Mental illness in household<br>7. Substance abuse in household<br>8. Domestic violence<br>9. Incarcerated family member<br>10. Divorce/separation</div></div>
+              <div><div style="font-size:12px;font-weight:700;color:#14532D;margin-bottom:8px;padding-bottom:4px;border-bottom:2px solid #86EFAC">The 7 PCEs — You provide these</div><div style="font-size:12px;color:var(--gray-600);line-height:1.9">1. Able to talk to family about feelings<br>2. Family is supportive<br>3. Sense of community<br>4. <strong>Sense of belonging in school</strong><br>5. Supported by friends<br>6. <strong>2+ non-parent caring adults</strong><br>7. <strong>Feeling safe with an adult</strong></div></div>
+            </div>
+            <div style="background:#DCFCE7;border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:#14532D;margin-bottom:4px">Your role</div><div style="font-size:12px;color:#166534;line-height:1.7">PCEs 4, 6, and 7 are directly within your sphere of influence. A consistent greeting, a genuine 2x10, and a safe classroom are neurobiological protection against trauma.</div></div>
+          </div>
+        </div>
+
+        <div class="brain-card" id="bc_wot">
+          <div class="brain-card-header" onclick="toggleBrainCard('bc_wot')">
+            <div style="display:flex;align-items:center;gap:12px"><div class="brain-card-icon" style="background:#DBEAFE">&#127919;</div><div><div class="brain-card-title">Window of Tolerance &mdash; Dan Siegel</div><div class="brain-card-subtitle">The zone where learning and connection are possible</div></div></div>
+            <div class="brain-card-chevron">&#8964;</div>
+          </div>
+          <div class="brain-card-body">
+            <div style="font-size:13px;color:var(--gray-600);line-height:1.7;margin-top:1rem;margin-bottom:12px">The Window of Tolerance is the zone of arousal where a person can function effectively. Outside this window, learning is impossible.</div>
+            <div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:#991B1B;margin-bottom:4px">Hyperarousal &mdash; Above the window</div><div style="font-size:12px;color:#7F1D1D;line-height:1.6">Too activated. Racing heart, panic, anger, aggression. Fight or flight. <strong>Calm the body first &mdash; breathing, movement, reduce stimulation.</strong></div></div>
+            <div style="background:#DCFCE7;border:2px solid #16A34A;border-radius:10px;padding:12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:#14532D;margin-bottom:4px">Window of Tolerance &mdash; In the zone</div><div style="font-size:12px;color:#166534;line-height:1.6">Optimal arousal. Able to think, connect, and learn. Prefrontal cortex is online. <strong>Keep students here through predictability, connection, and regulation supports.</strong></div></div>
+            <div style="background:#DBEAFE;border:1px solid #93C5FD;border-radius:10px;padding:12px;margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#1E3A8A;margin-bottom:4px">Hypoarousal &mdash; Below the window</div><div style="font-size:12px;color:#1E3A8A;line-height:1.6">Too shut down. Numbness, dissociation, collapse. Freeze or fawn. <strong>Gentle activation &mdash; movement, connection, warmth, gradual re-engagement.</strong></div></div>
+            <div style="background:var(--gray-50);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:700;color:var(--gray-700);margin-bottom:4px">Widening the window over time</div><div style="font-size:12px;color:var(--gray-600);line-height:1.7">Trauma narrows the window. Consistent co-regulation, safety, and predictability widen it over time. This is the long game of trauma-informed practice.</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="emotion-section">
+      <div class="emotion-section-title">Explore More</div>
     <div class="emotion-section">
       <div class="emotion-section-title">Explore More</div>
       <a href="https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/coping-strategies" target="_blank" class="emotion-link-card"><div><div class="emotion-link-name">Coping Strategies One-Pager &#8599;</div><div class="emotion-link-desc">Full list of regulation strategies with implementation steps from </div></div><span style="color:var(--purple);font-size:20px">&#8250;</span></a>
