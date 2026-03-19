@@ -1358,17 +1358,16 @@ let _overridesCache = {};
 
 async function loadOverrides() {
   try {
-    // Fetch all override categories in parallel
-    const keys = ['strategy_overrides', '_resources', '_emotions', '_steps'];
+    const keys = ['strategy_overrides', '_resources', '_emotions', '_steps', '_header'];
     const results = await Promise.all(keys.map(k =>
       fetch(`/api/overrides-get?key=${k}`).then(r => r.ok ? r.json() : {overrides:{}}).catch(() => ({overrides:{}}))
     ));
     _overridesCache = {};
-    // strategy overrides live at top level
     Object.assign(_overridesCache, results[0].overrides || {});
     _overridesCache._resources = results[1].overrides || {};
-    _overridesCache._emotions = results[2].overrides || {};
-    _overridesCache._steps = results[3].overrides || {};
+    _overridesCache._emotions  = results[2].overrides || {};
+    _overridesCache._steps     = results[3].overrides || {};
+    _overridesCache._header    = results[4].overrides || {};
   } catch(e) {
     console.warn('Could not load overrides:', e.message);
     _overridesCache = {};
@@ -1428,19 +1427,26 @@ function renderLibrary() {
       const url = customUrl || (BASE + s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''));
       const isEdited = !!overrides[overrideKey];
 
+      const imgKey = `img_lib_${key}_${idx}`;
+      const imgOverride = overrides[imgKey];
+
       if (isAdminMode) {
         h += `<div class="lib-card admin-card" style="border-left-color:${bucket.color};display:block" data-name="${name.toLowerCase()}" data-desc="${desc.toLowerCase()}">
           ${isEdited ? `<div style="font-size:10px;font-weight:700;color:#16A34A;margin-bottom:4px">EDITED</div>` : ''}
+          ${imgOverride?._imgUrl ? `<img src="${imgOverride._imgUrl}" style="width:100%;border-radius:6px;max-height:100px;object-fit:cover;margin-bottom:6px">` : ''}
           <div class="lib-card-name">${name}</div>
           <div class="lib-card-desc">${desc}</div>
           <a href="${url}" target="_blank" class="lib-card-link" style="color:${bucket.color}">View one-pager &#8599;</a>
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-100);display:flex;gap:6px;flex-wrap:wrap">
-            <button class="btn btn-sm" style="color:var(--purple);border-color:var(--purple);font-size:11px" onclick="openEditModal('${overrideKey}','${name.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}','${url}')">Edit</button>
+            <button class="btn btn-sm" style="color:var(--purple);border-color:var(--purple);font-size:11px" onclick="openEditModal('${overrideKey}','${name.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}','${url}')">Edit Text</button>
+            <button class="btn btn-sm" style="color:var(--teal-mid);border-color:var(--teal-mid);font-size:11px" onclick="openImageUpload('${imgKey}','lib-${key}-${idx}',function(url){renderLibrary()})">Image</button>
+            ${imgOverride?._imgUrl ? `<button class="btn btn-sm" style="color:var(--gray-400);font-size:11px" onclick="saveStrategyOverride('${imgKey}',null).then(()=>renderLibrary())">Remove Img</button>` : ''}
             ${isEdited ? `<button class="btn btn-sm" style="color:var(--red-mid);border-color:#FCA5A5;font-size:11px" onclick="resetStrategy('${overrideKey}')">Reset</button>` : ''}
           </div>
         </div>`;
       } else {
         h += `<a class="lib-card" href="${url}" target="_blank" style="border-left-color:${bucket.color}" data-name="${name.toLowerCase()}" data-desc="${desc.toLowerCase()}">
+          ${imgOverride?._imgUrl ? `<img src="${imgOverride._imgUrl}" style="width:100%;border-radius:6px;max-height:100px;object-fit:cover;margin-bottom:6px">` : ''}
           <div class="lib-card-name">${name}</div>
           <div class="lib-card-desc">${desc}</div>
           <div class="lib-card-link" style="color:${bucket.color}">View one-pager &#8599;</div>
@@ -1712,17 +1718,68 @@ function applyEmotionOverrides() {
     if (overrides[key] !== undefined) el.innerHTML = overrides[key];
   });
 
-  // Add edit buttons in admin mode
+  // Add edit + image upload buttons in admin mode
   if (isAdminMode) {
+    // Add admin tip banner
+    const emotionsPage = document.getElementById('page-emotions');
+    if (emotionsPage && !document.getElementById('emotionsAdminTip')) {
+      const tip = document.createElement('div');
+      tip.id = 'emotionsAdminTip';
+      tip.style.cssText = 'background:#EDE9FE;border:1.5px solid var(--purple);border-radius:10px;padding:10px 14px;margin:1rem auto;max-width:760px;font-size:13px;color:var(--purple-dark)';
+      tip.innerHTML = '<strong>Admin:</strong> Click "Edit" buttons on section titles and subtitles to update text. Click "Image" to add an image to any section.';
+      emotionsPage.insertBefore(tip, emotionsPage.querySelector('.main'));
+    }
+
     document.querySelectorAll('[data-ekey]').forEach(el => {
       if (el.querySelector('.e-edit-btn')) return;
-      const btn = document.createElement('button');
-      btn.className = 'e-edit-btn btn btn-sm';
-      btn.style.cssText = 'font-size:10px;color:var(--purple);border-color:var(--purple);margin-top:4px;display:block';
-      btn.textContent = 'Edit';
       const key = el.dataset.ekey;
-      btn.onclick = () => openEditEmotionField(key, el);
-      el.appendChild(btn);
+      const btnWrap = document.createElement('span');
+
+      const editBtn = document.createElement('button');
+      editBtn.className = 'e-edit-btn btn btn-sm';
+      editBtn.style.cssText = 'font-size:10px;color:var(--purple);border-color:var(--purple);margin-left:8px;vertical-align:middle';
+      editBtn.textContent = 'Edit';
+      editBtn.onclick = () => openEditEmotionField(key, el);
+      btnWrap.appendChild(editBtn);
+
+      // Add image upload for section title elements only
+      if (key.endsWith('_title')) {
+        const imgKey = `img_${key}`;
+        const imgBtn = document.createElement('button');
+        imgBtn.className = 'btn btn-sm';
+        imgBtn.style.cssText = 'font-size:10px;color:var(--teal-mid);border-color:var(--teal-mid);margin-left:4px;vertical-align:middle';
+        imgBtn.textContent = 'Image';
+        const sectionEl = el.parentElement;
+        imgBtn.onclick = () => openImageUpload(imgKey, key, (url) => {
+          // Show image above the section
+          const existing = sectionEl.querySelector('.em-img-preview');
+          if (existing) { existing.querySelector('img').src = url; return; }
+          const wrap = document.createElement('div');
+          wrap.className = 'em-img-preview';
+          wrap.style.cssText = 'margin-bottom:10px';
+          const img = document.createElement('img');
+          img.src = url;
+          img.style.cssText = 'width:100%;border-radius:10px;max-height:200px;object-fit:cover';
+          wrap.appendChild(img);
+          sectionEl.insertBefore(wrap, sectionEl.firstChild);
+        });
+        btnWrap.appendChild(imgBtn);
+
+        // Show existing image
+        const existingImgUrl = getEmotionOverrides()[`img_${key}`];
+        if (existingImgUrl && typeof existingImgUrl === 'string' && existingImgUrl.startsWith('http')) {
+          const wrap = document.createElement('div');
+          wrap.className = 'em-img-preview';
+          wrap.style.cssText = 'margin-bottom:10px';
+          const img = document.createElement('img');
+          img.src = existingImgUrl;
+          img.style.cssText = 'width:100%;border-radius:10px;max-height:200px;object-fit:cover';
+          wrap.appendChild(img);
+          el.parentElement.insertBefore(wrap, el);
+        }
+      }
+
+      el.appendChild(btnWrap);
     });
   }
 }
@@ -1827,6 +1884,256 @@ function openEditStepQuestion(key) {
     applyStepOverrides();
   });
 }
+
+// ============================================================
+// HEADER / NAV / RULE EDITING & IMAGE UPLOADS
+// ============================================================
+function getHeaderOverrides() {
+  return _overridesCache._header || {};
+}
+
+async function saveHeaderOverride(key, value) {
+  if (!_overridesCache._header) _overridesCache._header = {};
+  if (value === null) delete _overridesCache._header[key];
+  else _overridesCache._header[key] = value;
+  try {
+    await fetch('/api/overrides-set', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: '_header', value: _overridesCache._header })
+    });
+  } catch(e) { console.warn('Sync failed:', e.message); }
+}
+
+function applyHeaderOverrides() {
+  const overrides = getHeaderOverrides();
+
+  // Apply text overrides to header/nav/rule elements
+  document.querySelectorAll('[data-hkey]').forEach(el => {
+    const key = el.dataset.hkey;
+    if (overrides[key]) el.innerHTML = overrides[key] + (el.querySelector('.h-edit-btn') ? el.querySelector('.h-edit-btn').outerHTML : '');
+  });
+  document.querySelectorAll('[data-nkey]').forEach(el => {
+    const key = el.dataset.nkey;
+    if (overrides[key]) {
+      const badge = el.querySelector('.nbadge');
+      const editBtn = el.querySelector('.h-edit-btn');
+      el.textContent = overrides[key];
+      if (badge) el.appendChild(badge);
+      if (editBtn) el.appendChild(editBtn);
+    }
+  });
+  document.querySelectorAll('[data-rkey]').forEach(el => {
+    const key = el.dataset.rkey;
+    if (overrides[key]) {
+      const editBtn = el.querySelector('.h-edit-btn');
+      el.innerHTML = overrides[key];
+      if (editBtn) el.appendChild(editBtn);
+    }
+  });
+
+  // Apply header image
+  if (overrides.img_header) {
+    const wrap = document.getElementById('headerImageWrap');
+    const img = document.getElementById('headerImage');
+    if (wrap && img) { img.src = overrides.img_header; wrap.style.display = 'block'; }
+  }
+
+  if (!isAdminMode) return;
+
+  // Add edit buttons to header elements
+  document.querySelectorAll('[data-hkey]').forEach(el => {
+    if (el.querySelector('.h-edit-btn')) return;
+    const key = el.dataset.hkey;
+    const btn = document.createElement('button');
+    btn.className = 'h-edit-btn';
+    btn.style.cssText = 'background:var(--gold);color:var(--purple-dark);border:none;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;margin-left:8px;vertical-align:middle';
+    btn.textContent = 'Edit';
+    btn.onclick = (e) => { e.stopPropagation(); openEditHeaderField(key, el); };
+    el.appendChild(btn);
+  });
+
+  // Nav tab edit buttons
+  document.querySelectorAll('[data-nkey]').forEach(el => {
+    if (el.querySelector('.h-edit-btn')) return;
+    const key = el.dataset.nkey;
+    const btn = document.createElement('button');
+    btn.className = 'h-edit-btn';
+    btn.style.cssText = 'background:var(--gold);color:var(--purple-dark);border:none;border-radius:3px;padding:1px 6px;font-size:9px;font-weight:700;cursor:pointer;margin-left:6px';
+    btn.textContent = '✎';
+    btn.onclick = (e) => { e.stopPropagation(); openEditNavTab(key, el); };
+    el.appendChild(btn);
+  });
+
+  // Rule bar edit buttons
+  document.querySelectorAll('[data-rkey]').forEach(el => {
+    if (el.querySelector('.h-edit-btn')) return;
+    const key = el.dataset.rkey;
+    const btn = document.createElement('button');
+    btn.className = 'h-edit-btn';
+    btn.style.cssText = 'background:var(--gold);color:var(--purple-dark);border:none;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;cursor:pointer;margin-left:8px';
+    btn.textContent = 'Edit';
+    btn.onclick = () => openEditRuleBar(key, el);
+    el.appendChild(btn);
+  });
+
+  // Header image upload button
+  const headerInner = document.querySelector('.header-inner');
+  if (headerInner && !document.getElementById('headerImgUploadBtn')) {
+    const uploadBtn = document.createElement('button');
+    uploadBtn.id = 'headerImgUploadBtn';
+    uploadBtn.style.cssText = 'background:var(--gold);color:var(--purple-dark);border:none;border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-top:8px;display:block;margin-left:auto;margin-right:auto';
+    uploadBtn.textContent = '+ Upload Header Image';
+    uploadBtn.onclick = () => openImageUpload('img_header', 'header', (url) => {
+      const wrap = document.getElementById('headerImageWrap');
+      const img = document.getElementById('headerImage');
+      if (wrap && img) { img.src = url; wrap.style.display = 'block'; }
+    });
+    headerInner.appendChild(uploadBtn);
+  }
+}
+
+function openEditHeaderField(key, el) {
+  const overrides = getHeaderOverrides();
+  const current = overrides[key] || el.innerText.replace('Edit','').trim();
+  showEditModal('Edit Header Text', [
+    {id:'eVal', label:'Text', value:current}
+  ], async () => {
+    const val = document.getElementById('eVal').value.trim();
+    if (!val) return;
+    await saveHeaderOverride(key, val);
+    const editBtn = el.querySelector('.h-edit-btn');
+    el.innerHTML = val;
+    if (editBtn) el.appendChild(editBtn);
+    closeModal();
+  });
+}
+
+function openEditNavTab(key, el) {
+  const overrides = getHeaderOverrides();
+  const current = overrides[key] || el.childNodes[0]?.textContent?.trim() || '';
+  showEditModal('Edit Tab Label', [
+    {id:'eVal', label:'Tab label', value:current}
+  ], async () => {
+    const val = document.getElementById('eVal').value.trim();
+    if (!val) return;
+    await saveHeaderOverride(key, val);
+    const badge = el.querySelector('.nbadge');
+    const editBtn = el.querySelector('.h-edit-btn');
+    el.textContent = val;
+    if (badge) el.appendChild(badge);
+    if (editBtn) el.appendChild(editBtn);
+    closeModal();
+  });
+}
+
+function openEditRuleBar(key, el) {
+  const overrides = getHeaderOverrides();
+  showEditModal('Edit Rule Bar Text', [
+    {id:'eVal', label:'Text (use <strong>bold</strong> for bold)', value: overrides[key] || el.innerHTML.replace(/<button[^>]*>.*?<\/button>/g,'').trim(), textarea:true}
+  ], async () => {
+    const val = document.getElementById('eVal').value.trim();
+    if (!val) return;
+    await saveHeaderOverride(key, val);
+    const editBtn = el.querySelector('.h-edit-btn');
+    el.innerHTML = val;
+    if (editBtn) el.appendChild(editBtn);
+    closeModal();
+  });
+}
+
+// ============================================================
+// IMAGE UPLOAD SYSTEM
+// ============================================================
+function openImageUpload(storageKey, location, onSuccess) {
+  const existing = document.getElementById('imgUploadModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'imgUploadModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9100;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:440px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:4px">Upload Image</div>
+    <div style="font-size:12px;color:var(--gray-500);margin-bottom:1rem">PNG, JPG or GIF. Recommended: under 2MB.</div>
+    <div style="border:2px dashed var(--gray-300);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .15s;margin-bottom:1rem"
+      onclick="document.getElementById('imgFileInput').click()"
+      ondragover="event.preventDefault();this.style.borderColor='var(--purple)'"
+      ondragleave="this.style.borderColor='var(--gray-300)'"
+      ondrop="handleImgDrop(event,'${storageKey}','${location}')">
+      <div style="font-size:32px;margin-bottom:8px">🖼</div>
+      <div style="font-size:13px;font-weight:600;color:var(--gray-600)">Click to choose or drag &amp; drop</div>
+      <div style="font-size:12px;color:var(--gray-400);margin-top:4px">PNG, JPG, GIF</div>
+    </div>
+    <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="handleImgSelect(this,'${storageKey}','${location}')">
+    <div id="imgUploadStatus" style="font-size:13px;color:var(--gray-500);text-align:center;min-height:20px"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:1rem">
+      <button onclick="document.getElementById('imgUploadModal').remove()" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  window._imgUploadCallback = onSuccess;
+}
+
+async function handleImgDrop(event, storageKey, location) {
+  event.preventDefault();
+  const file = event.dataTransfer.files[0];
+  if (file) await uploadImageFile(file, storageKey, location);
+}
+
+async function handleImgSelect(input, storageKey, location) {
+  const file = input.files[0];
+  if (file) await uploadImageFile(file, storageKey, location);
+}
+
+async function uploadImageFile(file, storageKey, location) {
+  const status = document.getElementById('imgUploadStatus');
+  if (status) status.textContent = 'Uploading...';
+  try {
+    const filename = `bic-${location}-${Date.now()}.${file.name.split('.').pop()}`;
+    const res = await fetch('/api/upload-image', {
+      method: 'POST',
+      headers: { 'Content-Type': file.type, 'x-filename': filename },
+      body: file
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+
+    // Save URL to the right store
+    if (storageKey.startsWith('img_header')) await saveHeaderOverride(storageKey, data.url);
+    else if (storageKey.startsWith('img_em')) await saveEmotionOverride(storageKey, data.url);
+    else if (storageKey.startsWith('img_res')) await saveResourceOverride(storageKey, {_imgUrl: data.url});
+    else await saveStrategyOverride(storageKey, {_imgUrl: data.url});
+
+    if (window._imgUploadCallback) window._imgUploadCallback(data.url);
+    document.getElementById('imgUploadModal')?.remove();
+  } catch(e) {
+    if (status) status.textContent = 'Error: ' + e.message + '. Make sure Vercel Blob is connected.';
+  }
+}
+
+function showImageInCard(el, url, removeKey, removeStore) {
+  const existing = el.querySelector('.admin-img-preview');
+  if (existing) existing.remove();
+  const wrap = document.createElement('div');
+  wrap.className = 'admin-img-preview';
+  wrap.style.cssText = 'margin-top:8px';
+  const img = document.createElement('img');
+  img.src = url;
+  img.style.cssText = 'width:100%;border-radius:6px;max-height:120px;object-fit:cover;margin-bottom:4px';
+  const removeBtn = document.createElement('button');
+  removeBtn.className = 'btn btn-sm';
+  removeBtn.style.cssText = 'font-size:10px;color:var(--red-mid);border-color:#FCA5A5;width:100%';
+  removeBtn.textContent = 'Remove Image';
+  removeBtn.onclick = async () => {
+    if (removeStore === 'header') await saveHeaderOverride(removeKey, null);
+    else if (removeStore === 'emotion') await saveEmotionOverride(removeKey, null);
+    else if (removeStore === 'resource') await saveResourceOverride(removeKey, null);
+    else await saveStrategyOverride(removeKey, null);
+    wrap.remove();
+  };
+  wrap.appendChild(img);
+  wrap.appendChild(removeBtn);
+  el.appendChild(wrap);
+}
+
 function showPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -1908,6 +2215,7 @@ function enableAdminMode() {
   renderLibrary();
   renderResources();
   setTimeout(() => {
+    applyHeaderOverrides();
     applyEmotionOverrides();
     applyStepOverrides();
   }, 300);
@@ -2033,5 +2341,8 @@ initDark();
 initAuth();
 renderStrategyOfDay();
 setTimeout(applyGlossaryTooltips, 200);
-// Load strategy overrides from server then render library
-loadOverrides().then(() => renderLibrary());
+// Load all overrides from server then render
+loadOverrides().then(() => {
+  renderLibrary();
+  applyHeaderOverrides();
+});
