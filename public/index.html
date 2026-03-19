@@ -151,6 +151,8 @@ textarea:focus,input:focus,select:focus{outline:none;border-color:var(--purple);
 .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
 .lib-card{background:white;border:1px solid var(--gray-200);border-radius:12px;padding:1rem;text-decoration:none;color:inherit;transition:all .15s;display:block;border-left:4px solid var(--gray-200)}
 .lib-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-1px)}
+.admin-card{cursor:default}
+.admin-card:hover{transform:none;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .lib-card-name{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:4px}
 .lib-card-desc{font-size:12px;color:var(--gray-500);line-height:1.5}
 .lib-card-link{font-size:11px;font-weight:600;margin-top:6px;display:inline-block}
@@ -314,7 +316,7 @@ body.dark #siteFooter div{color:#64748B}
   <div class="pw-box">
     <div class="pw-logo">Behavior Coaching</div>
     <div class="pw-title">Behavior Intervention Center</div>
-    <div class="pw-sub">This tool is for authorized staff only.<br>Enter the access password to continue.</div>
+    <div class="pw-sub">This tool is for authorized staff only.<br>Enter your access password to continue.</div>
     <div style="background:#EDE9FE;border:1.5px solid #7C3AED;border-radius:10px;padding:10px 14px;margin-bottom:1.25rem;text-align:left">
       <div style="font-size:12px;font-weight:700;color:#5B21B6;margin-bottom:3px">Privacy Notice</div>
       <div style="font-size:12px;color:#3B0764;line-height:1.6">Do <strong>not</strong> enter any student names, staff names, or other identifying information anywhere in this tool. Use initials, grade level, or descriptive language only.</div>
@@ -382,18 +384,18 @@ body.dark #siteFooter div{color:#64748B}
   <div class="main">
     <div class="hero"><h2>Emotions Hub</h2><p>Emotions are messengers. Understanding the emotional landscape behind behavior helps us respond to what a student needs rather than just what they are doing.</p></div>
     <div class="emotion-section">
-      <div class="emotion-section-title">Mood Meter &mdash; The Four Zones</div>
-      <div class="emotion-section-sub">"If you can name it, you can tame it." &mdash; Marc Brackett, Permission to Feel</div>
+      <div class="emotion-section-title" data-ekey="em_mood_title">Mood Meter &mdash; The Four Zones</div>
+      <div class="emotion-section-sub" data-ekey="em_mood_sub">"If you can name it, you can tame it." &mdash; Marc Brackett, Permission to Feel</div>
       <div class="mood-meter-grid">
-        <div class="mood-zone" style="background:#DCFCE7;border-color:#16A34A"><div class="mood-zone-title" style="color:#14532D">Green Zone</div><div class="mood-zone-sub" style="color:#166534">Calm, Happy, Ready to Learn</div><div class="mood-zone-desc" style="color:#166534">High pleasantness, low-moderate energy. The student is regulated, engaged, and able to access learning.</div><div class="mood-zone-strategies" style="color:#14532D">Strategies that work well:</div><div class="mood-zone-list" style="color:#166534">2x10 &middot; Morning Greeting &middot; Responsibilities &middot; Morning Meeting &middot; Positive Praise</div></div>
-        <div class="mood-zone" style="background:#DBEAFE;border-color:#1D4ED8"><div class="mood-zone-title" style="color:#1E3A8A">Blue Zone</div><div class="mood-zone-sub" style="color:#1E40AF">Sad, Tired, Withdrawn, Sick</div><div class="mood-zone-desc" style="color:#1E40AF">Low pleasantness, low energy. The student may appear shut down, disengaged, or emotionally flat.</div><div class="mood-zone-strategies" style="color:#1E3A8A">Strategies that work well:</div><div class="mood-zone-list" style="color:#1E40AF">Check In &middot; Pulse Check &middot; Empathetic Listening &middot; Responsibilities &middot; Gentle Movement Break</div></div>
-        <div class="mood-zone" style="background:#FEF3C7;border-color:#D97706"><div class="mood-zone-title" style="color:#78350F">Yellow Zone</div><div class="mood-zone-sub" style="color:#92400E">Anxious, Nervous, Frustrated, Excited</div><div class="mood-zone-desc" style="color:#92400E">Low-moderate pleasantness, high energy. The student may be agitated, unfocused, or escalating.</div><div class="mood-zone-strategies" style="color:#78350F">Strategies that work well:</div><div class="mood-zone-list" style="color:#92400E">Break Card &middot; Secret Signal &middot; Breathing Techniques &middot; Fidget &middot; Forewarning &middot; Controlled Choices</div></div>
-        <div class="mood-zone" style="background:#FEE2E2;border-color:#DC2626"><div class="mood-zone-title" style="color:#991B1B">Red Zone</div><div class="mood-zone-sub" style="color:#B91C1C">Angry, Frustrated, Terrified, Overwhelmed</div><div class="mood-zone-desc" style="color:#B91C1C">Low pleasantness, high energy. The student is dysregulated and likely in a Fight/Flight/Freeze/Fawn response.</div><div class="mood-zone-strategies" style="color:#991B1B">Strategies that work well:</div><div class="mood-zone-list" style="color:#B91C1C">Reset Plan &middot; Break Card &middot; Calm Neutral Tone &middot; Rapid Resets &middot; Avoid Power Struggle</div></div>
+        <div class="mood-zone" style="background:#DCFCE7;border-color:#16A34A"><div class="mood-zone-title" style="color:#14532D">Green Zone</div><div class="mood-zone-sub" style="color:#166534">Calm, Happy, Ready to Learn</div><div class="mood-zone-desc" style="color:#166534">High pleasantness, low-moderate energy. The student is regulated, engaged, and able to access learning.</div><div class="mood-zone-strategies" style="color:#14532D">Strategies that work well:</div><div class="mood-zone-list" data-ekey="em_mz_green" style="color:#166534">2x10 &middot; Morning Greeting &middot; Responsibilities &middot; Morning Meeting &middot; Positive Praise</div></div>
+        <div class="mood-zone" style="background:#DBEAFE;border-color:#1D4ED8"><div class="mood-zone-title" style="color:#1E3A8A">Blue Zone</div><div class="mood-zone-sub" style="color:#1E40AF">Sad, Tired, Withdrawn, Sick</div><div class="mood-zone-desc" style="color:#1E40AF">Low pleasantness, low energy. The student may appear shut down, disengaged, or emotionally flat.</div><div class="mood-zone-strategies" style="color:#1E3A8A">Strategies that work well:</div><div class="mood-zone-list" data-ekey="em_mz_blue" style="color:#1E40AF">Check In &middot; Pulse Check &middot; Empathetic Listening &middot; Responsibilities &middot; Gentle Movement Break</div></div>
+        <div class="mood-zone" style="background:#FEF3C7;border-color:#D97706"><div class="mood-zone-title" style="color:#78350F">Yellow Zone</div><div class="mood-zone-sub" style="color:#92400E">Anxious, Nervous, Frustrated, Excited</div><div class="mood-zone-desc" style="color:#92400E">Low-moderate pleasantness, high energy. The student may be agitated, unfocused, or escalating.</div><div class="mood-zone-strategies" style="color:#78350F">Strategies that work well:</div><div class="mood-zone-list" data-ekey="em_mz_yellow" style="color:#92400E">Break Card &middot; Secret Signal &middot; Breathing Techniques &middot; Fidget &middot; Forewarning &middot; Controlled Choices</div></div>
+        <div class="mood-zone" style="background:#FEE2E2;border-color:#DC2626"><div class="mood-zone-title" style="color:#991B1B">Red Zone</div><div class="mood-zone-sub" style="color:#B91C1C">Angry, Frustrated, Terrified, Overwhelmed</div><div class="mood-zone-desc" style="color:#B91C1C">Low pleasantness, high energy. The student is dysregulated and likely in a Fight/Flight/Freeze/Fawn response.</div><div class="mood-zone-strategies" style="color:#991B1B">Strategies that work well:</div><div class="mood-zone-list" data-ekey="em_mz_red" style="color:#B91C1C">Reset Plan &middot; Break Card &middot; Calm Neutral Tone &middot; Rapid Resets &middot; Avoid Power Struggle</div></div>
       </div>
     </div>
     <div class="emotion-section">
-      <div class="emotion-section-title">Trauma Response Behaviors &mdash; Fight / Flight / Freeze / Fawn</div>
-      <div class="emotion-section-sub">"When a threat is identified, the downstairs brain takes over." &mdash; Joe Brummer, Building a Trauma-Informed Restorative School</div>
+      <div class="emotion-section-title" data-ekey="em_trauma_title">Trauma Response Behaviors &mdash; Fight / Flight / Freeze / Fawn</div>
+      <div class="emotion-section-sub" data-ekey="em_trauma_sub">"When a threat is identified, the downstairs brain takes over." &mdash; Joe Brummer, Building a Trauma-Informed Restorative School</div>
       <div class="emotion-framework">
         <div class="emotion-framework-title">What you see &rarr; What it may mean &rarr; How to respond</div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
@@ -405,8 +407,8 @@ body.dark #siteFooter div{color:#64748B}
       </div>
     </div>
     <div class="emotion-section">
-      <div class="emotion-section-title">Emotions are Messengers</div>
-      <div class="emotion-section-sub">We can invite others to connect their emotional vocabulary with appropriate expression. &mdash; Aguilar & Cohen, The PD Book</div>
+      <div class="emotion-section-title" data-ekey="em_msg_title">Emotions are Messengers</div>
+      <div class="emotion-section-sub" data-ekey="em_msg_sub">We can invite others to connect their emotional vocabulary with appropriate expression. &mdash; Aguilar & Cohen, The PD Book</div>
       <div class="emotion-framework">
         <div class="emotion-framework-title">Three Ways to Support Emotional Literacy in Your Setting</div>
         <div class="ef-grid">
@@ -417,8 +419,8 @@ body.dark #siteFooter div{color:#64748B}
       </div>
     </div>
     <div class="emotion-section">
-      <div class="emotion-section-title">Five Domains of Regulation</div>
-      <div class="emotion-section-sub">Understanding different types of regulation helps us develop the right skills to improve them. &mdash; Brummer, adapted from Sorrels (2015)</div>
+      <div class="emotion-section-title" data-ekey="em_domains_title">Five Domains of Regulation</div>
+      <div class="emotion-section-sub" data-ekey="em_domains_sub">Understanding different types of regulation helps us develop the right skills to improve them. &mdash; Brummer, adapted from Sorrels (2015)</div>
       <div class="domains-grid">
         <div class="domain-card"><div class="domain-icon" style="background:#EDE9FE"></div><div><div class="domain-name">Physical Regulation</div><div class="domain-desc">The ability to regulate our bodies in response to sensory input — equilibrium, hunger cues, movement, and sensory processing.</div></div></div>
         <div class="domain-card"><div class="domain-icon" style="background:#DBEAFE"></div><div><div class="domain-name">Cognitive Regulation</div><div class="domain-desc">The ability to control and purposefully use our minds — holding information, blocking distractions, and maintaining focus on a task.</div></div></div>
@@ -428,8 +430,8 @@ body.dark #siteFooter div{color:#64748B}
       </div>
     </div>
     <div class="emotion-section">
-      <div class="emotion-section-title">Emotional Regulation Strategies &mdash; Four Category Types</div>
-      <div class="emotion-section-sub">Emotional regulation starts with giving ourselves and others permission to own our feelings. &mdash; Brackett, Permission to Feel, p.146</div>
+      <div class="emotion-section-title" data-ekey="em_reg_title">Emotional Regulation Strategies &mdash; Four Category Types</div>
+      <div class="emotion-section-sub" data-ekey="em_reg_sub">Emotional regulation starts with giving ourselves and others permission to own our feelings. &mdash; Brackett, Permission to Feel, p.146</div>
       <div class="regulation-grid">
         <div class="reg-card" style="border-top-color:#5B21B6"><div class="reg-card-title" style="color:#5B21B6">&#128168; Mindful Breathing</div><div class="reg-card-desc">Calms the body and mind. "Hits the brake" on the stress response.</div><div class="reg-strategies"><strong>Strategies:</strong> 7-11 Breathing &middot; Belly Breathing &middot; Rapid Resets &middot; Shape Breathing &middot; Thich Nhat Hahn Breathing &middot; Slow Counting</div></div>
         <div class="reg-card" style="border-top-color:#1D4ED8"><div class="reg-card-title" style="color:#1D4ED8">&#128336; Forward-Looking</div><div class="reg-card-desc">Anticipate what will cause an unwanted emotion. Plan ahead to alter the emotional impact.</div><div class="reg-strategies"><strong>Strategies:</strong> Reset Plan &middot; Forewarning &middot; Implementation Intention &middot; Scheduled Breaks</div></div>
@@ -438,8 +440,8 @@ body.dark #siteFooter div{color:#64748B}
       </div>
     </div>
     <div class="emotion-section">
-      <div class="emotion-section-title">3 Components of Co-Regulation</div>
-      <div class="emotion-section-sub">When we meet students' dysregulated behaviors with co-regulation, they learn how to self-regulate. &mdash; Micere Keels, Trauma Responsive Educational Practices</div>
+      <div class="emotion-section-title" data-ekey="em_coreg_title">3 Components of Co-Regulation</div>
+      <div class="emotion-section-sub" data-ekey="em_coreg_sub">When we meet students' dysregulated behaviors with co-regulation, they learn how to self-regulate. &mdash; Micere Keels, Trauma Responsive Educational Practices</div>
       <div class="coregulation-grid">
         <div class="coreg-card" style="background:#EDE9FE;border-color:#7C3AED"><div class="coreg-title" style="color:#5B21B6"> Build</div><div class="coreg-desc" style="color:#5B21B6">Cultivate a warm, responsive relationship by displaying care and affection.</div><div class="coreg-list" style="color:#5B21B6">2x10 &middot; Greeting at the Door &middot; Affirmations &middot; Morning Meeting &middot; Circles &middot; Teach Kindness</div></div>
         <div class="coreg-card" style="background:#DBEAFE;border-color:#1D4ED8"><div class="coreg-title" style="color:#1E3A8A">&#128203; Structure</div><div class="coreg-desc" style="color:#1E3A8A">Structure the environment to make self-regulation manageable. Avoid vague expectations and prolonged quiet seated work.</div><div class="coreg-list" style="color:#1E3A8A">Getting Class Ready &middot; TROGS &middot; Visual Schedule &middot; Structured Routine &middot; Belonging Cues</div></div>
@@ -447,8 +449,8 @@ body.dark #siteFooter div{color:#64748B}
       </div>
     </div>
     <div class="emotion-section">
-      <div class="emotion-section-title">Three Types of Praise &mdash; and the Gratitude Formula</div>
-      <div class="emotion-section-sub">Adapted from Trauma Responsive Educational Practices &mdash; Micere Keels (2023)</div>
+      <div class="emotion-section-title" data-ekey="em_praise_title">Three Types of Praise &mdash; and the Gratitude Formula</div>
+      <div class="emotion-section-sub" data-ekey="em_praise_sub">Adapted from Trauma Responsive Educational Practices &mdash; Micere Keels (2023)</div>
       <div class="praise-grid">
         <div class="praise-card" style="background:#FEE2E2;border:1.5px solid #FCA5A5"><div class="praise-type" style="color:#991B1B">Personal</div><div class="praise-example" style="color:#B91C1C">"You are really smart!"</div><div class="praise-rec" style="background:#FCA5A5;color:#7F1D1D">Minimize This Type</div><div class="praise-why" style="color:#7F1D1D">Subjective, can feel judgmental. Reinforces fixed mindset and de-emphasizes effort.</div></div>
         <div class="praise-card" style="background:#DCFCE7;border:1.5px solid #86EFAC"><div class="praise-type" style="color:#14532D">Effort-Based</div><div class="praise-example" style="color:#166534">"You worked really hard!"</div><div class="praise-rec" style="background:#86EFAC;color:#14532D">Maximize This Type</div><div class="praise-why" style="color:#166534">Reinforces progress along the path to a goal. Especially impactful for struggling learners.</div></div>
