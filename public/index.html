@@ -231,8 +231,91 @@ textarea:focus,input:focus,select:focus{outline:none;border-color:var(--purple);
 .add-progress-form{margin-top:8px}
 .add-progress-form textarea{min-height:60px;font-size:13px}
 .status-badge{font-size:11px;font-weight:700;padding:3px 8px;border-radius:10px}
-@media(max-width:600px){.bucket-grid,.two-col,.bucket-row,.mood-meter-grid,.praise-grid,.ef-grid,.coregulation-grid,.regulation-grid,.teacher-info-grid{grid-template-columns:1fr}.obs-grid{grid-template-columns:1fr}.header h1{font-size:20px}.step{font-size:10px;padding:3px 7px}.lib-grid,.res-grid{grid-template-columns:1fr}.nav-tab{padding:8px 8px;font-size:11px}.gf-steps{flex-direction:column;align-items:flex-start}}
-@media print{.nav-tabs,.progress-wrap,.btn-row,.action-row,.header,.rule-bar,.teacher-info{display:none}.card,.rcard,.trial-card,.review-card,.warning-card,.trauma-banner,.window-banner{box-shadow:none;border:1px solid #ddd;break-inside:avoid}body{background:white}#form{display:none!important}#results{display:block!important}.page{display:block!important}}
+@media(max-width:600px){
+  .bucket-grid,.two-col,.bucket-row,.mood-meter-grid,.praise-grid,.ef-grid,.coregulation-grid,.regulation-grid,.teacher-info-grid{grid-template-columns:1fr}
+  .obs-grid{grid-template-columns:1fr}
+  .header h1{font-size:20px}
+  .step{font-size:10px;padding:3px 7px}
+  .lib-grid,.res-grid{grid-template-columns:1fr}
+  .nav-tab{padding:7px 8px;font-size:11px}
+  .gf-steps{flex-direction:column;align-items:flex-start}
+  .main{padding:1rem .75rem 5rem}
+  .card{padding:1rem}
+  .card-header{flex-direction:column;gap:6px}
+  .sec-badge{align-self:flex-start}
+  .chip{padding:5px 10px;font-size:12px}
+  .btn{padding:9px 14px;font-size:13px}
+  .btn-row{gap:8px}
+  .r-header{padding:1.1rem}
+  .r-title{font-size:18px}
+  .rcard{padding:1rem}
+  .int-item{padding:8px 0}
+  .header-links{gap:6px}
+  .hlink{font-size:11px;padding:5px 10px}
+  .dark-toggle{font-size:11px;padding:4px 8px}
+  .progress-wrap{padding:8px .75rem}
+  .pbar-label{font-size:10px}
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  [style*="grid-template-columns:2fr 1fr"]{grid-template-columns:1fr!important}
+  [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important}
+  .quick-search-fab{bottom:70px!important}
+}
+@media print{
+  /* Hide navigation and interactive elements */
+  .nav-tabs,.progress-wrap,.btn-row,.action-row,.header,.rule-bar,
+  #siteFooter,#adminBanner,#trialBanner,.quick-search-fab,
+  .tour-overlay,.pw-gate{display:none!important}
+  /* Reset page */
+  body{background:white;font-size:12pt;color:#000;margin:0;padding:0}
+  .page{display:block!important}
+  #form{display:none!important}
+  #results{display:block!important}
+  /* Print header */
+  #results::before{
+    content:'Behavior Intervention Plan';
+    display:block;
+    font-size:18pt;
+    font-weight:800;
+    color:#3B0764;
+    border-bottom:3px solid #F59E0B;
+    padding-bottom:8pt;
+    margin-bottom:12pt;
+  }
+  /* Cards */
+  .rcard,.card{
+    box-shadow:none!important;
+    border:1px solid #ddd!important;
+    break-inside:avoid;
+    margin-bottom:8pt!important;
+    padding:10pt!important;
+  }
+  .r-header{
+    background:#3B0764!important;
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+    color:white!important;
+    border-radius:8pt!important;
+    padding:12pt!important;
+    margin-bottom:10pt!important;
+    break-inside:avoid;
+  }
+  .r-title{font-size:16pt!important}
+  .r-summary{font-size:11pt!important}
+  /* Colored boxes */
+  [style*="background:#FEF3C7"],[style*="background:#EDE9FE"],
+  [style*="background:#DCFCE7"],[style*="background:#DBEAFE"],
+  [style*="background:#FFFBEB"],[style*="background:#F0FDF4"],
+  [style*="background:#FEF2F2"]{
+    -webkit-print-color-adjust:exact;
+    print-color-adjust:exact;
+  }
+  /* Side-by-side becomes stacked */
+  [style*="grid-template-columns"]{grid-template-columns:1fr!important;display:block!important}
+  .int-moves{background:#f5f5f5!important;border-left:3px solid #5B21B6!important}
+  .tag{border:1px solid #ddd!important}
+  /* Page setup */
+  @page{margin:1.5cm;size:A4}
+}
 
 /* DARK MODE */
 body.dark{background:#0F0F1A;color:#E2E8F0}
@@ -308,6 +391,43 @@ body.dark #siteFooter div{color:#64748B}
 .pw-btn:hover{background:var(--purple-mid)}
 .pw-error{font-size:13px;color:var(--red-mid);margin-top:10px;display:none;font-weight:600}
 .pw-bottom{font-size:11px;color:var(--gray-400);margin-top:1.5rem}
+/* QUICK SEARCH FAB */
+.quick-search-fab{position:fixed;bottom:24px;right:20px;width:52px;height:52px;border-radius:50%;background:var(--purple);color:white;border:none;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(91,33,182,.4);z-index:400;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.quick-search-fab:hover{background:var(--purple-mid);transform:scale(1.08)}
+.quick-search-panel{position:fixed;bottom:84px;right:20px;width:320px;background:white;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.18);z-index:400;padding:1rem;display:none;border:1px solid var(--gray-200)}
+.quick-search-panel.open{display:block}
+.qs-input{width:100%;padding:9px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px}
+.qs-input:focus{outline:none;border-color:var(--purple)}
+.qs-results{max-height:240px;overflow-y:auto}
+.qs-item{padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .1s;border-bottom:1px solid var(--gray-100)}
+.qs-item:last-child{border-bottom:none}
+.qs-item:hover{background:var(--purple-light)}
+.qs-item-name{font-size:13px;font-weight:700;color:var(--gray-800);margin-bottom:2px}
+.qs-item-bucket{font-size:10px;font-weight:700;padding:1px 6px;border-radius:6px;display:inline-block;margin-right:6px}
+.qs-item-link{font-size:11px;color:var(--blue-mid);font-weight:600;text-decoration:none}
+.qs-item-desc{font-size:11px;color:var(--gray-500);margin-top:2px;line-height:1.4}
+.qs-empty{font-size:13px;color:var(--gray-400);text-align:center;padding:1rem}
+
+/* TOUR OVERLAY */
+.tour-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8000;display:flex;align-items:center;justify-content:center;padding:1rem}
+.tour-box{background:white;border-radius:20px;padding:2rem;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center}
+.tour-step-indicator{display:flex;gap:6px;justify-content:center;margin-bottom:1.25rem}
+.tour-dot{width:8px;height:8px;border-radius:50%;background:var(--gray-200);transition:background .2s}
+.tour-dot.active{background:var(--purple)}
+.tour-icon{font-size:40px;margin-bottom:12px}
+.tour-title{font-size:18px;font-weight:800;color:var(--gray-800);margin-bottom:8px}
+.tour-desc{font-size:14px;color:var(--gray-600);line-height:1.65;margin-bottom:1.5rem}
+.tour-actions{display:flex;gap:10px;justify-content:center}
+
+/* RETURNING STUDENT */
+.returning-banner{background:var(--purple-light);border:1.5px solid var(--purple);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem}
+.returning-banner-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:8px}
+.returning-plan-card{background:white;border:1px solid var(--gray-200);border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all .15s}
+.returning-plan-card:hover{border-color:var(--purple);box-shadow:0 2px 8px rgba(91,33,182,.1)}
+.returning-plan-card.selected{border-color:var(--purple);background:var(--purple-light)}
+.returning-plan-date{font-size:11px;color:var(--gray-400);margin-bottom:3px;font-weight:600}
+.returning-plan-summary{font-size:12px;color:var(--gray-600);line-height:1.5}
+.returning-plan-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
 </style>
 </head>
 <body>
@@ -511,5 +631,24 @@ body.dark #siteFooter div{color:#64748B}
     <div style="font-size:11px;color:var(--gray-400);padding-top:1.5rem">Behavior Intervention Center &copy; 2025</div>
   </div>
 </footer>
+<!-- QUICK SEARCH FAB -->
+<button class="quick-search-fab" onclick="toggleQuickSearch()" id="qsFab" title="Quick strategy search">&#128269;</button>
+<div class="quick-search-panel" id="qsPanel">
+  <input class="qs-input" id="qsInput" placeholder="Search strategies... e.g. fidget, 2x10" oninput="runQuickSearch(this.value)">
+  <div class="qs-results" id="qsResults"><div class="qs-empty">Type to search all strategies</div></div>
+</div>
+<!-- TOUR OVERLAY -->
+<div class="tour-overlay hidden" id="tourOverlay">
+  <div class="tour-box">
+    <div class="tour-step-indicator" id="tourDots"></div>
+    <div class="tour-icon" id="tourIcon"></div>
+    <div class="tour-title" id="tourTitle"></div>
+    <div class="tour-desc" id="tourDesc"></div>
+    <div class="tour-actions">
+      <button class="btn btn-outline btn-sm" onclick="endTour()">Skip tour</button>
+      <button class="btn btn-primary" id="tourNext" onclick="nextTourStep()">Next</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
