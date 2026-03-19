@@ -1349,8 +1349,55 @@ function showDeeperResults(p, originalLog) {
 // ============================================================
 // LIBRARY RENDER
 // ============================================================
+// Server-synced overrides
+let _overridesCache = {};
+
+async function loadOverrides() {
+  try {
+    const res = await fetch('/api/overrides-get');
+    if (res.ok) {
+      const data = await res.json();
+      _overridesCache = data.overrides || {};
+    }
+  } catch(e) {
+    console.warn('Could not load overrides:', e.message);
+    _overridesCache = {};
+  }
+}
+
+function getStrategyOverrides() {
+  return _overridesCache;
+}
+
+async function saveStrategyOverride(key, data) {
+  _overridesCache[key] = data;
+  try {
+    await fetch('/api/overrides-set', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value: data })
+    });
+  } catch(e) {
+    console.warn('Could not save override:', e.message);
+  }
+}
+
+async function deleteStrategyOverride(key) {
+  delete _overridesCache[key];
+  try {
+    await fetch('/api/overrides-set', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value: null })
+    });
+  } catch(e) {
+    console.warn('Could not delete override:', e.message);
+  }
+}
+
 function renderLibrary() {
   const c = document.getElementById('libraryContent');
+  const overrides = getStrategyOverrides();
   let h = '';
   Object.entries(LIBRARY).forEach(([key, bucket]) => {
     h += `<div class="bucket-section" data-bucket="${key}">
@@ -1362,13 +1409,33 @@ function renderLibrary() {
         </div>
       </div>
       <div class="lib-grid">`;
-    bucket.strategies.forEach(s => {
-      const url = BASE + s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
-      h += `<a class="lib-card" href="${url}" target="_blank" style="border-left-color:${bucket.color}" data-name="${s.name.toLowerCase()}" data-desc="${s.desc.toLowerCase()}">
-        <div class="lib-card-name">${s.name}</div>
-        <div class="lib-card-desc">${s.desc}</div>
-        <div class="lib-card-link" style="color:${bucket.color}">View one-pager &#8599;</div>
-      </a>`;
+    bucket.strategies.forEach((s, idx) => {
+      const overrideKey = `${key}_${idx}`;
+      const ov = overrides[overrideKey] || {};
+      const name = ov.name || s.name;
+      const desc = ov.desc || s.desc;
+      const customUrl = ov.url || '';
+      const url = customUrl || (BASE + s.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''));
+      const isEdited = !!overrides[overrideKey];
+
+      if (isAdminMode) {
+        h += `<div class="lib-card admin-card" style="border-left-color:${bucket.color};display:block" data-name="${name.toLowerCase()}" data-desc="${desc.toLowerCase()}">
+          ${isEdited ? `<div style="font-size:10px;font-weight:700;color:#16A34A;margin-bottom:4px">EDITED</div>` : ''}
+          <div class="lib-card-name">${name}</div>
+          <div class="lib-card-desc">${desc}</div>
+          <a href="${url}" target="_blank" class="lib-card-link" style="color:${bucket.color}">View one-pager &#8599;</a>
+          <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--gray-100);display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-sm" style="color:var(--purple);border-color:var(--purple);font-size:11px" onclick="openEditModal('${overrideKey}','${name.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}','${url}')">Edit</button>
+            ${isEdited ? `<button class="btn btn-sm" style="color:var(--red-mid);border-color:#FCA5A5;font-size:11px" onclick="resetStrategy('${overrideKey}')">Reset</button>` : ''}
+          </div>
+        </div>`;
+      } else {
+        h += `<a class="lib-card" href="${url}" target="_blank" style="border-left-color:${bucket.color}" data-name="${name.toLowerCase()}" data-desc="${desc.toLowerCase()}">
+          <div class="lib-card-name">${name}</div>
+          <div class="lib-card-desc">${desc}</div>
+          <div class="lib-card-link" style="color:${bucket.color}">View one-pager &#8599;</div>
+        </a>`;
+      }
     });
     h += `</div></div>`;
   });
@@ -1441,11 +1508,18 @@ function startOver() {
 // PASSWORD GATE
 // ============================================================
 const SITE_PASSWORD = 'BehaviorCoach25'; // Change this to your preferred password
+const ADMIN_PASSWORD = 'AdminCoach25';   // Change this to your preferred admin password
+let isAdminMode = false;
 
 function checkPassword() {
   const input = document.getElementById('pwInput').value;
   const error = document.getElementById('pwError');
-  if (input === SITE_PASSWORD) {
+  if (input === ADMIN_PASSWORD) {
+    isAdminMode = true;
+    document.getElementById('pwGate').style.display = 'none';
+    enableAdminMode();
+  } else if (input === SITE_PASSWORD) {
+    isAdminMode = false;
     document.getElementById('pwGate').style.display = 'none';
   } else {
     error.style.display = 'block';
@@ -1455,7 +1529,74 @@ function checkPassword() {
 }
 
 function initAuth() {
-  // Always show password screen on every visit
+  // Clear any previously stored auth on every visit — password required every time
+  localStorage.removeItem('bic_auth');
+  sessionStorage.removeItem('bic_auth');
+}
+
+function enableAdminMode() {
+  // Show admin banner
+  const banner = document.createElement('div');
+  banner.id = 'adminBanner';
+  banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#5B21B6;color:white;text-align:center;padding:8px;font-size:13px;font-weight:700;z-index:500;display:flex;align-items:center;justify-content:center;gap:12px';
+  banner.innerHTML = `Admin Mode — Strategy Library is editable
+    <button onclick="goToPage('library')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Go to Library</button>
+    <span style="font-size:11px;font-weight:400;opacity:.8">Changes save to this browser</span>`;
+  document.body.appendChild(banner);
+  // Navigate to library and re-render with edit buttons
+  goToPage('library');
+  renderLibrary();
+}
+
+function openEditModal(key, name, desc, url) {
+  // Remove any existing modal
+  const existing = document.getElementById('editModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'editModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:1.5rem;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">Edit Strategy</div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Strategy Name</label>
+        <input type="text" id="editName" value="${name}" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:inherit">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Description</label>
+        <textarea id="editDesc" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;min-height:100px;resize:vertical">${desc}</textarea>
+      </div>
+      <div style="margin-bottom:1.25rem">
+        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">One-Pager Link (URL)</label>
+        <input type="text" id="editUrl" value="${url}" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit">
+        <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Leave as-is to use the auto-generated link, or paste a custom URL</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button onclick="document.getElementById('editModal').remove()" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+        <button onclick="saveEdit('${key}')" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Changes</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('editName').focus();
+}
+
+async function saveEdit(key) {
+  const name = document.getElementById('editName').value.trim();
+  const desc = document.getElementById('editDesc').value.trim();
+  const url = document.getElementById('editUrl').value.trim();
+  if (!name || !desc) { alert('Name and description are required.'); return; }
+  const btn = document.querySelector('#editModal button:last-child');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  await saveStrategyOverride(key, {name, desc, url});
+  document.getElementById('editModal').remove();
+  renderLibrary();
+}
+
+async function resetStrategy(key) {
+  if (!confirm('Reset this strategy to its original text?')) return;
+  await deleteStrategyOverride(key);
+  renderLibrary();
 }
 
 // ============================================================
@@ -1545,10 +1686,11 @@ function applyGlossaryTooltips() {
 // INIT
 // ============================================================
 render();
-renderLibrary();
 renderResources();
 updateLogBadge();
 initDark();
 initAuth();
 renderStrategyOfDay();
 setTimeout(applyGlossaryTooltips, 200);
+// Load strategy overrides from server then render library
+loadOverrides().then(() => renderLibrary());
