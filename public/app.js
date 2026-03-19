@@ -517,8 +517,12 @@ function buildSec(s, idx) {
     <div><div class="card-title">${s.title}</div><div class="card-focus">${s.focus}</div></div>
   </div>`;
   s.questions.forEach(q => {
-    h += `<div class="q"><label>${q.label}</label>`;
-    if (q.hint) h += `<div class="hint">${q.hint}</div>`;
+    const stepKey = `${s.id}_${q.id}`;
+    const stepOv = getStepData(s.id, q.id);
+    const label = stepOv?.label || q.label;
+    const hint = stepOv?.hint !== undefined ? stepOv.hint : (q.hint || '');
+    h += `<div class="q"><label data-step-label="${stepKey}">${label}</label>`;
+    if (hint) h += `<div class="hint" data-step-hint="${stepKey}">${hint}</div>`;
     if (q.type === 'textarea') h += `<textarea id="q_${q.id}" placeholder="Type your response here..."></textarea>`;
     else if (q.type === 'select') {
       h += `<select id="q_${q.id}"><option value="">Select grade level...</option>`;
@@ -1354,11 +1358,17 @@ let _overridesCache = {};
 
 async function loadOverrides() {
   try {
-    const res = await fetch('/api/overrides-get');
-    if (res.ok) {
-      const data = await res.json();
-      _overridesCache = data.overrides || {};
-    }
+    // Fetch all override categories in parallel
+    const keys = ['strategy_overrides', '_resources', '_emotions', '_steps'];
+    const results = await Promise.all(keys.map(k =>
+      fetch(`/api/overrides-get?key=${k}`).then(r => r.ok ? r.json() : {overrides:{}}).catch(() => ({overrides:{}}))
+    ));
+    _overridesCache = {};
+    // strategy overrides live at top level
+    Object.assign(_overridesCache, results[0].overrides || {});
+    _overridesCache._resources = results[1].overrides || {};
+    _overridesCache._emotions = results[2].overrides || {};
+    _overridesCache._steps = results[3].overrides || {};
   } catch(e) {
     console.warn('Could not load overrides:', e.message);
     _overridesCache = {};
@@ -1459,29 +1469,372 @@ function filterLibrary(q) {
 // ============================================================
 function renderResources() {
   const c = document.getElementById('resourcesContent');
+  const overrides = getResourceOverrides();
   let h = '';
-  RESOURCES.forEach(section => {
-    h += `<div class="res-section"><h3>${section.section}</h3><div class="res-grid">`;
-    section.items.forEach(item => {
-      h += `<a class="res-card" href="${item.url}" target="_blank">
-        <div class="res-card-title">${item.title}</div>
-        <div class="res-card-desc">${item.desc}</div>
-      </a>`;
+
+  if (isAdminMode) {
+    h += `<div style="background:#EDE9FE;border:1.5px solid var(--purple);border-radius:10px;padding:10px 14px;margin-bottom:1.25rem;font-size:13px;color:var(--purple-dark)">
+      <strong>Admin:</strong> Click Edit on any resource to update its title, description, or link. Click + Add Resource to add a new one to any section.
+    </div>`;
+  }
+
+  RESOURCES.forEach((section, sIdx) => {
+    h += `<div class="res-section">
+      <h3 style="display:flex;align-items:center;justify-content:space-between">
+        ${section.section}
+        ${isAdminMode ? `<button class="btn btn-sm" style="font-size:11px;color:var(--purple);border-color:var(--purple)" onclick="openAddResource(${sIdx})">+ Add Resource</button>` : ''}
+      </h3>
+      <div class="res-grid">`;
+
+    section.items.forEach((item, iIdx) => {
+      const key = `res_${sIdx}_${iIdx}`;
+      const ov = overrides[key] || {};
+      const title = ov.title || item.title;
+      const desc = ov.desc || item.desc;
+      const url = ov.url || item.url;
+      const hidden = ov.hidden || false;
+      if (hidden && !isAdminMode) return;
+
+      if (isAdminMode) {
+        h += `<div class="res-card" style="${hidden ? 'opacity:.4;' : ''}">
+          ${hidden ? '<div style="font-size:10px;font-weight:700;color:var(--gray-400);margin-bottom:4px">HIDDEN</div>' : ''}
+          ${ov.title ? '<div style="font-size:10px;font-weight:700;color:#16A34A;margin-bottom:4px">EDITED</div>' : ''}
+          <div class="res-card-title">${title}</div>
+          <div class="res-card-desc">${desc}</div>
+          <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn btn-sm" style="font-size:11px;color:var(--purple);border-color:var(--purple)" onclick="openEditResource('${key}','${title.replace(/'/g,"\\'")}','${desc.replace(/'/g,"\\'")}','${url}')">Edit</button>
+            <button class="btn btn-sm" style="font-size:11px;color:${hidden?'#16A34A':'var(--red-mid)'};border-color:${hidden?'#86EFAC':'#FCA5A5'}" onclick="toggleResourceHidden('${key}',${!hidden})">${hidden ? 'Show' : 'Hide'}</button>
+            ${ov.title ? `<button class="btn btn-sm" style="font-size:11px;color:var(--gray-500)" onclick="resetResource('${key}')">Reset</button>` : ''}
+          </div>
+        </div>`;
+      } else {
+        h += `<a class="res-card" href="${url}" target="_blank">
+          <div class="res-card-title">${title}</div>
+          <div class="res-card-desc">${desc}</div>
+        </a>`;
+      }
     });
+
+    // Show admin-added resources for this section
+    const added = overrides[`res_added_${sIdx}`] || [];
+    added.forEach((item, aIdx) => {
+      if (item.hidden && !isAdminMode) return;
+      const aKey = `res_added_${sIdx}_${aIdx}`;
+      if (isAdminMode) {
+        h += `<div class="res-card" style="border-color:var(--green-mid)${item.hidden?';opacity:.4':''}">
+          <div style="font-size:10px;font-weight:700;color:#16A34A;margin-bottom:4px">ADDED</div>
+          <div class="res-card-title">${item.title}</div>
+          <div class="res-card-desc">${item.desc}</div>
+          <div style="margin-top:8px;display:flex;gap:6px">
+            <button class="btn btn-sm" style="font-size:11px;color:var(--purple);border-color:var(--purple)" onclick="openEditAddedResource(${sIdx},${aIdx})">Edit</button>
+            <button class="btn btn-sm" style="font-size:11px;color:var(--red-mid);border-color:#FCA5A5" onclick="deleteAddedResource(${sIdx},${aIdx})">Delete</button>
+          </div>
+        </div>`;
+      } else {
+        h += `<a class="res-card" href="${item.url}" target="_blank">
+          <div class="res-card-title">${item.title}</div>
+          <div class="res-card-desc">${item.desc}</div>
+        </a>`;
+      }
+    });
+
     h += `</div></div>`;
   });
   c.innerHTML = h;
 }
 
+function getResourceOverrides() {
+  return _overridesCache._resources || {};
+}
+
+async function saveResourceOverride(key, value) {
+  if (!_overridesCache._resources) _overridesCache._resources = {};
+  if (value === null) delete _overridesCache._resources[key];
+  else _overridesCache._resources[key] = value;
+  await syncOverrides();
+}
+
+async function syncOverrides() {
+  try {
+    await fetch('/api/overrides-set', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({key: '_resources', value: _overridesCache._resources || {}})
+    });
+  } catch(e) { console.warn('Sync failed:', e.message); }
+}
+
+function openEditResource(key, title, desc, url) {
+  showEditModal('Edit Resource', [
+    {id:'eTitle', label:'Title', value:title},
+    {id:'eDesc', label:'Description', value:desc, textarea:true},
+    {id:'eUrl', label:'URL', value:url}
+  ], () => {
+    const t = document.getElementById('eTitle').value.trim();
+    const d = document.getElementById('eDesc').value.trim();
+    const u = document.getElementById('eUrl').value.trim();
+    if (!t || !d || !u) { alert('All fields required.'); return; }
+    saveResourceOverride(key, {title:t, desc:d, url:u}).then(() => renderResources());
+    closeModal();
+  });
+}
+
+async function toggleResourceHidden(key, hide) {
+  const overrides = getResourceOverrides();
+  const existing = overrides[key] || {};
+  existing.hidden = hide;
+  await saveResourceOverride(key, existing);
+  renderResources();
+}
+
+async function resetResource(key) {
+  if (!confirm('Reset to original?')) return;
+  await saveResourceOverride(key, null);
+  renderResources();
+}
+
+function openAddResource(sIdx) {
+  showEditModal('Add New Resource', [
+    {id:'eTitle', label:'Title', value:''},
+    {id:'eDesc', label:'Description', value:'', textarea:true},
+    {id:'eUrl', label:'URL', value:'https://'}
+  ], async () => {
+    const t = document.getElementById('eTitle').value.trim();
+    const d = document.getElementById('eDesc').value.trim();
+    const u = document.getElementById('eUrl').value.trim();
+    if (!t || !d || !u) { alert('All fields required.'); return; }
+    const overrides = getResourceOverrides();
+    const key = `res_added_${sIdx}`;
+    const added = overrides[key] || [];
+    added.push({title:t, desc:d, url:u});
+    await saveResourceOverride(key, added);
+    renderResources();
+    closeModal();
+  });
+}
+
+function openEditAddedResource(sIdx, aIdx) {
+  const overrides = getResourceOverrides();
+  const item = (overrides[`res_added_${sIdx}`] || [])[aIdx] || {};
+  showEditModal('Edit Added Resource', [
+    {id:'eTitle', label:'Title', value:item.title||''},
+    {id:'eDesc', label:'Description', value:item.desc||'', textarea:true},
+    {id:'eUrl', label:'URL', value:item.url||''}
+  ], async () => {
+    const t = document.getElementById('eTitle').value.trim();
+    const d = document.getElementById('eDesc').value.trim();
+    const u = document.getElementById('eUrl').value.trim();
+    const key = `res_added_${sIdx}`;
+    const added = overrides[key] || [];
+    added[aIdx] = {title:t, desc:d, url:u};
+    await saveResourceOverride(key, added);
+    renderResources();
+    closeModal();
+  });
+}
+
+async function deleteAddedResource(sIdx, aIdx) {
+  if (!confirm('Delete this resource?')) return;
+  const overrides = getResourceOverrides();
+  const key = `res_added_${sIdx}`;
+  const added = overrides[key] || [];
+  added.splice(aIdx, 1);
+  await saveResourceOverride(key, added);
+  renderResources();
+}
+
 // ============================================================
-// PAGE NAVIGATION
+// SHARED EDIT MODAL HELPER
 // ============================================================
+function showEditModal(title, fields, onSave) {
+  const existing = document.getElementById('editModal');
+  if (existing) existing.remove();
+  let fieldsHtml = fields.map(f => `
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">${f.label}</label>
+      ${f.textarea
+        ? `<textarea id="${f.id}" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;min-height:80px;resize:vertical">${f.value}</textarea>`
+        : `<input type="text" id="${f.id}" value="${f.value.replace(/"/g,'&quot;')}" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:inherit">`
+      }
+    </div>`).join('');
+  const modal = document.createElement('div');
+  modal.id = 'editModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto';
+  modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">${title}</div>
+    ${fieldsHtml}
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1rem">
+      <button onclick="closeModal()" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
+      <button id="modalSaveBtn" onclick="modalSaveAction()" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Changes</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  window._modalSaveAction = onSave;
+  const firstInput = modal.querySelector('input,textarea');
+  if (firstInput) firstInput.focus();
+}
+
+function modalSaveAction() {
+  if (window._modalSaveAction) window._modalSaveAction();
+}
+
+function closeModal() {
+  const m = document.getElementById('editModal');
+  if (m) m.remove();
+}
+
+// ============================================================
+// EMOTIONS HUB EDITING
+// ============================================================
+function getEmotionOverrides() {
+  return _overridesCache._emotions || {};
+}
+
+async function saveEmotionOverride(key, value) {
+  if (!_overridesCache._emotions) _overridesCache._emotions = {};
+  if (value === null) delete _overridesCache._emotions[key];
+  else _overridesCache._emotions[key] = value;
+  try {
+    await fetch('/api/overrides-set', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({key:'_emotions', value:_overridesCache._emotions})
+    });
+  } catch(e) { console.warn('Sync failed:', e.message); }
+}
+
+function applyEmotionOverrides() {
+  if (!isAdminMode && Object.keys(getEmotionOverrides()).length === 0) return;
+  const overrides = getEmotionOverrides();
+
+  // Apply text overrides to emotion-section elements
+  document.querySelectorAll('[data-ekey]').forEach(el => {
+    const key = el.dataset.ekey;
+    if (overrides[key] !== undefined) el.innerHTML = overrides[key];
+  });
+
+  // Add edit buttons in admin mode
+  if (isAdminMode) {
+    document.querySelectorAll('[data-ekey]').forEach(el => {
+      if (el.querySelector('.e-edit-btn')) return;
+      const btn = document.createElement('button');
+      btn.className = 'e-edit-btn btn btn-sm';
+      btn.style.cssText = 'font-size:10px;color:var(--purple);border-color:var(--purple);margin-top:4px;display:block';
+      btn.textContent = 'Edit';
+      const key = el.dataset.ekey;
+      btn.onclick = () => openEditEmotionField(key, el);
+      el.appendChild(btn);
+    });
+  }
+}
+
+function openEditEmotionField(key, el) {
+  const overrides = getEmotionOverrides();
+  const current = overrides[key] || el.innerHTML.replace(/<button[^>]*>.*?<\/button>/gs,'').trim();
+  showEditModal('Edit Content', [
+    {id:'eContent', label:'Content (HTML allowed)', value:'', textarea:true}
+  ], async () => {
+    const val = document.getElementById('eContent').value;
+    await saveEmotionOverride(key, val);
+    el.innerHTML = val;
+    if (isAdminMode) {
+      const btn = document.createElement('button');
+      btn.className = 'e-edit-btn btn btn-sm';
+      btn.style.cssText = 'font-size:10px;color:var(--purple);border-color:var(--purple);margin-top:4px;display:block';
+      btn.textContent = 'Edit';
+      btn.onclick = () => openEditEmotionField(key, el);
+      el.appendChild(btn);
+    }
+    closeModal();
+  });
+  // Pre-fill with current content
+  setTimeout(() => {
+    const ta = document.getElementById('eContent');
+    if (ta) ta.value = current;
+  }, 50);
+}
+
+// ============================================================
+// STEP QUESTIONS EDITING
+// ============================================================
+function getStepOverrides() {
+  return _overridesCache._steps || {};
+}
+
+async function saveStepOverride(key, value) {
+  if (!_overridesCache._steps) _overridesCache._steps = {};
+  if (value === null) delete _overridesCache._steps[key];
+  else _overridesCache._steps[key] = value;
+  try {
+    await fetch('/api/overrides-set', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({key:'_steps', value:_overridesCache._steps})
+    });
+  } catch(e) { console.warn('Sync failed:', e.message); }
+}
+
+function getStepData(secId, qId) {
+  const overrides = getStepOverrides();
+  const key = `step_${secId}_${qId}`;
+  return overrides[key] || null;
+}
+
+function applyStepOverrides() {
+  const overrides = getStepOverrides();
+  Object.entries(overrides).forEach(([key, val]) => {
+    const parts = key.split('_'); // step_secId_qId
+    if (parts.length < 3) return;
+    const secId = parts[1], qId = parts.slice(2).join('_');
+    const labelEl = document.querySelector(`[data-step-label="${secId}_${qId}"]`);
+    const hintEl = document.querySelector(`[data-step-hint="${secId}_${qId}"]`);
+    if (labelEl && val.label) labelEl.textContent = val.label;
+    if (hintEl && val.hint !== undefined) hintEl.textContent = val.hint;
+  });
+
+  if (isAdminMode) {
+    document.querySelectorAll('[data-step-label]').forEach(el => {
+      if (el.querySelector('.s-edit-btn')) return;
+      const key = el.dataset.stepLabel;
+      const btn = document.createElement('button');
+      btn.className = 's-edit-btn btn btn-sm';
+      btn.style.cssText = 'font-size:10px;color:var(--purple);border-color:var(--purple);margin-left:8px;vertical-align:middle';
+      btn.textContent = 'Edit';
+      btn.onclick = (e) => { e.stopPropagation(); openEditStepQuestion(key); };
+      el.appendChild(btn);
+    });
+  }
+}
+
+function openEditStepQuestion(key) {
+  const overrides = getStepOverrides();
+  const existing = overrides[`step_${key}`] || {};
+  const parts = key.split('_');
+  const secId = parts[0], qId = parts[1];
+  const sec = SECTIONS.find(s => s.id === secId);
+  const q = sec ? sec.questions.find(q => q.id === qId) : null;
+  showEditModal('Edit Question', [
+    {id:'eLabel', label:'Question text', value: existing.label || (q ? q.label : '')},
+    {id:'eHint', label:'Hint text (optional)', value: existing.hint !== undefined ? existing.hint : (q && q.hint ? q.hint : ''), textarea:true}
+  ], async () => {
+    const label = document.getElementById('eLabel').value.trim();
+    const hint = document.getElementById('eHint').value.trim();
+    if (!label) { alert('Question text required.'); return; }
+    await saveStepOverride(`step_${key}`, {label, hint});
+    closeModal();
+    // Re-render the form to reflect changes
+    const wasCurrentStep = current;
+    render();
+    current = wasCurrentStep;
+    applyStepOverrides();
+  });
+}
 function showPage(page, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
   if (btn) btn.classList.add('active');
   if (page === 'logs') renderLogs();
+  if (page === 'emotions' && isAdminMode) setTimeout(applyEmotionOverrides, 100);
+  if (page === 'tool' && isAdminMode) setTimeout(applyStepOverrides, 300);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1492,6 +1845,8 @@ function goToPage(page) {
   const idx = {tool:0,emotions:1,library:2,logs:3,resources:4}[page] || 0;
   document.querySelectorAll('.nav-tab')[idx].classList.add('active');
   if (page === 'logs') renderLogs();
+  if (page === 'emotions' && isAdminMode) setTimeout(applyEmotionOverrides, 100);
+  if (page === 'tool' && isAdminMode) setTimeout(applyStepOverrides, 300);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1539,46 +1894,32 @@ function enableAdminMode() {
   const banner = document.createElement('div');
   banner.id = 'adminBanner';
   banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#5B21B6;color:white;text-align:center;padding:8px;font-size:13px;font-weight:700;z-index:500;display:flex;align-items:center;justify-content:center;gap:12px';
-  banner.innerHTML = `Admin Mode — Strategy Library is editable
-    <button onclick="goToPage('library')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Go to Library</button>
-    <span style="font-size:11px;font-weight:400;opacity:.8">Changes save to this browser</span>`;
+  banner.innerHTML = `Admin Mode — Strategy Library, Resources, Emotions Hub &amp; Step Questions are editable
+    <button onclick="goToPage('library')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Library</button>
+    <button onclick="goToPage('resources')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Resources</button>
+    <button onclick="goToPage('emotions')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Emotions</button>
+    <button onclick="goToPage('tool')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Steps</button>
+    <span style="font-size:11px;font-weight:400;opacity:.8">Changes sync for all users</span>`;
   document.body.appendChild(banner);
-  // Navigate to library and re-render with edit buttons
-  goToPage('library');
+  // Pad footer so banner doesn't cover content
+  const footer = document.getElementById('siteFooter');
+  if (footer) footer.style.marginBottom = '48px';
+  // Render all editable sections
   renderLibrary();
+  renderResources();
+  setTimeout(() => {
+    applyEmotionOverrides();
+    applyStepOverrides();
+  }, 300);
+  goToPage('library');
 }
 
 function openEditModal(key, name, desc, url) {
-  // Remove any existing modal
-  const existing = document.getElementById('editModal');
-  if (existing) existing.remove();
-
-  const modal = document.createElement('div');
-  modal.id = 'editModal';
-  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
-  modal.innerHTML = `
-    <div style="background:white;border-radius:16px;padding:1.5rem;max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
-      <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:1rem;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">Edit Strategy</div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Strategy Name</label>
-        <input type="text" id="editName" value="${name}" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:inherit">
-      </div>
-      <div style="margin-bottom:12px">
-        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">Description</label>
-        <textarea id="editDesc" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit;min-height:100px;resize:vertical">${desc}</textarea>
-      </div>
-      <div style="margin-bottom:1.25rem">
-        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:4px">One-Pager Link (URL)</label>
-        <input type="text" id="editUrl" value="${url}" style="width:100%;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-family:inherit">
-        <div style="font-size:11px;color:var(--gray-400);margin-top:4px">Leave as-is to use the auto-generated link, or paste a custom URL</div>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button onclick="document.getElementById('editModal').remove()" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>
-        <button onclick="saveEdit('${key}')" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Changes</button>
-      </div>
-    </div>`;
-  document.body.appendChild(modal);
-  document.getElementById('editName').focus();
+  showEditModal('Edit Strategy', [
+    {id:'editName', label:'Strategy Name', value:name},
+    {id:'editDesc', label:'Description', value:desc, textarea:true},
+    {id:'editUrl', label:'One-Pager Link (URL)', value:url}
+  ], () => saveEdit(key));
 }
 
 async function saveEdit(key) {
