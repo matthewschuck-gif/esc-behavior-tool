@@ -7,6 +7,9 @@
 
 const BASE = “https://sites.google.com/easdpa.org/behaviorcoaching/find-the-right-fit/”;
 
+// Returning student state — must be declared before render() is called
+let _returningPlanId = null;
+
 // ============================================================
 // STRATEGY LIST (for Already Tried picker)
 // ============================================================
@@ -2353,7 +2356,6 @@ el.innerHTML = html;
 // ============================================================
 // RETURNING STUDENT
 // ============================================================
-let _returningPlanId = null;
 
 function buildReturningPanel() {
 try {
