@@ -916,9 +916,13 @@ async function generatePlan() {
   // Run confidence check first
   const issues = runConfidenceCheck();
   if (issues.length > 0) {
-    showConfidenceCheck(generatePlan);
+    showConfidenceCheck(() => generatePlanCore());
     return;
   }
+  generatePlanCore();
+}
+
+async function generatePlanCore() {
   const btn = document.getElementById('btnGenerate');
   const dots = document.getElementById('dGenerate');
   btn.disabled = true; dots.classList.remove('hidden');
@@ -2849,6 +2853,7 @@ function showConfidenceCheck(onProceed) {
   if (issues.length === 0) { onProceed(); return; }
   const existing = document.getElementById('confidenceModal');
   if (existing) existing.remove();
+  window._confidenceProceed = onProceed;
   const modal = document.createElement('div');
   modal.id = 'confidenceModal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
@@ -2860,7 +2865,7 @@ function showConfidenceCheck(onProceed) {
     </ul>
     <div style="display:flex;gap:8px;justify-content:flex-end">
       <button onclick="document.getElementById('confidenceModal').remove()" style="padding:8px 16px;border:1.5px solid var(--purple);color:var(--purple);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Go back &amp; complete</button>
-      <button onclick="document.getElementById('confidenceModal').remove();(${onProceed.toString()})()" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Generate anyway</button>
+      <button onclick="document.getElementById('confidenceModal').remove();window._confidenceProceed&&window._confidenceProceed()" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Generate anyway</button>
     </div>
   </div>`;
   document.body.appendChild(modal);
