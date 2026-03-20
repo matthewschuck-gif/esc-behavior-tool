@@ -476,7 +476,7 @@ async function callAPI(messages) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:2500, messages})
+    body: JSON.stringify({model:'claude-opus-4-6', max_tokens:2500, messages})
   });
   const j = await res.json();
   if (!res.ok) throw new Error(j.error || 'Server error');
