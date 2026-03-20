@@ -2858,19 +2858,21 @@ function showConfidenceCheck(onProceed) {
 // ============================================================
 // INIT
 // ============================================================
-// SAFE INIT — every call wrapped to prevent password screen crash
 try { render(); } catch(e) { console.error('render',e); }
+try { renderLibrary(); } catch(e) { console.error('renderLibrary',e); }
 try { renderResources(); } catch(e) { console.error('renderResources',e); }
 try { updateLogBadge(); } catch(e) {}
 try { initDark(); } catch(e) {}
 try { initAuth(); } catch(e) { console.error('initAuth',e); }
 try { renderStrategyOfDay(); } catch(e) {}
 setTimeout(() => { try { applyGlossaryTooltips(); } catch(e) {} }, 500);
+// Load overrides and re-render with any saved edits
 setTimeout(() => {
   try {
     loadOverrides().then(() => {
       try { renderLibrary(); } catch(e) {}
+      try { renderResources(); } catch(e) {}
       try { applyHeaderOverrides(); } catch(e) {}
-    }).catch((e) => { console.error('loadOverrides',e); try { renderLibrary(); } catch(e2) {} });
-  } catch(e) { try { renderLibrary(); } catch(e2) {} }
-}, 100);
+    }).catch((e) => { console.error('loadOverrides', e); });
+  } catch(e) { console.error('loadOverrides init', e); }
+}, 300);
