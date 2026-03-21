@@ -940,6 +940,8 @@ async function generatePlanCore() {
   const triedSummary = getTriedSummary();
   const intensity = getIntensity();
   const returningContext = getReturningContext();
+  let schoolContext = '';
+  try { schoolContext = await loadSchoolContext(); } catch(e) { console.warn('School context failed:', e); }
   const teacherName = 'Educator';
   const teacherBuilding = '';
 
@@ -976,6 +978,7 @@ ${rapportSummary || 'Not provided'}
 
 COACHING INTENSITY: ${intensity}
 ${returningContext}
+${schoolContext}
 WHAT HAS ALREADY BEEN TRIED (EXCLUDE THESE FROM PRIMARY RECOMMENDATIONS):
 ${triedSummary || 'Nothing logged — this may be a first attempt at formal intervention'}
 
@@ -990,7 +993,7 @@ CRITICAL PERSONALIZATION INSTRUCTIONS:
 6. Use effort-based and behavior-specific praise only.
 
 Respond ONLY with valid JSON, no markdown:
-{"scientist_summary":"2-3 sentence Be a Scientist summary using their actual observables","trauma_type":"${traumaR ? traumaR.type : 'none'}","trauma_guidance":"${traumaR ? traumaR.desc.replace(/"/g,"'") : ''}","social_discipline_note":"1 sentence on working WITH this specific student","primary_bucket":"connection|awareness|skills|regulation","secondary_bucket":"connection|awareness|skills|regulation|none","bucket_rationale":"1-2 sentences tied to their specific data","priority":"low|moderate|high","tags":["tag1","tag2","tag3"],"rapport_connection":"1-2 sentences on how to use this student's specific interests to build connection and make interventions more relevant — be specific about the actual interests provided","educator_connection":"1 sentence on a natural connection point between educator and student interests if applicable, or a suggestion for building rapport based on educator's background","try_first":[{"name":"exact strategy name — must NOT be in the already tried list","bucket":"connection|awareness|skills|regulation","why":"rationale tied to their data","the_moves":"2-4 specific implementation steps adapted to THIS student — include their specific interests/hobbies where relevant"},{"name":"...","bucket":"...","why":"...","the_moves":"..."},{"name":"...","bucket":"...","why":"...","the_moves":"..."}],"also_consider":[{"name":"strategy name","bucket":"...","why":"brief rationale — if previously tried, note what to do differently"},{"name":"...","bucket":"...","why":"..."},{"name":"...","bucket":"...","why":"..."}],"what_to_say":"2-4 sentences the educator can say to this student tomorrow — reference their interests if possible, effort-based or behavior-specific language only","what_not_to_do":"1-2 sentences on what to avoid based on data, trauma lens, and what has already been tried","environment_fits":["specific environmental adjustment 1","specific adjustment 2","specific adjustment 3"],"two_week_trial":"Days 1-3 (start here), Days 4-7 (build on this), Days 8-14 (monitor and adjust) — specific to their context and interests","what_to_track":"exact observable data to collect and what change signals it is working","who_to_loop_in":["specific person or role 1","specific person or role 2"],"review_by":"specific recommendation referencing 6-8 consecutive school weeks"}`}]);
+{'scientist_summary':'...','trauma_type':'none','trauma_guidance':'...','social_discipline_note':'...','primary_bucket':'connection|awareness|skills|regulation','secondary_bucket':'none','bucket_rationale':'...','priority':'low|moderate|high','tags':['tag'],'rapport_connection':'...','educator_connection':'...','try_first':[{'name':'strategy','bucket':'connection','why':'why','the_moves':'steps'},{'name':'strategy','bucket':'skills','why':'why','the_moves':'steps'},{'name':'strategy','bucket':'regulation','why':'why','the_moves':'steps'}],'also_consider':[{'name':'strategy','bucket':'connection','why':'why'},{'name':'strategy','bucket':'skills','why':'why'}],'what_to_say':'...','what_not_to_do':'...','environment_fits':['adj1','adj2','adj3'],'review_by':'6-8 school weeks'}`}]);
 
     let txt = response.replace(/```json|```/g, '').trim();
     const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
@@ -1023,6 +1026,8 @@ let _lastDate = null;
 function showResults(p) {
   _lastPlan = p;
   _lastDate = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  // Auto-log anonymized plan data to Upstash for school learning
+  try { autoLogPlanToUpstash(p); } catch(e) {}
   const rs = document.getElementById('results');
   rs.style.display = 'block';
   document.getElementById('form').style.display = 'none';
@@ -1266,7 +1271,7 @@ function renderLogs() {
           <button class="btn btn-teal btn-sm" onclick="addProgress('${log.id}')">Add Progress Note</button>
           <button class="btn btn-primary btn-sm" onclick="goDeeper('${log.id}')">Go Deeper &#8250;</button>
           <button class="btn btn-sm" onclick="generateShareableLink('${log.id}')" style="font-size:12px;color:var(--blue-mid);border-color:#93C5FD">Share Link</button>
-          <select onchange="updateStatus('${log.id}',this.value)" style="width:auto;padding:6px 10px;font-size:12px;border-radius:8px">
+          <select onchange="handleStatusChange('${log.id}',this.value,${JSON.stringify((log.strategies||[])).replace(/"/g,'&quot;')})" style="width:auto;padding:6px 10px;font-size:12px;border-radius:8px">
             <option value="active" ${log.status==='active'?'selected':''}>Active</option>
             <option value="reviewing" ${log.status==='reviewing'?'selected':''}>Under Review</option>
             <option value="closed" ${log.status==='closed'?'selected':''}>Closed</option>
@@ -1294,6 +1299,14 @@ function addProgress(id) {
     localStorage.setItem('bic_logs', JSON.stringify(logs));
     renderLogs();
   } catch(e) { alert('Could not save note: ' + e.message); }
+}
+
+function handleStatusChange(id, status, strategies) {
+  if (status === 'closed' && strategies && strategies.length > 0) {
+    openEffectivenessModal(id, strategies);
+  } else {
+    updateStatus(id, status);
+  }
 }
 
 function updateStatus(id, status) {
@@ -2305,6 +2318,7 @@ function enableAdminMode() {
     <button onclick="goToPage('emotions')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Emotions</button>
     <button onclick="goToPage('tool')" style="background:white;color:var(--purple);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Steps</button>
     <button onclick="viewFeedback()" style="background:var(--gold);color:var(--purple-dark);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Feedback</button>
+    <button onclick="showAdminInsights()" style="background:var(--gold);color:var(--purple-dark);border:none;border-radius:6px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer">Insights</button>
     <span style="font-size:11px;font-weight:400;opacity:.8">Changes sync for all users</span>`;
   document.body.appendChild(banner);
   // Pad footer so banner doesn't cover content
@@ -2853,6 +2867,294 @@ function showConfidenceCheck(onProceed) {
     </div>
   </div>`;
   document.body.appendChild(modal);
+}
+
+// ============================================================
+// SCHOOL LEARNING SYSTEM
+// ============================================================
+
+async function autoLogPlanToUpstash(plan) {
+  try {
+    const building = document.getElementById('teacherBuilding')?.value?.trim() || 'Unknown';
+    const educator = document.getElementById('teacherName')?.value?.trim() || 'Anonymous';
+    const entry = {
+      ts: Date.now(),
+      date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+      building,
+      educator,
+      bucket: plan.primary_bucket,
+      secondary_bucket: plan.secondary_bucket,
+      priority: plan.priority,
+      trauma: plan.trauma_type || 'none',
+      tags: plan.tags || [],
+      strategies: (plan.try_first || []).map(s => s.name),
+      also_consider: (plan.also_consider || []).map(s => s.name),
+      observables: data.what?.observables || [],
+      intensity: getIntensity().split('—')[0].trim(),
+      effective_strategies: [], // filled in when plan is closed
+      outcome: null // filled in when plan is closed
+    };
+    await fetch('/api/overrides-set', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({key: `plan_log_${entry.ts}`, value: entry})
+    });
+  } catch(e) { console.warn('Auto-log failed:', e.message); }
+}
+
+async function loadSchoolContext() {
+  try {
+    // Fetch all plan logs from Upstash
+    const res = await fetch('/api/overrides-get?key=_plan_index');
+    if (!res.ok) return '';
+    const data = await res.json();
+    const index = data.overrides || {};
+    if (!Object.keys(index).length) return '';
+
+    const plans = Object.values(index);
+    if (!plans.length) return '';
+
+    // Aggregate patterns
+    const bucketCounts = {};
+    const strategyCounts = {};
+    const traumaCounts = {};
+    const observableCounts = {};
+    const effectiveStrategies = {};
+
+    plans.forEach(p => {
+      // Buckets
+      bucketCounts[p.bucket] = (bucketCounts[p.bucket] || 0) + 1;
+      // Strategies
+      (p.strategies || []).forEach(s => { strategyCounts[s] = (strategyCounts[s] || 0) + 1; });
+      // Effective strategies
+      (p.effective_strategies || []).forEach(s => { effectiveStrategies[s] = (effectiveStrategies[s] || 0) + 1; });
+      // Trauma
+      if (p.trauma && p.trauma !== 'none') traumaCounts[p.trauma] = (traumaCounts[p.trauma] || 0) + 1;
+      // Observables
+      (p.observables || []).forEach(o => { observableCounts[o] = (observableCounts[o] || 0) + 1; });
+    });
+
+    const topBuckets = Object.entries(bucketCounts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v} plans)`).join(', ');
+    const topStrategies = Object.entries(strategyCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} (${v}x)`).join(', ');
+    const topEffective = Object.entries(effectiveStrategies).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} (${v} educators confirmed effective)`).join(', ');
+    const topTrauma = Object.entries(traumaCounts).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${k} (${v} plans)`).join(', ');
+    const topObservables = Object.entries(observableCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k])=>k).join(', ');
+
+    return `\n\nSCHOOL LEARNING CONTEXT (${plans.length} plans generated at this school):
+Most common intervention buckets: ${topBuckets || 'N/A'}
+Most frequently recommended strategies: ${topStrategies || 'N/A'}
+Strategies confirmed effective by educators: ${topEffective || 'Not yet tracked'}
+Most common trauma responses: ${topTrauma || 'N/A'}
+Most common observables: ${topObservables || 'N/A'}
+Use this context to inform your recommendations — prioritize strategies confirmed effective in this school when appropriate, and be aware of patterns that may indicate school-wide needs.`;
+  } catch(e) {
+    console.warn('Could not load school context:', e.message);
+    return '';
+  }
+}
+
+async function updatePlanIndex(entry) {
+  // Maintain a rolling index of all plan summaries for fast retrieval
+  try {
+    const res = await fetch('/api/overrides-get?key=_plan_index');
+    const existing = res.ok ? (await res.json()).overrides || {} : {};
+    existing[`plan_${entry.ts}`] = entry;
+    await fetch('/api/overrides-set', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({key: '_plan_index', value: existing})
+    });
+  } catch(e) { console.warn('Index update failed:', e.message); }
+}
+
+// Update autoLogPlanToUpstash to also update the index
+async function autoLogPlanToUpstash(plan) {
+  try {
+    const building = document.getElementById('teacherBuilding')?.value?.trim() || 'Unknown';
+    const educator = document.getElementById('teacherName')?.value?.trim() || 'Anonymous';
+    const entry = {
+      ts: Date.now(),
+      date: new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),
+      building,
+      educator,
+      bucket: plan.primary_bucket,
+      secondary_bucket: plan.secondary_bucket,
+      priority: plan.priority,
+      trauma: plan.trauma_type || 'none',
+      tags: plan.tags || [],
+      strategies: (plan.try_first || []).map(s => s.name),
+      also_consider: (plan.also_consider || []).map(s => s.name),
+      observables: data?.what?.observables || [],
+      intensity: getIntensity().split('—')[0].trim(),
+      effective_strategies: [],
+      outcome: null
+    };
+    await updatePlanIndex(entry);
+  } catch(e) { console.warn('Auto-log failed:', e.message); }
+}
+
+async function markStrategiesEffective(logId, strategies) {
+  try {
+    // Update the plan index with effective strategies
+    const res = await fetch('/api/overrides-get?key=_plan_index');
+    const existing = res.ok ? (await res.json()).overrides || {} : {};
+    const key = `plan_${logId}`;
+    if (existing[key]) {
+      existing[key].effective_strategies = strategies;
+      existing[key].outcome = 'closed';
+      await fetch('/api/overrides-set', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({key: '_plan_index', value: existing})
+      });
+    }
+  } catch(e) { console.warn('Could not mark strategies:', e.message); }
+}
+
+function openEffectivenessModal(logId, strategies) {
+  const existing = document.getElementById('effectModal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'effectModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:460px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="font-size:16px;font-weight:700;color:var(--gray-800);margin-bottom:4px">Before closing this plan...</div>
+    <div style="font-size:13px;color:var(--gray-500);margin-bottom:1rem">Which strategies actually worked? This helps the AI make better recommendations for future plans at your school.</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1.25rem">
+      ${strategies.map((s,i) => `<label style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1.5px solid var(--gray-200);border-radius:8px;cursor:pointer;font-size:13px">
+        <input type="checkbox" id="eff_${i}" value="${s}" style="width:16px;height:16px;accent-color:var(--purple)">
+        ${s}
+      </label>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="document.getElementById('effectModal').remove();closeLogWithoutTracking('${logId}')" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Skip</button>
+      <button onclick="saveEffectiveness('${logId}',${strategies.length})" style="padding:8px 16px;background:var(--purple);color:white;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save & Close Plan</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+async function saveEffectiveness(logId, count) {
+  const effective = [];
+  for (let i = 0; i < count; i++) {
+    const cb = document.getElementById(`eff_${i}`);
+    if (cb?.checked) effective.push(cb.value);
+  }
+  document.getElementById('effectModal')?.remove();
+  await markStrategiesEffective(logId, effective);
+  closeLogWithoutTracking(logId);
+}
+
+function closeLogWithoutTracking(id) {
+  try {
+    const logs = JSON.parse(localStorage.getItem('bic_logs') || '[]');
+    const log = logs.find(l => l.id === id);
+    if (log) { log.status = 'closed'; localStorage.setItem('bic_logs', JSON.stringify(logs)); }
+    renderLogs();
+  } catch(e) {}
+}
+
+async function showAdminInsights() {
+  try {
+    const res = await fetch('/api/overrides-get?key=_plan_index');
+    const plans = Object.values(res.ok ? (await res.json()).overrides || {} : {});
+
+    const existing = document.getElementById('insightsModal');
+    if (existing) existing.remove();
+
+    if (!plans.length) {
+      alert('No plans have been generated yet. Insights will appear after educators start using the tool.');
+      return;
+    }
+
+    // Aggregate
+    const total = plans.length;
+    const buildings = {};
+    const buckets = {};
+    const strategies = {};
+    const effective = {};
+    const trauma = {};
+    const byDate = {};
+
+    plans.forEach(p => {
+      if (p.building) buildings[p.building] = (buildings[p.building] || 0) + 1;
+      if (p.bucket) buckets[p.bucket] = (buckets[p.bucket] || 0) + 1;
+      (p.strategies || []).forEach(s => { strategies[s] = (strategies[s] || 0) + 1; });
+      (p.effective_strategies || []).forEach(s => { effective[s] = (effective[s] || 0) + 1; });
+      if (p.trauma && p.trauma !== 'none') trauma[p.trauma] = (trauma[p.trauma] || 0) + 1;
+      const week = p.date ? p.date.split(',')[0] : 'Unknown';
+      byDate[week] = (byDate[week] || 0) + 1;
+    });
+
+    const topBuckets = Object.entries(buckets).sort((a,b)=>b[1]-a[1]);
+    const topStrategies = Object.entries(strategies).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const topEffective = Object.entries(effective).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const topTrauma = Object.entries(trauma).sort((a,b)=>b[1]-a[1]);
+    const topBuildings = Object.entries(buildings).sort((a,b)=>b[1]-a[1]);
+
+    const modal = document.createElement('div');
+    modal.id = 'insightsModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto';
+    modal.innerHTML = `<div style="background:white;border-radius:16px;padding:1.5rem;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;padding-bottom:10px;border-bottom:1px solid var(--gray-100)">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--gray-800)">School Insights</div>
+          <div style="font-size:12px;color:var(--gray-400)">${total} plans generated across your school</div>
+        </div>
+        <button onclick="document.getElementById('insightsModal').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-400)">&times;</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem">
+        <div style="background:var(--purple-light);border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:28px;font-weight:800;color:var(--purple)">${total}</div>
+          <div style="font-size:12px;color:var(--purple)">Plans Generated</div>
+        </div>
+        <div style="background:#DCFCE7;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:28px;font-weight:800;color:#14532D">${Object.keys(buildings).length}</div>
+          <div style="font-size:12px;color:#14532D">Buildings</div>
+        </div>
+        <div style="background:#FEF3C7;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:28px;font-weight:800;color:#92400E">${Object.keys(effective).length}</div>
+          <div style="font-size:12px;color:#92400E">Effective Strategies Confirmed</div>
+        </div>
+      </div>
+
+      ${topBuildings.length ? `<div style="margin-bottom:1.25rem">
+        <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">Plans by Building</div>
+        ${topBuildings.map(([b,c])=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--gray-100);font-size:13px"><span>${b}</span><span style="font-weight:700;color:var(--purple)">${c} plans</span></div>`).join('')}
+      </div>` : ''}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">Intervention Buckets</div>
+          ${topBuckets.map(([b,c])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100);font-size:12px"><span style="text-transform:capitalize">${b}</span><span style="font-weight:700;color:${bColor(b)}">${c} (${Math.round(c/total*100)}%)</span></div>`).join('')}
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">Trauma Responses</div>
+          ${topTrauma.length ? topTrauma.map(([t,c])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-100);font-size:12px"><span style="text-transform:capitalize">${t}</span><span style="font-weight:700">${c}</span></div>`).join('') : '<div style="font-size:12px;color:var(--gray-400)">Not yet tracked</div>'}
+        </div>
+      </div>
+
+      <div style="margin-bottom:1.25rem">
+        <div style="font-size:13px;font-weight:700;color:var(--gray-700);margin-bottom:8px">Most Recommended Strategies</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${topStrategies.map(([s,c])=>`<span style="background:var(--gray-100);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--gray-700)">${s} <span style="color:var(--purple)">${c}x</span></span>`).join('')}
+        </div>
+      </div>
+
+      ${topEffective.length ? `<div style="background:#DCFCE7;border-radius:10px;padding:12px;margin-bottom:1.25rem">
+        <div style="font-size:13px;font-weight:700;color:#14532D;margin-bottom:8px">Confirmed Effective by Educators</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${topEffective.map(([s,c])=>`<span style="background:white;border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:#14532D">${s} <span style="color:#16A34A">${c} educators</span></span>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div style="text-align:center;padding-top:10px;border-top:1px solid var(--gray-100)">
+        <div style="font-size:11px;color:var(--gray-400)">Data is anonymized. No student names or identifying information is stored.</div>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+  } catch(e) { alert('Could not load insights: ' + e.message); }
 }
 
 // ============================================================
