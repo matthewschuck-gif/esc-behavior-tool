@@ -956,8 +956,7 @@ async function generatePlanCore() {
   const intensity = getIntensity();
   const returningContext = getReturningContext();
   let schoolContext = '';
-  // School context temporarily disabled while debugging
-  // try { schoolContext = await loadSchoolContext(); } catch(e) {}
+  try { schoolContext = await loadSchoolContext(); } catch(e) { console.warn('School context failed:', e); }
   const teacherName = 'Educator';
   const teacherBuilding = '';
 
@@ -2922,53 +2921,27 @@ async function autoLogPlanToUpstash(plan) {
 
 async function loadSchoolContext() {
   try {
-    // Fetch all plan logs from Upstash
     const res = await fetch('/api/overrides-get?key=_plan_index');
     if (!res.ok) return '';
-    const data = await res.json();
-    const index = data.overrides || {};
-    if (!Object.keys(index).length) return '';
+    const d = await res.json();
+    const plans = Object.values(d.overrides || {});
+    if (plans.length < 3) return ''; // not enough data yet
 
-    const plans = Object.values(index);
-    if (!plans.length) return '';
-
-    // Aggregate patterns
-    const bucketCounts = {};
-    const strategyCounts = {};
-    const traumaCounts = {};
-    const observableCounts = {};
-    const effectiveStrategies = {};
-
+    const buckets = {}, strategies = {}, effective = {};
     plans.forEach(p => {
-      // Buckets
-      bucketCounts[p.bucket] = (bucketCounts[p.bucket] || 0) + 1;
-      // Strategies
-      (p.strategies || []).forEach(s => { strategyCounts[s] = (strategyCounts[s] || 0) + 1; });
-      // Effective strategies
-      (p.effective_strategies || []).forEach(s => { effectiveStrategies[s] = (effectiveStrategies[s] || 0) + 1; });
-      // Trauma
-      if (p.trauma && p.trauma !== 'none') traumaCounts[p.trauma] = (traumaCounts[p.trauma] || 0) + 1;
-      // Observables
-      (p.observables || []).forEach(o => { observableCounts[o] = (observableCounts[o] || 0) + 1; });
+      if (p.bucket) buckets[p.bucket] = (buckets[p.bucket]||0)+1;
+      (p.strategies||[]).forEach(s => { strategies[s]=(strategies[s]||0)+1; });
+      (p.effective_strategies||[]).forEach(s => { effective[s]=(effective[s]||0)+1; });
     });
 
-    const topBuckets = Object.entries(bucketCounts).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${k} (${v} plans)`).join(', ');
-    const topStrategies = Object.entries(strategyCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} (${v}x)`).join(', ');
-    const topEffective = Object.entries(effectiveStrategies).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>`${k} (${v} educators confirmed effective)`).join(', ');
-    const topTrauma = Object.entries(traumaCounts).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,v])=>`${k} (${v} plans)`).join(', ');
-    const topObservables = Object.entries(observableCounts).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k])=>k).join(', ');
+    const topBucket = Object.entries(buckets).sort((a,b)=>b[1]-a[1])[0]?.[0] || '';
+    const topStrats = Object.entries(strategies).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k])=>k).join(', ');
+    const topEffective = Object.entries(effective).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k])=>k).join(', ');
 
-    return `\n\nSCHOOL LEARNING CONTEXT (${plans.length} plans generated at this school):
-Most common intervention buckets: ${topBuckets || 'N/A'}
-Most frequently recommended strategies: ${topStrategies || 'N/A'}
-Strategies confirmed effective by educators: ${topEffective || 'Not yet tracked'}
-Most common trauma responses: ${topTrauma || 'N/A'}
-Most common observables: ${topObservables || 'N/A'}
-Use this context to inform your recommendations — prioritize strategies confirmed effective in this school when appropriate, and be aware of patterns that may indicate school-wide needs.`;
-  } catch(e) {
-    console.warn('Could not load school context:', e.message);
-    return '';
-  }
+    let ctx = `\nSCHOOL DATA (${plans.length} plans): Top bucket: ${topBucket}. Most used: ${topStrats}.`;
+    if (topEffective) ctx += ` Confirmed effective: ${topEffective}.`;
+    return ctx;
+  } catch(e) { return ''; }
 }
 
 async function updatePlanIndex(entry) {
