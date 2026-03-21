@@ -476,7 +476,7 @@ async function callAPI(messages, maxTokens) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({model:'claude-opus-4-6', max_tokens: maxTokens || 4000, messages})
+    body: JSON.stringify({model:'claude-sonnet-4-5', max_tokens: maxTokens || 4000, messages})
   });
   const j = await res.json();
   if (!res.ok) throw new Error(j.error || 'Server error');
@@ -956,7 +956,8 @@ async function generatePlanCore() {
   const intensity = getIntensity();
   const returningContext = getReturningContext();
   let schoolContext = '';
-  try { schoolContext = await loadSchoolContext(); } catch(e) { console.warn('School context failed:', e); }
+  // School context temporarily disabled while debugging
+  // try { schoolContext = await loadSchoolContext(); } catch(e) {}
   const teacherName = 'Educator';
   const teacherBuilding = '';
 
