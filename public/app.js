@@ -992,13 +992,24 @@ CRITICAL PERSONALIZATION INSTRUCTIONS:
 5. Work WITH the student (Social Discipline Window). Best intervention fits STUDENT, TEACHER, and ENVIRONMENT.
 6. Use effort-based and behavior-specific praise only.
 
-Respond ONLY with valid JSON, no markdown:
+Respond ONLY with valid JSON. No markdown, no backticks, no newlines inside string values, no apostrophes in text (use "it is" not "it's"). All string values must use escaped double quotes:
 {'scientist_summary':'...','trauma_type':'none','trauma_guidance':'...','social_discipline_note':'...','primary_bucket':'connection|awareness|skills|regulation','secondary_bucket':'none','bucket_rationale':'...','priority':'low|moderate|high','tags':['tag'],'rapport_connection':'...','educator_connection':'...','try_first':[{'name':'strategy','bucket':'connection','why':'why','the_moves':'steps'},{'name':'strategy','bucket':'skills','why':'why','the_moves':'steps'},{'name':'strategy','bucket':'regulation','why':'why','the_moves':'steps'}],'also_consider':[{'name':'strategy','bucket':'connection','why':'why'},{'name':'strategy','bucket':'skills','why':'why'}],'what_to_say':'...','what_not_to_do':'...','environment_fits':['adj1','adj2','adj3'],'review_by':'6-8 school weeks'}`}]);
 
     let txt = response.replace(/```json|```/g, '').trim();
     const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
     if (start > -1 && end > -1) txt = txt.slice(start, end + 1);
-    const plan = JSON.parse(txt);
+    // Clean common JSON issues from AI output
+    txt = txt.replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ') // control chars
+             .replace(/,\s*}/g, '}')   // trailing commas in objects
+             .replace(/,\s*]/g, ']');  // trailing commas in arrays
+    let plan;
+    try {
+      plan = JSON.parse(txt);
+    } catch(parseErr) {
+      // Try to salvage by extracting key fields manually
+      console.error('JSON parse failed:', parseErr.message, txt.slice(7500, 7600));
+      throw new Error('The AI response had a formatting issue. Please try again — this usually resolves itself.');
+    }
     btn.disabled = false; dots.classList.add('hidden');
     showResults(plan);
   } catch(e) {
