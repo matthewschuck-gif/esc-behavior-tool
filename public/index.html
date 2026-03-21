@@ -261,59 +261,21 @@ textarea:focus,input:focus,select:focus{outline:none;border-color:var(--purple);
   .quick-search-fab{bottom:70px!important}
 }
 @media print{
-  /* Hide navigation and interactive elements */
   .nav-tabs,.progress-wrap,.btn-row,.action-row,.header,.rule-bar,
   #siteFooter,#adminBanner,#trialBanner,.quick-search-fab,
   .tour-overlay,.pw-gate{display:none!important}
-  /* Reset page */
-  body{background:white;font-size:12pt;color:#000;margin:0;padding:0}
-  .page{display:block!important}
+  body{background:white}
+  .page{display:none!important}
+  #page-tool{display:block!important}
   #form{display:none!important}
   #results{display:block!important}
-  /* Print header */
-  #results::before{
-    content:'Behavior Intervention Plan';
-    display:block;
-    font-size:18pt;
-    font-weight:800;
-    color:#3B0764;
-    border-bottom:3px solid #F59E0B;
-    padding-bottom:8pt;
-    margin-bottom:12pt;
-  }
-  /* Cards */
-  .rcard,.card{
-    box-shadow:none!important;
-    border:1px solid #ddd!important;
-    break-inside:avoid;
-    margin-bottom:8pt!important;
-    padding:10pt!important;
-  }
-  .r-header{
-    background:#3B0764!important;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
-    color:white!important;
-    border-radius:8pt!important;
-    padding:12pt!important;
-    margin-bottom:10pt!important;
-    break-inside:avoid;
-  }
-  .r-title{font-size:16pt!important}
-  .r-summary{font-size:11pt!important}
-  /* Colored boxes */
-  [style*="background:#FEF3C7"],[style*="background:#EDE9FE"],
-  [style*="background:#DCFCE7"],[style*="background:#DBEAFE"],
-  [style*="background:#FFFBEB"],[style*="background:#F0FDF4"],
-  [style*="background:#FEF2F2"]{
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
-  }
-  /* Side-by-side becomes stacked */
+  .returning-banner{display:none!important}
+  #sotdCard{display:none!important}
+  .rcard,.card{box-shadow:none!important;border:1px solid #ddd!important;break-inside:avoid}
+  .r-header{background:#3B0764!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:white!important;border-radius:8pt!important;padding:12pt!important;margin-bottom:10pt!important;break-inside:avoid}
+  [style*="background:#FEF3C7"],[style*="background:#EDE9FE"],[style*="background:#DCFCE7"],[style*="background:#DBEAFE"],[style*="background:#FFFBEB"],[style*="background:#F0FDF4"],[style*="background:#FEF2F2"]{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   [style*="grid-template-columns"]{grid-template-columns:1fr!important;display:block!important}
   .int-moves{background:#f5f5f5!important;border-left:3px solid #5B21B6!important}
-  .tag{border:1px solid #ddd!important}
-  /* Page setup */
   @page{margin:1.5cm;size:A4}
 }
 
