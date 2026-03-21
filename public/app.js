@@ -472,15 +472,30 @@ function detectTrauma(obs) {
 // ============================================================
 // API CALL
 // ============================================================
-async function callAPI(messages) {
+async function callAPI(messages, maxTokens) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({model:'claude-opus-4-6', max_tokens:2500, messages})
+    body: JSON.stringify({model:'claude-opus-4-6', max_tokens: maxTokens || 4000, messages})
   });
   const j = await res.json();
   if (!res.ok) throw new Error(j.error || 'Server error');
   return j.content?.[0]?.text || '';
+}
+
+function repairJSON(txt) {
+  // Remove markdown fences
+  txt = txt.replace(/```json|```/g, '').trim();
+  // Extract just the JSON object
+  const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
+  if (start > -1 && end > -1) txt = txt.slice(start, end + 1);
+  // Remove control characters
+  txt = txt.replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ');
+  // Fix trailing commas
+  txt = txt.replace(/,(\s*[}\]])/g, '$1');
+  // Fix unescaped apostrophes in values (basic fix)
+  txt = txt.replace(/"([^"]*)'([^"]*)"/g, (m, a, b) => `"${a}${b}"`);
+  return txt;
 }
 
 // ============================================================
@@ -995,20 +1010,13 @@ CRITICAL PERSONALIZATION INSTRUCTIONS:
 Respond ONLY with valid JSON. No markdown, no backticks, no newlines inside string values, no apostrophes in text (use "it is" not "it's"). All string values must use escaped double quotes:
 {'scientist_summary':'...','trauma_type':'none','trauma_guidance':'...','social_discipline_note':'...','primary_bucket':'connection|awareness|skills|regulation','secondary_bucket':'none','bucket_rationale':'...','priority':'low|moderate|high','tags':['tag'],'rapport_connection':'...','educator_connection':'...','try_first':[{'name':'strategy','bucket':'connection','why':'why','the_moves':'steps'},{'name':'strategy','bucket':'skills','why':'why','the_moves':'steps'},{'name':'strategy','bucket':'regulation','why':'why','the_moves':'steps'}],'also_consider':[{'name':'strategy','bucket':'connection','why':'why'},{'name':'strategy','bucket':'skills','why':'why'}],'what_to_say':'...','what_not_to_do':'...','environment_fits':['adj1','adj2','adj3'],'review_by':'6-8 school weeks'}`}]);
 
-    let txt = response.replace(/```json|```/g, '').trim();
-    const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
-    if (start > -1 && end > -1) txt = txt.slice(start, end + 1);
-    // Clean common JSON issues from AI output
-    txt = txt.replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ') // control chars
-             .replace(/,\s*}/g, '}')   // trailing commas in objects
-             .replace(/,\s*]/g, ']');  // trailing commas in arrays
+    let txt = repairJSON(response);
     let plan;
     try {
       plan = JSON.parse(txt);
     } catch(parseErr) {
-      // Try to salvage by extracting key fields manually
-      console.error('JSON parse failed:', parseErr.message, txt.slice(7500, 7600));
-      throw new Error('The AI response had a formatting issue. Please try again — this usually resolves itself.');
+      console.error('JSON parse failed at:', parseErr.message);
+      throw new Error('The AI response had a formatting issue. Please try again.');
     }
     btn.disabled = false; dots.classList.add('hidden');
     showResults(plan);
@@ -1395,9 +1403,7 @@ This is an escalation. Generate a deeper, more intensive plan. Assume Tier 2 int
 Respond ONLY with valid JSON no markdown:
 {"escalation_summary":"2-3 sentences on what the pattern of attempts reveals and why this requires a deeper response","tier_recommendation":"Tier 2|Tier 3","tier_rationale":"1-2 sentences explaining tier recommendation","primary_bucket":"connection|awareness|skills|regulation","secondary_bucket":"connection|awareness|skills|regulation|none","bucket_rationale":"rationale","priority":"moderate|high","tags":["tag1","tag2"],"try_first":[{"name":"strategy name — must NOT be in already tried list","bucket":"connection|awareness|skills|regulation","why":"why this deeper approach is warranted now","the_moves":"3-4 specific implementation steps more intensive than previous attempts"},{"name":"...","bucket":"...","why":"...","the_moves":"..."},{"name":"...","bucket":"...","why":"...","the_moves":"..."}],"also_consider":[{"name":"strategy name","bucket":"...","why":"brief rationale"},{"name":"...","bucket":"...","why":"..."}],"what_to_say":"2-3 sentences the educator can say to this student — acknowledging the relationship while signaling a new approach","what_changed":"1-2 sentences on what must be done differently this time based on what the progress notes reveal","who_to_loop_in":["specific person or role 1","specific person or role 2","specific person or role 3"],"formal_referral":"yes|no","referral_rationale":"1 sentence on whether a formal referral or team meeting is now warranted and why","review_by":"recommendation referencing 6-8 consecutive school weeks"}`}]);
 
-    let txt = response.replace(/```json|```/g,'').trim();
-    const start = txt.indexOf('{'), end = txt.lastIndexOf('}');
-    if (start > -1 && end > -1) txt = txt.slice(start, end+1);
+    let txt = repairJSON(response);
     const plan = JSON.parse(txt);
     showDeeperResults(plan, log);
   } catch(e) {
