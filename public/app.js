@@ -2388,11 +2388,14 @@ function toggleDark() {
 }
 
 function initDark() {
-  if (localStorage.getItem('bic_dark') === '1') {
+  const pref = localStorage.getItem('bic_dark');
+  const isDark = pref === null ? true : pref === '1';
+  if (isDark) {
     document.body.classList.add('dark');
     const btn = document.getElementById('darkBtn');
     if (btn) btn.innerHTML = '&#9728; Light';
   }
+  if (pref === null) localStorage.setItem('bic_dark', '1');
 }
 
 // ============================================================
