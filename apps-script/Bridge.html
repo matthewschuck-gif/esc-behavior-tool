@@ -1,0 +1,142 @@
+<style>
+.bic-bar { position: fixed; right: 14px; bottom: 76px; z-index: 600; display: flex; gap: 8px; flex-direction: column; align-items: flex-end; }
+.bic-chip { background: #3b0764; color: #fff; border: none; border-radius: 999px; padding: 8px 14px; font: 600 12px/1.2 Geist, system-ui, sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,.25); cursor: pointer; }
+.bic-student { background: #ede9fe; color: #3b0764; border: 1.5px solid #7c3aed; border-radius: 10px; padding: 8px 12px; font: 13px/1.4 Geist, system-ui, sans-serif; max-width: 280px; }
+</style>
+<script>
+/**
+ * Connects the original BIC page (App.html, unchanged apart from its password gate) to this
+ * Apps Script project:
+ *  - its fetch('/api/…') calls go to bicApi / bicUploadImage instead of Vercel;
+ *  - sign-in: EASD mode uses the Google account (no gate); OPEN mode checks the password on
+ *    the server (bicSignIn);
+ *  - Saved Plans (localStorage 'bic_logs') are copied to and from the teacher's rows in the
+ *    Sheet, so they follow the teacher to any device;
+ *  - a link with ?id=800# (from Climb-er or Follow-Up) ties plans saved this visit to that
+ *    student. The 800# is stored with the plan only; it is never sent to the AI.
+ */
+(function () {
+  var BOOT = <?!= boot ?>;
+  window.BIC_BOOT = BOOT;
+  var token = '';
+
+  function run(fn) {
+    var args = Array.prototype.slice.call(arguments, 1);
+    return new Promise(function (resolve, reject) {
+      var r = google.script.run
+        .withSuccessHandler(function (t) { try { resolve(typeof t === 'string' && t ? JSON.parse(t) : t); } catch (e) { resolve(t); } })
+        .withFailureHandler(function (e) { reject(new Error(String((e && e.message) || e).replace(/^Exception:\s*/, ''))); });
+      r[fn].apply(r, args);
+    });
+  }
+  window.bicRun_ = run;
+
+  window.bicSignIn_ = function (pw) {
+    return run('bicSignIn', pw).then(function (r) { token = r.token; return r.role; });
+  };
+
+  // A Response-like object for the page's existing fetch(...).then(r => r.json()) code.
+  function reply(ok, data) {
+    return { ok: ok, status: ok ? 200 : 500, json: function () { return Promise.resolve(data); }, text: function () { return Promise.resolve(JSON.stringify(data)); } };
+  }
+  function fileToBase64(file) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () { resolve(String(fr.result).split(',')[1] || ''); };
+      fr.onerror = reject;
+      fr.readAsDataURL(file);
+    });
+  }
+  var realFetch = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function (url, opts) {
+    if (typeof url !== 'string' || url.indexOf('/api/') !== 0) return realFetch(url, opts);
+    opts = opts || {};
+    var parts = url.slice(5).split('?');
+    var path = parts[0], query = {};
+    (parts[1] || '').split('&').forEach(function (kv) { if (kv) { var p = kv.split('='); query[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ''); } });
+    var call;
+    if (path === 'upload-image') {
+      var h = opts.headers || {};
+      call = fileToBase64(opts.body).then(function (b64) { return run('bicUploadImage', token, h['x-filename'] || 'image.png', h['Content-Type'] || (opts.body && opts.body.type) || 'image/png', b64); });
+    } else {
+      call = run('bicApi', token, (opts.method || 'GET').toUpperCase(), path, query, typeof opts.body === 'string' ? opts.body : '');
+    }
+    return call.then(function (d) { return reply(true, d); }, function (e) { return reply(false, { error: e.message }); });
+  };
+
+  // ── Saved Plans ↔ the Sheet (EASD mode: the teacher's Google account) ──
+  var LOGS = 'bic_logs', OWNER = 'bic_logs_owner';
+  var realSet = Storage.prototype.setItem;
+  var pageStart = new Date().toISOString();
+  var saveTimer = null;
+  function pushPlans(json) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function () { run('bicSavePlans', token, json).catch(function (e) { console.warn('Plans not saved to the Sheet:', e.message); }); }, 1200);
+  }
+  if (BOOT.mode === 'EASD' && BOOT.email) {
+    Storage.prototype.setItem = function (k, v) {
+      if (this === window.localStorage && k === LOGS) {
+        // Plans saved during a visit opened from a student's page carry that student's 800#.
+        if (BOOT.student) {
+          try {
+            var list = JSON.parse(v);
+            list.forEach(function (p) { if (!p.student && String(p.savedAt || '') >= pageStart) p.student = BOOT.student; });
+            v = JSON.stringify(list);
+          } catch (e) { /* leave as is */ }
+        }
+        realSet.call(this, k, v);
+        pushPlans(v);
+        return;
+      }
+      return realSet.apply(this, arguments);
+    };
+    run('bicMyPlans', token).then(function (plans) {
+      if (!Array.isArray(plans)) return;
+      var local = [];
+      try { if (localStorage.getItem(OWNER) === BOOT.email) local = JSON.parse(localStorage.getItem(LOGS) || '[]'); } catch (e) {}
+      var byId = {};
+      plans.forEach(function (p) { byId[p.id] = p; });
+      var onlyHere = local.filter(function (p) { return !byId[p.id]; }); // saved here before the Sheet had them
+      var merged = onlyHere.concat(plans);
+      realSet.call(localStorage, OWNER, BOOT.email);
+      realSet.call(localStorage, LOGS, JSON.stringify(merged));
+      if (onlyHere.length) pushPlans(JSON.stringify(merged));
+      if (typeof window.updateLogBadge === 'function') try { window.updateLogBadge(); } catch (e) {}
+    }).catch(function (e) { console.warn('Could not load saved plans:', e.message); });
+  }
+
+  // ── Sign-in and the small floating bar ──
+  function start() {
+    var gate = document.getElementById('pwGate');
+    if (BOOT.mode === 'EASD') {
+      if (!BOOT.allowed) {
+        if (gate) gate.querySelector('.pw-sub').innerHTML = 'Please open this with your school Google account' + (BOOT.email ? ' (you are signed in as ' + BOOT.email + ').' : '.');
+        ['pwInput'].forEach(function (id) { var el = document.getElementById(id); if (el) el.style.display = 'none'; });
+        var btn = gate && gate.querySelector('.pw-btn'); if (btn) btn.style.display = 'none';
+        return;
+      }
+      if (gate) gate.style.display = 'none';
+      try { setTimeout(window.maybeShowTour, 800); } catch (e) {}
+    }
+    var bar = document.createElement('div');
+    bar.className = 'bic-bar';
+    if (BOOT.student) {
+      bar.innerHTML += '<div class="bic-student">🧭 Plans you save now are linked to student <b>' + BOOT.student +
+        '</b> in Define a Climb-er. Still use initials only in the steps.</div>';
+    }
+    if (BOOT.mode === 'EASD' && BOOT.admin) {
+      var edit = document.createElement('button');
+      edit.className = 'bic-chip';
+      edit.textContent = '✏️ Edit mode';
+      edit.onclick = function () {
+        window.isAdminMode = true;
+        try { window.enableAdminMode(); } catch (e) {}
+        edit.remove();
+      };
+      bar.appendChild(edit);
+    }
+    if (bar.innerHTML) document.body.appendChild(bar);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+})();
+</script>
