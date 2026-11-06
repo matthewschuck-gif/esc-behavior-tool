@@ -199,4 +199,18 @@ test('import unwraps the old site\'s { value: "<JSON>" } layers (they were copie
   assert.strictEqual(JSON.stringify(w.unwrapOverrides_({ value: 'not json' })), '{}');
 });
 
+test('the password box is hidden by the server for school accounts in EASD mode, shown otherwise', () => {
+  const page = user => {
+    const w = world({ user });
+    let t = {};
+    w.HtmlService.createTemplateFromFile = () => { t = { evaluate: () => { const o = { setTitle: () => o, addMetaTag: () => o, setXFrameOptionsMode: () => o }; return o; } }; return t; };
+    w.HtmlService.XFrameOptionsMode = { ALLOWALL: 1 };
+    w.doGet({ parameter: {} });
+    return t.gateStyle;
+  };
+  assert.strictEqual(page('teacher@easdpa.org'), ' style="display:none"');
+  assert.strictEqual(page('someone@gmail.com'), '', 'not a school account: the box stays (it says to use the school account)');
+  assert.ok(/<div class="pw-gate" id="pwGate"<\?!= gateStyle \?>>/.test(fs.readFileSync(path.join(dir, 'Index.html'), 'utf8')));
+});
+
 console.log('\n' + passed + ' tests passed');

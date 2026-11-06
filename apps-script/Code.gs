@@ -43,6 +43,9 @@ function doGet(e) {
   const id = String((e && e.parameter && e.parameter.id) || '').replace(/\D/g, '');
   if (id && boot.mode === 'EASD') boot.student = id;
   t.boot = JSON.stringify(boot);
+  // EASD mode with a school account: the password box is hidden by the server itself, so it
+  // never shows even if a page script fails to run.
+  t.gateStyle = boot.mode === 'EASD' && boot.allowed ? ' style="display:none"' : '';
   return t.evaluate()
     .setTitle(getSetting_('APP_TITLE') || 'Behavior Intervention Center')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')

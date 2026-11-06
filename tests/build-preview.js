@@ -58,7 +58,8 @@ window.google = { script: { get run() {
   })();
   let html = read('Index.html')
     .replace(/<\?!= include\('([A-Za-z]+)'\); \?>/g, (m, f) => read(f + '.html'))
-    .replace('<?!= boot ?>', boot);
+    .replace('<?!= boot ?>', boot)
+    .replace('<?!= gateStyle ?>', '');  // the preview's page script hides it (doGet does it server-side live)
   return html.replace('<head>', '<head>\n' + fake);
 }
 
