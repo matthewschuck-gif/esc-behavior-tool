@@ -187,7 +187,7 @@ function importFromOldSite_() {
   const get = function (key) {
     const res = UrlFetchApp.fetch(base + '/api/overrides-get' + (key ? '?key=' + encodeURIComponent(key) : ''), { muteHttpExceptions: true });
     if (res.getResponseCode() !== 200) return {};
-    return (JSON.parse(res.getContentText()).overrides) || {};
+    return unwrapOverrides_(JSON.parse(res.getContentText()).overrides);
   };
   const all = get('strategy_overrides');
   // Older versions also kept these as separate keys; the copy inside strategy_overrides is newer.
@@ -224,4 +224,16 @@ function menuImport_() {
   if (ok !== ui.Button.OK) return;
   const r = importFromOldSite_();
   ui.alert('Copied ' + r.keys + ' items and ' + r.images + ' images.');
+}
+
+// The old site's KV saved each edit as { value: "<JSON text>" }, and its saves wrapped what was
+// already there, so one key could arrive as { value: '{"value":"{\"value\":…}"}' } many times
+// over. Peel those layers off until the real overrides object is left.
+function unwrapOverrides_(o) {
+  for (let i = 0; i < 100; i++) {
+    if (typeof o === 'string') { try { o = JSON.parse(o); } catch (e) { return {}; } continue; }
+    if (o && typeof o === 'object' && !Array.isArray(o) && Object.keys(o).length === 1 && 'value' in o) { o = o.value; continue; }
+    break;
+  }
+  return o && typeof o === 'object' && !Array.isArray(o) ? o : {};
 }

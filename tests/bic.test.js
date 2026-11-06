@@ -189,4 +189,14 @@ test('page files: no passwords, the gate calls the server, scripts parse', () =>
   assert.ok(/bicSignIn_\(val\)/.test(fs.readFileSync(path.join(dir, 'App.html'), 'utf8')));
 });
 
+test('import unwraps the old site\'s { value: "<JSON>" } layers (they were copied as one "value" key)', () => {
+  const w = world({ user: 'owner@easdpa.org' });
+  let layered = JSON.stringify({ strat_breathing: { name: 'Box breathing' }, _emotions: { calm: 'blue' } });
+  for (let i = 0; i < 6; i++) layered = JSON.stringify({ value: layered });
+  assert.deepStrictEqual(Object.keys(w.unwrapOverrides_({ value: layered })).sort(), ['_emotions', 'strat_breathing']);
+  assert.deepStrictEqual(JSON.parse(JSON.stringify(w.unwrapOverrides_({ a: 1 }))), { a: 1 }, 'plain overrides pass through');
+  assert.strictEqual(JSON.stringify(w.unwrapOverrides_(null)), '{}');
+  assert.strictEqual(JSON.stringify(w.unwrapOverrides_({ value: 'not json' })), '{}');
+});
+
 console.log('\n' + passed + ' tests passed');
