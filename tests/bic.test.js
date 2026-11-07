@@ -213,4 +213,57 @@ test('the password box is hidden by the server for school accounts in EASD mode,
   assert.ok(/<div class="pw-gate" id="pwGate"<\?!= gateStyle \?>>/.test(fs.readFileSync(path.join(dir, 'Index.html'), 'utf8')));
 });
 
+// Apps Script fills in server tags only in the template (Index.html); include() pastes the other
+// files raw. A tag in Bridge.html reached the live page as text: its script failed to parse.
+function livePage(boot) {
+  const read = f => fs.readFileSync(path.join(dir, f), 'utf8');
+  return read('Index.html')
+    .replace('<?!= boot ?>', JSON.stringify(boot))
+    .replace('<?!= gateStyle ?>', '')
+    .replace(/<\?!= include\('([A-Za-z]+)'\); \?>/g, (m, f) => read(f + '.html'));
+}
+
+test('the page as Apps Script builds it: no server tags left, every script parses', () => {
+  for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.html') && f !== 'Index.html')) {
+    assert.ok(!/<\?/.test(fs.readFileSync(path.join(dir, f), 'utf8')), f + ' is included raw, so it cannot hold <? ?> tags');
+  }
+  const page = livePage({ mode: 'EASD', email: 't@easdpa.org', allowed: true });
+  assert.ok(!/<\?/.test(page), 'a server tag was left in the page');
+  const scripts = [...page.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+  scripts.forEach((s, i) => new vm.Script(s, { filename: 'script' + i }));
+  assert.ok(scripts.some(s => /window\.BIC_BOOT = \{"mode":"EASD"/.test(s)), 'boot info comes before Bridge');
+});
+
+test('Bridge runs when Chrome blocks storage in Google\'s frame, and saved plans still reach the Sheet', () => {
+  const bridge = [...fs.readFileSync(path.join(dir, 'Bridge.html'), 'utf8').matchAll(/<script>([\s\S]*?)<\/script>/g)][0][1];
+  const calls = [];
+  const timers = [];
+  function Storage() {}
+  const win = {
+    BIC_BOOT: { mode: 'EASD', email: 't@easdpa.org', allowed: true, student: '8001234' },
+    fetch: () => {},
+    setTimeout: (f) => { timers.push(f); }, clearTimeout() {},
+    google: { script: { get run() {
+      let ok = () => {};
+      const r = new Proxy({}, { get: (t, n) => n === 'withSuccessHandler' ? f => { ok = f; return r; } : n === 'withFailureHandler' ? () => r : (...a) => { calls.push([n, ...a]); ok(n === 'bicMyPlans' ? [] : 'ok'); } });
+      return r;
+    } } },
+  };
+  Object.defineProperty(win, 'localStorage', { configurable: true, get() { throw new Error('SecurityError: Access is denied'); } });
+  win.window = win;
+  const ctx = vm.createContext(Object.assign(win, {
+    Storage, Promise, JSON, Object, Array, String, Date, Error,
+    document: { readyState: 'complete', getElementById: () => null, createElement: () => ({ appendChild() {} }), body: { appendChild() {} } },
+  }));
+  vm.runInContext(bridge, ctx);
+  const ls = ctx.localStorage;
+  ls.setItem('bic_dark', '1');
+  assert.strictEqual(ls.getItem('bic_dark'), '1', 'a stand-in store is used for the visit');
+  ls.setItem('bic_logs', JSON.stringify([{ id: 'p1', savedAt: new Date(Date.now() + 1000).toISOString() }]));
+  timers.forEach(f => typeof f === 'function' && f());
+  const saved = calls.find(c => c[0] === 'bicSavePlans');
+  assert.ok(saved, 'plans are sent to the Sheet');
+  assert.strictEqual(JSON.parse(saved[2])[0].student, '8001234', 'the student link still tags the plan');
+});
+
 console.log('\n' + passed + ' tests passed');

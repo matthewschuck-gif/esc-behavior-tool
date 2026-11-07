@@ -4,8 +4,23 @@
     {
       "name": "bic",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", "public", "-p", "4200", "--no-clipboard"],
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "public",
+        "-p",
+        "4200",
+        "--no-clipboard"
+      ],
       "port": 4200
+    },
+    {
+      "name": "bic-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "tests/build-preview.js"
+      ],
+      "port": 3042
     }
   ]
 }

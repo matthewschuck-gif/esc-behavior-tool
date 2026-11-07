@@ -16,8 +16,21 @@
  *    student. The 800# is stored with the plan only; it is never sent to the AI.
  */
 (function () {
-  var BOOT = <?!= boot ?>;
-  window.BIC_BOOT = BOOT;
+  var BOOT = window.BIC_BOOT || {}; // set by Index.html, the only file filled in by the server
+  // Some Chrome settings block storage inside Google's page frame; then every localStorage
+  // call throws (Saved Plans, dark mode). A stand-in kept for this visit keeps the page working.
+  try { window.localStorage.getItem('bic_dark'); } catch (e) {
+    var mem = {};
+    var memStore = {
+      getItem: function (k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; },
+      setItem: function (k, v) { mem[k] = String(v); },
+      removeItem: function (k) { delete mem[k]; },
+      clear: function () { mem = {}; },
+      key: function (i) { return Object.keys(mem)[i] || null; }
+    };
+    Object.defineProperty(memStore, 'length', { get: function () { return Object.keys(mem).length; } });
+    try { Object.defineProperty(window, 'localStorage', { value: memStore, configurable: true }); } catch (e2) { /* stays blocked */ }
+  }
   var token = '';
 
   function run(fn) {
@@ -74,22 +87,28 @@
     saveTimer = setTimeout(function () { run('bicSavePlans', token, json).catch(function (e) { console.warn('Plans not saved to the Sheet:', e.message); }); }, 1200);
   }
   if (BOOT.mode === 'EASD' && BOOT.email) {
-    Storage.prototype.setItem = function (k, v) {
-      if (this === window.localStorage && k === LOGS) {
-        // Plans saved during a visit opened from a student's page carry that student's 800#.
-        if (BOOT.student) {
-          try {
-            var list = JSON.parse(v);
-            list.forEach(function (p) { if (!p.student && String(p.savedAt || '') >= pageStart) p.student = BOOT.student; });
-            v = JSON.stringify(list);
-          } catch (e) { /* leave as is */ }
-        }
-        realSet.call(this, k, v);
-        pushPlans(v);
-        return;
+    var store = window.localStorage, isReal = store instanceof Storage;
+    var plainSet = isReal ? function (k, v) { realSet.call(store, k, v); } : store.setItem;
+    var setPlans = function (v) {
+      // Plans saved during a visit opened from a student's page carry that student's 800#.
+      if (BOOT.student) {
+        try {
+          var list = JSON.parse(v);
+          list.forEach(function (p) { if (!p.student && String(p.savedAt || '') >= pageStart) p.student = BOOT.student; });
+          v = JSON.stringify(list);
+        } catch (e) { /* leave as is */ }
       }
-      return realSet.apply(this, arguments);
+      plainSet(LOGS, v);
+      pushPlans(v);
     };
+    if (isReal) {
+      Storage.prototype.setItem = function (k, v) {
+        if (this === window.localStorage && k === LOGS) return setPlans(v);
+        return realSet.apply(this, arguments);
+      };
+    } else {
+      store.setItem = function (k, v) { if (k === LOGS) return setPlans(v); plainSet(k, v); };
+    }
     run('bicMyPlans', token).then(function (plans) {
       if (!Array.isArray(plans)) return;
       var local = [];
@@ -98,8 +117,8 @@
       plans.forEach(function (p) { byId[p.id] = p; });
       var onlyHere = local.filter(function (p) { return !byId[p.id]; }); // saved here before the Sheet had them
       var merged = onlyHere.concat(plans);
-      realSet.call(localStorage, OWNER, BOOT.email);
-      realSet.call(localStorage, LOGS, JSON.stringify(merged));
+      plainSet(OWNER, BOOT.email);
+      plainSet(LOGS, JSON.stringify(merged));
       if (onlyHere.length) pushPlans(JSON.stringify(merged));
       if (typeof window.updateLogBadge === 'function') try { window.updateLogBadge(); } catch (e) {}
     }).catch(function (e) { console.warn('Could not load saved plans:', e.message); });

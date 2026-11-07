@@ -1,7 +1,8 @@
 // Local preview of the Apps Script version: renders Index.html with its includes and runs the
 // real .gs code in the browser against fake Google services (EASD mode, signed in as the owner,
 // so Edit mode shows; add ?as=teacher to be a regular teacher, ?id=8001234 for a student link).
-// AI answers are canned. node tests/build-preview.js → http://localhost:3042
+// AI answers are canned; ?nostorage acts like Chrome blocking storage in Google's frame.
+// node tests/build-preview.js → http://localhost:3042 (PORT=… for another port)
 const fs = require('fs');
 const path = require('path');
 const http = require('http');
@@ -13,6 +14,7 @@ function build(query) {
   const id = (query.match(/id=(\d+)/) || [])[1] || '';
   const gs = fs.readdirSync(dir).filter(f => f.endsWith('.gs')).sort().map(read).join('\n');
   const fake = `<script>
+${/nostorage/.test(query) ? 'Object.defineProperty(window, "localStorage", { configurable: true, get: function () { throw new DOMException("Access is denied", "SecurityError"); } });' : ''}
 (function () {
   function makeSheet(name) { var s = { rows: [], getName: function () { return name; }, getLastRow: function () { return this.rows.length; },
     getDataRange: function () { var t = this; return { getValues: function () { return t.rows.map(function (r) { return r.slice(); }); } }; },
@@ -56,14 +58,15 @@ window.google = { script: { get run() {
     // Same as doGet: bootInfo_ plus ?id=, evaluated in the page.
     return `(function(){ var b = bootInfo_(); ${id ? `b.student = '${id}';` : ''} return b; })()`;
   })();
+  // Like Apps Script: only Index.html is a template; included files go in as they are.
   let html = read('Index.html')
-    .replace(/<\?!= include\('([A-Za-z]+)'\); \?>/g, (m, f) => read(f + '.html'))
     .replace('<?!= boot ?>', boot)
-    .replace('<?!= gateStyle ?>', '');  // the preview's page script hides it (doGet does it server-side live)
+    .replace('<?!= gateStyle ?>', '')  // the preview's page script hides it (doGet does it server-side live)
+    .replace(/<\?!= include\('([A-Za-z]+)'\); \?>/g, (m, f) => read(f + '.html'));
   return html.replace('<head>', '<head>\n' + fake);
 }
 
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(build(req.url));
-}).listen(3042, () => console.log('Preview on http://localhost:3042'));
+}).listen(process.env.PORT || 3042, () => console.log('Preview on http://localhost:' + (process.env.PORT || 3042)));
