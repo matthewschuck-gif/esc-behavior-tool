@@ -1724,7 +1724,7 @@ function openAddResource(sIdx) {
   showEditModal('Add New Resource', [
     {id:'eTitle', label:'Title', value:''},
     {id:'eDesc', label:'Description', value:'', textarea:true},
-    {id:'eUrl', label:'URL', value:'https://'}
+    {id:'eUrl', label:'URL', value:'https:\/\/'} // written \/\/ : Google strips a // that ends a string as if it were a comment
   ], async () => {
     const t = document.getElementById('eTitle').value.trim();
     const d = document.getElementById('eDesc').value.trim();
@@ -2183,7 +2183,7 @@ function openImageUpload(storageKey, location, onSuccess) {
       <div style="font-size:13px;font-weight:600;color:var(--gray-600)">Click to choose or drag &amp; drop</div>
       <div style="font-size:12px;color:var(--gray-400);margin-top:4px">PNG, JPG, GIF</div>
     </div>
-    <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="handleImgSelect(this,'${storageKey}','${location}')">
+    <input type="file" id="imgFileInput" accept="image/${'*'}" style="display:none" onchange="handleImgSelect(this,'${storageKey}','${location}')">
     <div id="imgUploadStatus" style="font-size:13px;color:var(--gray-500);text-align:center;min-height:20px"></div>
     <div style="display:flex;justify-content:flex-end;margin-top:1rem">
       <button onclick="document.getElementById('imgUploadModal').remove()" style="padding:8px 16px;border:1.5px solid var(--gray-200);border-radius:8px;background:white;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Cancel</button>

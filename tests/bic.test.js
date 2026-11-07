@@ -234,6 +234,25 @@ test('the page as Apps Script builds it: no server tags left, every script parse
   assert.ok(scripts.some(s => /window\.BIC_BOOT = \{"mode":"EASD"/.test(s)), 'boot info comes before Bridge');
 });
 
+// Google strips comments from page scripts before serving them, and not carefully: live,
+// value:'https://' lost everything after the // and App.html failed to parse. So every script
+// must still parse after a crude stripper: // to end of line (unless it is a web address
+// going on, like https://x), and /* ... */ anywhere, even inside strings.
+function crudeStrip(js) {
+  return js
+    .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ''))
+    .split('\n').map(l => l.replace(/(^|[^:\\])\/\/.*$|:\/\/(?=['"`\s]|$).*$/, (m, p) => (p || '') + (m.startsWith('://') ? ':' : ''))).join('\n');
+}
+
+test('scripts survive Google stripping comments (// at the end of a string, /* inside a string)', () => {
+  const page = livePage({ mode: 'EASD', email: 't@easdpa.org', allowed: true });
+  [...page.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].forEach((m, i) => {
+    try { new vm.Script(crudeStrip(m[1]), { filename: 'script' + i }); }
+    catch (e) { const L = crudeStrip(m[1]).split('\n'); const n = Number((e.stack.match(/script\d+:(\d+)/) || [])[1]); throw new Error('script ' + i + ' line ' + n + ': ' + e.message + ' | ' + (L[n - 1] || '').trim().slice(0, 120)); }
+  });
+  assert.throws(() => new vm.Script(crudeStrip("var a = {v:'https://'};")), /Invalid or unexpected token/, 'the stripper reproduces the live failure');
+});
+
 test('Bridge runs when Chrome blocks storage in Google\'s frame, and saved plans still reach the Sheet', () => {
   const bridge = [...fs.readFileSync(path.join(dir, 'Bridge.html'), 'utf8').matchAll(/<script>([\s\S]*?)<\/script>/g)][0][1];
   const calls = [];
