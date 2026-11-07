@@ -1,9 +1,9 @@
 # Behavior Intervention Center: Apps Script version
 
 This replaced the Vercel site on 2026-11-06. behaviorinterventioncenter.com (Vercel, `main`) now
-serves only `public/index.html`, a page that shows this web app full-screen. `api/overrides-get.js`
-is kept, read-only, so **BIC › Copy content from the old site** still works; delete it once the
-content copy is confirmed.
+serves only `public/index.html`, a page that shows this web app full-screen. The old site's
+content was copied into the Content tab, and its `api/` was removed, so **BIC › Copy content from
+the old site** no longer has anything to read.
 
 **What moves where:**
 

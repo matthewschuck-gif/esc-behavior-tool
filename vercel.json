@@ -1,7 +1,13 @@
 {
-  "git": { "deploymentEnabled": { "ready-to-go-live": false } },
+  "git": {
+    "deploymentEnabled": {
+      "ready-to-go-live": false
+    }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/(.*)", "destination": "/public/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/public/index.html"
+    }
   ]
 }
