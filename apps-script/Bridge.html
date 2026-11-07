@@ -38,7 +38,7 @@
     return new Promise(function (resolve, reject) {
       var r = google.script.run
         .withSuccessHandler(function (t) { try { resolve(typeof t === 'string' && t ? JSON.parse(t) : t); } catch (e) { resolve(t); } })
-        .withFailureHandler(function (e) { reject(new Error(String((e && e.message) || e).replace(/^Exception:\s*/, ''))); });
+        .withFailureHandler(function (e) { reject(new Error(String((e && e.message) || e).replace(/^Exception:\s{0,}/, ''))); });
       r[fn].apply(r, args);
     });
   }

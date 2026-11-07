@@ -234,17 +234,17 @@ test('the page as Apps Script builds it: no server tags left, every script parse
   assert.ok(scripts.some(s => /window\.BIC_BOOT = \{"mode":"EASD"/.test(s)), 'boot info comes before Bridge');
 });
 
-// Google strips comments from page scripts before serving them, and not carefully: live,
-// value:'https://' lost everything after the // and App.html failed to parse. So every script
-// must still parse after a crude stripper: // to end of line (unless it is a web address
-// going on, like https://x), and /* ... */ anywhere, even inside strings.
+// Google strips comments from page scripts before serving them, and not carefully: live, it cut
+// 'https://…' strings at the // (single-quoted ones first), and App.html failed to parse. So
+// every script must still parse after the crudest stripper: every /* … */ and every // to the
+// end of its line, quotes or not. Web addresses in scripts are written https:\/\/ for this.
 function crudeStrip(js) {
   return js
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ''))
-    .split('\n').map(l => l.replace(/(^|[^:\\])\/\/.*$|:\/\/(?=['"`\s]|$).*$/, (m, p) => (p || '') + (m.startsWith('://') ? ':' : ''))).join('\n');
+    .split('\n').map(l => l.replace(/\/\/.*$/, '')).join('\n');
 }
 
-test('scripts survive Google stripping comments (// at the end of a string, /* inside a string)', () => {
+test('scripts survive Google stripping comments (no // or /* anywhere but real comments)', () => {
   const page = livePage({ mode: 'EASD', email: 't@easdpa.org', allowed: true });
   [...page.matchAll(/<script[^>]*>([\s\S]*?)<\/script>/g)].forEach((m, i) => {
     try { new vm.Script(crudeStrip(m[1]), { filename: 'script' + i }); }
