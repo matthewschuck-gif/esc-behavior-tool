@@ -147,6 +147,54 @@ test('saved plans follow the teacher, carry the student 800# from a Climb-er lin
   assert.strictEqual(w.book.getSheetByName('Saved Plans').rows.length, 2, 'saving their own empty list leaves others alone');
 });
 
+test('plan check-ins: 2 and 4 weeks after a plan, answered by email link or in BIC; what works here adds up; the MTSS one-pager', () => {
+  const w = world();
+  const sent = [];
+  w.MailApp = { sendEmail: m => sent.push(m) };
+  w.HtmlService = { createHtmlOutput: h => ({ html: h, setTitle() { return this; }, setXFrameOptionsMode() { return this; } }), XFrameOptionsMode: { ALLOWALL: 1 } };
+  const ago = n => new Date(Date.now() - n * 86400000).toISOString();
+  w.bicSavePlans('', JSON.stringify([
+    { id: 'plan_a', savedAt: ago(20), status: 'active', summary: 'Needs connection', student: '8001234', bucket: 'Escape', strategies: ['Check-in/check-out', 'Choice board'], fullPlan: { try_first: [{ name: 'Check-in/check-out' }] } },
+    { id: 'plan_b', savedAt: ago(3), status: 'active', summary: 'New one', bucket: 'Escape', strategies: ['Choice board'] },
+    { id: 'plan_c', savedAt: ago(40), status: 'closed', summary: 'Done', bucket: 'Attention', strategies: ['Planned ignoring'] }]));
+  const checks = J(w.rowsOf_('Plan Checks'));
+  assert.deepStrictEqual(checks.map(c => c['Plan ID'] + c.Check).sort(), ['plan_a1', 'plan_a2', 'plan_b1', 'plan_b2'], 'two per active plan, none for a closed one');
+  w.bicSavePlans('', JSON.stringify([{ id: 'plan_a', savedAt: ago(20), status: 'active', bucket: 'Escape', strategies: ['Check-in/check-out', 'Choice board'], student: '8001234' }, { id: 'plan_b', savedAt: ago(3), status: 'active', bucket: 'Escape', strategies: ['Choice board'] }]));
+  assert.strictEqual(J(w.rowsOf_('Plan Checks')).length, 4, 'saving again adds none');
+  let mine = JSON.parse(w.bicMyChecks(''));
+  assert.deepStrictEqual(mine.due.map(c => [c.plan, c.check, c.student]), [['plan_a', 1, '234']], 'only the one that is due; the 800# shows as its last 3 digits');
+  // The 7 AM email: one tap.
+  assert.strictEqual(w.bicDailyChecks(), 1);
+  assert.strictEqual(w.bicDailyChecks(), 0, 'sent once');
+  assert.ok(/checkin=[a-z0-9-]+&r=better/.test(sent[0].htmlBody) && sent[0].to === 'teacher@easdpa.org' && !/Needs connection.*8001234/.test(sent[0].htmlBody));
+  const tokenA = sent[0].htmlBody.match(/checkin=([a-z0-9-]+)&r=better/)[1];
+  let page = w.checkinPage_({ parameter: { checkin: tokenA, r: 'better' } });
+  assert.ok(/Better/.test(page.html) && /how often did you use the plan/.test(page.html));
+  w.checkinPage_({ parameter: { checkin: tokenA, r: 'better', u: 'most' } });
+  assert.ok(/run out/.test(w.checkinPage_({ parameter: { checkin: 'nope' } }).html));
+  const a1 = J(w.rowsOf_('Plan Checks')).find(c => c['Plan ID'] === 'plan_a' && c.Check === 1);
+  assert.deepStrictEqual([a1.Result, a1.Used], ['Better', 'Most days']);
+  // What works here (and the tab Follow-Up / Climb-er read).
+  const works = JSON.parse(w.bicMyChecks('')).works;
+  assert.deepStrictEqual(works.Escape.map(o => [o.strategy, o.tried, o.worked]), [['Check-in/check-out', 1, 1], ['Choice board', 1, 1]]);
+  assert.deepStrictEqual(J(w.book.getSheetByName('Strategy Outcomes').rows[1]).slice(0, 5), ['Escape', 'Check-in/check-out', 1, 1, '100%']);
+  // Another teacher can't answer it.
+  w.setUser('other@easdpa.org');
+  assert.throws(() => w.bicAnswerCheck('', a1['Check ID'], 'worse'), /not yours/);
+  assert.ok(/not yours/.test(w.mtssPage_({ parameter: { plan: 'plan_a' } }).html));
+  w.setUser('teacher@easdpa.org');
+  // The MTSS one-pager: plan, check-ins, incidents before/after from the Follow-Up Sheet.
+  const ymd = n => new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+  const incident = { getName: () => 'Form Responses 1', getDataRange: () => ({ getValues: () => [['Timestamp', '800 Number (Student ID)'], [ymd(25), '8001234'], [ymd(22), '8001234'], [ymd(5), '8001234'], [ymd(5), '8009999']] }) };
+  w.SpreadsheetApp.openById = () => ({ getSheets: () => [incident] });
+  setSetting(w, 'INCIDENT_SHEET_ID', 'FOLLOWUP');
+  page = w.mtssPage_({ parameter: { plan: 'plan_a' } });
+  assert.ok(/MTSS one-pager/.test(page.html) && /Most days/.test(page.html) && /Check-in\/check-out/.test(page.html));
+  assert.ok(/<td class="n">2<\/td><td class="n">1<\/td>/.test(page.html), '2 incidents in the 4 weeks before, 1 since');
+  setSetting(w, 'CHECKINS', 'OFF');
+  assert.strictEqual(JSON.parse(w.bicMyChecks('')).on, false);
+});
+
 test('OPEN mode: passwords checked on the server and stored hashed; no plans saved centrally', () => {
   const w = world({ user: '' });
   setSetting(w, 'ACCESS', 'OPEN');

@@ -1,6 +1,13 @@
 <style>
 .bic-bar { position: fixed; right: 14px; bottom: 76px; z-index: 600; display: flex; gap: 8px; flex-direction: column; align-items: flex-end; }
 .bic-chip { background: #3b0764; color: #fff; border: none; border-radius: 999px; padding: 8px 14px; font: 600 12px/1.2 Geist, system-ui, sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,.25); cursor: pointer; }
+.bic-panel { position: fixed; right: 14px; bottom: 130px; z-index: 601; width: min(380px, calc(100vw - 28px)); max-height: 70vh; overflow: auto; background: #fff; color: #1f1235; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.3); padding: 14px 16px; font: 13.5px/1.45 Geist, system-ui, sans-serif; }
+.bic-panel h3 { margin: 0 0 6px; font-size: 15px; color: #3b0764; }
+.bic-panel .row { border-top: 1px solid #eee; padding: 8px 0; }
+.bic-panel button.t { border: 1.5px solid #3b0764; background: #fff; color: #3b0764; border-radius: 999px; padding: 5px 11px; margin: 4px 6px 0 0; font: 600 12px/1 Geist, system-ui, sans-serif; cursor: pointer; }
+.bic-panel button.t.on { background: #3b0764; color: #fff; }
+.bic-panel .muted { color: #6b6280; font-size: 12px; }
+.bic-panel a { color: #6d28d9; }
 .bic-student { background: #ede9fe; color: #3b0764; border: 1.5px solid #7c3aed; border-radius: 10px; padding: 8px 12px; font: 13px/1.4 Geist, system-ui, sans-serif; max-width: 280px; }
 </style>
 <script>
@@ -154,7 +161,60 @@
       };
       bar.appendChild(edit);
     }
+    if (BOOT.mode === 'EASD' && BOOT.allowed && BOOT.checkins) checkinsChip(bar);
     if (bar.innerHTML) document.body.appendChild(bar);
+  }
+
+  // ── Check-ins, what works here, MTSS one-pagers (Checks.gs) ──
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function checkinsChip(bar) {
+    var chip = document.createElement('button'), data = null, panel = null;
+    chip.className = 'bic-chip'; chip.textContent = '✅ Check-ins';
+    bar.appendChild(chip);
+    var load = function () {
+      return run('bicMyChecks', token).then(function (d) { data = d; chip.textContent = '✅ Check-ins' + (d && d.due && d.due.length ? ' (' + d.due.length + ')' : ''); return d; });
+    };
+    load().catch(function () {});
+    chip.onclick = function () {
+      if (panel) { panel.remove(); panel = null; return; }
+      panel = document.createElement('div'); panel.className = 'bic-panel'; panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-label', 'Plan check-ins');
+      panel.innerHTML = '<p class="muted">Loading…</p>';
+      document.body.appendChild(panel);
+      load().then(draw).catch(function (e) { panel.innerHTML = '<p>' + esc(e.message) + '</p>'; });
+    };
+    function draw() {
+      if (!panel || !data) return;
+      var due = data.due || [], works = data.works || {}, plans = [];
+      try { plans = JSON.parse(localStorage.getItem('bic_logs') || '[]'); } catch (e) { plans = []; }
+      var h = '<h3>Is the plan working?</h3>';
+      h += due.length ? due.map(function (c) {
+        return '<div class="row" data-ck="' + esc(c.id) + '"><b>Plan ' + (c.student ? 'for the student ending in ' + esc(c.student) : 'saved ' + esc(c.saved)) + '</b> · check ' + c.check +
+          '<div class="muted">' + esc(c.strategies || '') + '</div><div>' + [['better', 'Better'], ['same', 'Same'], ['worse', 'Worse']].map(function (b) { return '<button class="t" data-r="' + b[0] + '">' + b[1] + '</button>'; }).join('') + '</div>' +
+          '<div class="muted" style="margin-top:4px">How often did you use it?</div><div>' + [['every', 'Every day'], ['most', 'Most days'], ['little', 'Not much']].map(function (b) { return '<button class="t" data-u="' + b[0] + '">' + b[1] + '</button>'; }).join('') + '</div>' +
+          '<div><button class="t on" data-save>Save</button> <span class="muted" data-msg></span></div></div>';
+      }).join('') : '<p class="muted">No check-ins due right now. Each saved plan gets one 2 weeks and 4 weeks after you save it.</p>';
+      var buckets = Object.keys(works);
+      h += '<h3 style="margin-top:12px">What works here</h3>' + (buckets.length ? buckets.map(function (b) {
+        return '<div class="row"><b>' + esc(b) + '</b>' + works[b].slice(0, 4).map(function (o) { return '<div>' + esc(o.strategy) + ' <span class="muted">worked ' + o.worked + ' of ' + o.tried + ' time' + (o.tried === 1 ? '' : 's') + '</span></div>'; }).join('') + '</div>';
+      }).join('') : '<p class="muted">Once teachers answer check-ins, the strategies that worked in our building show here.</p>');
+      h += '<h3 style="margin-top:12px">MTSS one-pagers</h3>' + (plans.length ? plans.slice(0, 12).map(function (p) {
+        return '<div class="row"><a target="_blank" rel="noopener" href="' + esc(String(BOOT.link || '') + '/?page=mtss&plan=' + encodeURIComponent(p.id)) + '">' + esc((p.summary || 'Plan').slice(0, 70)) + '</a> <span class="muted">' + esc(String(p.savedAt || '').slice(0, 10)) + '</span></div>';
+      }).join('') : '<p class="muted">Save a plan to make its one-pager.</p>');
+      panel.innerHTML = h;
+      panel.querySelectorAll('[data-ck]').forEach(function (row) {
+        var pick = { r: '', u: '' };
+        row.querySelectorAll('[data-r],[data-u]').forEach(function (b) {
+          b.onclick = function () { var k = b.hasAttribute('data-r') ? 'r' : 'u'; pick[k] = b.getAttribute('data-' + k); row.querySelectorAll('[data-' + k + ']').forEach(function (x) { x.classList.toggle('on', x === b); }); };
+        });
+        row.querySelector('[data-save]').onclick = function () {
+          var m = row.querySelector('[data-msg]');
+          if (!pick.r) { m.textContent = 'Pick Better, Same or Worse.'; return; }
+          m.textContent = 'Saving…';
+          run('bicAnswerCheck', token, row.getAttribute('data-ck'), pick.r, pick.u).then(function () { m.textContent = 'Saved. Thank you!'; setTimeout(function () { load().then(draw); }, 700); })
+            .catch(function (e) { m.textContent = e.message; });
+        };
+      });
+    }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();

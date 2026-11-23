@@ -171,6 +171,7 @@ function bicSavePlans(token, plansJson) {
       range.setNumberFormat('@');
       range.setValues(rows);
     }
+    try { syncPlanChecks_(); } catch (e) { console.warn('Plan check-ins: ' + e.message); } // Checks.gs
     return JSON.stringify({ saved: true, count: rows.length });
   } finally {
     lock.releaseLock();

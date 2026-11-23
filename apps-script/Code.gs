@@ -33,10 +33,18 @@ const DEFAULT_SETTINGS_ = [
   ['IMAGE_FOLDER_ID', '', 'Drive folder for uploaded images. Blank = a "BIC Images" folder is made next to this Sheet the first time.'],
   ['OLD_SITE_URL', 'https://behaviorinterventioncenter.com', 'The Vercel site to copy content from (BIC › Copy content from the old site).'],
   ['APP_TITLE', 'Behavior Intervention Center', 'Browser tab title.'],
+  ['CHECKINS', 'ON', 'Plan check-ins (Checks.gs): every saved plan gets "Is it working?" checks CHECKIN_DAYS after it was saved. OFF = none.'],
+  ['CHECKIN_DAYS', '14, 28', 'Days after a plan is saved for each check-in.'],
+  ['CHECKIN_EMAIL', 'ON', 'Email each due check-in to the teacher with one-tap buttons (BIC › Set up plan check-ins makes the 7 AM job). OFF = they only wait in BIC.'],
+  ['BIC_LINK', 'https://behaviorinterventioncenter.com', 'The BIC address used in check-in emails and the MTSS one-pager link.'],
+  ['INCIDENT_SHEET_ID', '', 'The Follow-Up incident Sheet (link or ID), for incidents before and after a plan on the MTSS one-pager. Blank = that section says how to set it.'],
 ];
 
 // ── PAGE ────────────────────────────────────────────────────────────
 function doGet(e) {
+  // Check-in links from the email, and the MTSS one-pager (Checks.gs).
+  if (e && e.parameter && e.parameter.checkin) return checkinPage_(e);
+  if (e && e.parameter && e.parameter.page === 'mtss') return mtssPage_(e);
   const t = HtmlService.createTemplateFromFile('Index');
   const boot = bootInfo_();
   // ?id=800# (from Climb-er or Follow-Up): plans saved this visit are linked to that student.
@@ -61,7 +69,7 @@ function bootInfo_() {
   const mode = accessMode_();
   if (mode === 'OPEN') return { mode: mode, ai: aiOn_() };
   const me = currentEmail_();
-  return { mode: mode, email: me, allowed: emailAllowed_(me), admin: isAdminEmail_(me), ai: aiOn_() };
+  return { mode: mode, email: me, allowed: emailAllowed_(me), admin: isAdminEmail_(me), ai: aiOn_(), checkins: checksOn_(), link: bicLink_() };
 }
 
 // ── WHO IS THIS ─────────────────────────────────────────────────────
@@ -186,6 +194,7 @@ function onOpen() {
     .addItem('Run setup (tabs + Settings)', 'setup')
     .addItem('Save Claude API key…', 'menuSaveKey_')
     .addItem('Copy content from the old site', 'menuImport_')
+    .addItem('Set up plan check-ins (daily 7 AM email)', 'menuSetupChecks_')
     .addSeparator()
     .addItem('Set site password (OPEN mode)…', 'menuSitePw_')
     .addItem('Set admin password (OPEN mode)…', 'menuAdminPw_')
