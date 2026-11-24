@@ -1,6 +1,6 @@
 /**
- * Claude calls for coaching notes and plans. The key is in Script Properties
- * (ANTHROPIC_API_KEY, saved from the BIC menu), so it never reaches the page. Only signed-in
+ * AI calls for coaching notes and plans: Claude or Gemini, whichever the EMS AI switch has on
+ * (AiSwitch.gs). Keys are in Script Properties (saved from BIC › AI: Claude or Gemini), so it never reaches the page. Only signed-in
  * people can call it, up to AI_DAILY_LIMIT calls a day each; the model and answer length come
  * from Settings, not from the page. Every call adds a row to the AI Usage tab.
  */
@@ -10,8 +10,7 @@ const AI_USAGE_HEADERS_ = ['Date', 'Who', 'Model', 'Input Tokens', 'Output Token
 
 function aiChat_(who, body) {
   if (!aiOn_()) throw new Error('AI is turned off on the Settings tab.');
-  const key = PropertiesService.getScriptProperties().getProperty('ANTHROPIC_API_KEY');
-  if (!key) throw new Error('No Claude key yet: an admin saves it from the BIC menu.');
+  if (!emsAiHasKey_()) throw new Error('No ' + (emsAiProvider_() === 'GEMINI' ? 'Gemini' : 'Claude') + ' key yet: an admin saves it from BIC › AI: Claude or Gemini.');
   const messages = body.messages;
   if (!Array.isArray(messages) || !messages.length) throw new Error('Nothing to send.');
   if (JSON.stringify(messages).length > 80000) throw new Error('That request is too long.');
@@ -31,13 +30,13 @@ function aiChat_(who, body) {
   };
   const effort = String(getSetting_('AI_EFFORT') || '').trim().toLowerCase();
   if (effort) req.output_config = { effort: effort };
-  const res = UrlFetchApp.fetch('https://api.anthropic.com/v1/messages', {
+  const res = emsAiFetch_({
     method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-    headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    headers: { 'anthropic-version': '2023-06-01' },
     payload: JSON.stringify(req),
   });
   const data = JSON.parse(res.getContentText() || '{}');
-  if (res.getResponseCode() !== 200) throw new Error((data.error && data.error.message) || 'Claude returned ' + res.getResponseCode());
+  if (res.getResponseCode() !== 200) throw new Error((data.error && data.error.message) || 'The AI returned ' + res.getResponseCode());
   const u = data.usage || {};
   try {
     tab_(AI_USAGE_TAB_).appendRow([new Date(), who.email || who.role, data.model || req.model, u.input_tokens || 0, u.output_tokens || 0]);

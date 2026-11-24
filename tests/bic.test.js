@@ -55,6 +55,7 @@ function world(opts) {
     UrlFetchApp: {
       fetch(url, o) {
         fetched.push({ url, body: o && o.payload ? JSON.parse(o.payload) : null });
+        if (/generativelanguage/.test(url)) return { getResponseCode: () => 200, getContentText: () => JSON.stringify({ candidates: [{ content: { parts: [{ text: 'Gemini note' }] }, finishReason: 'STOP' }], usageMetadata: { promptTokenCount: 7, candidatesTokenCount: 9 } }) };
         if (/anthropic/.test(url)) return { getResponseCode: () => 200, getContentText: () => JSON.stringify(nextReply || { model: 'claude-sonnet-5-5', stop_reason: 'end_turn', usage: { input_tokens: 10, output_tokens: 20 }, content: [{ type: 'text', text: 'Coaching note' }] }) };
         if (/overrides-get\?key=strategy_overrides/.test(url)) return { getResponseCode: () => 200, getContentText: () => JSON.stringify({ overrides: { s1: { _imgUrl: 'https://abc.public.blob.vercel-storage.com/pic.png' }, _emotions: { e1: 'x' }, feedback_1: { rating: 5 } } }) };
         if (/overrides-get\?key=_emotions/.test(url)) return { getResponseCode: () => 200, getContentText: () => JSON.stringify({ overrides: { e0: 'old' } }) };
@@ -133,6 +134,19 @@ test('AI: key stays on the server, model and length come from Settings, daily ca
   assert.throws(() => api(w, 'POST', 'chat', {}, { messages: [{ role: 'user', content: 'hi' }] }), /today's AI limit/);
   setSetting(w, 'AI', 'OFF');
   assert.throws(() => api(w, 'POST', 'chat', {}, { messages: [{ role: 'user', content: 'hi' }] }), /turned off/);
+});
+
+test('AI switch: with Gemini on, the same chat goes to Gemini and comes back in the same shape', () => {
+  const w = world();
+  w.props.AI_PROVIDER_HERE = 'GEMINI';
+  assert.throws(() => api(w, 'POST', 'chat', {}, { messages: [{ role: 'user', content: 'hi' }] }), /No Gemini key/);
+  w.props.GEMINI_API_KEY = 'g-test';
+  const r = api(w, 'POST', 'chat', {}, { messages: [{ role: 'user', content: 'hi' }, { role: 'assistant', content: 'ok' }, { role: 'user', content: 'more' }] });
+  assert.strictEqual(r.content[0].text, 'Gemini note');
+  const g = w.fetched.find(f => /generativelanguage/.test(f.url));
+  assert.ok(g && g.body.contents.length === 3 && g.body.contents[1].role === 'model');
+  assert.ok(!w.fetched.some(f => /anthropic/.test(f.url)), 'nothing sent to Claude');
+  assert.deepStrictEqual(J(w.book.getSheetByName('AI Usage').rows[1].slice(3)), [7, 9]);
 });
 
 test('saved plans follow the teacher, carry the student 800# from a Climb-er link', () => {

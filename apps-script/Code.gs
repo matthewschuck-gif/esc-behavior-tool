@@ -192,7 +192,7 @@ function splitList_(v) {
 function onOpen() {
   SpreadsheetApp.getUi().createMenu('BIC')
     .addItem('Run setup (tabs + Settings)', 'setup')
-    .addItem('Save Claude API key…', 'menuSaveKey_')
+    .addSubMenu(emsAiMenu_(SpreadsheetApp.getUi()))
     .addItem('Copy content from the old site', 'menuImport_')
     .addItem('Set up plan check-ins (daily 7 AM email)', 'menuSetupChecks_')
     .addSeparator()
@@ -205,18 +205,9 @@ function onOpen() {
 function setup() {
   ensureSettings_();
   ensureStoreTabs_();
-  SpreadsheetApp.getUi().alert('BIC is set up: Settings, Content, Saved Plans and AI Usage tabs.\n\nNext: BIC › Save Claude API key…, then BIC › Copy content from the old site.');
+  SpreadsheetApp.getUi().alert('BIC is set up: Settings, Content, Saved Plans and AI Usage tabs.\n\nNext: BIC › AI: Claude or Gemini › Save the key, then BIC › Copy content from the old site.');
 }
 
-function menuSaveKey_() {
-  const ui = SpreadsheetApp.getUi();
-  const r = ui.prompt('Claude API key', 'Paste the key (starts with sk-ant-). It is saved in Script Properties, never in the Sheet or the page.', ui.ButtonSet.OK_CANCEL);
-  if (r.getSelectedButton() !== ui.Button.OK) return;
-  const key = r.getResponseText().trim();
-  if (!/^sk-ant-/.test(key)) { ui.alert('That doesn\'t look like a Claude key (it should start with sk-ant-).'); return; }
-  PropertiesService.getScriptProperties().setProperty('ANTHROPIC_API_KEY', key);
-  ui.alert('Key saved.');
-}
 
 function menuPw_(role, label) {
   const ui = SpreadsheetApp.getUi();
